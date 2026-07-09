@@ -1,0 +1,11 @@
+services:
+
+  - type: web
+    name: restaurant-backend
+    env: python
+    rootDir: backend
+
+  - type: web
+    name: restaurant-frontend
+    env: node
+    rootDir: frontend
