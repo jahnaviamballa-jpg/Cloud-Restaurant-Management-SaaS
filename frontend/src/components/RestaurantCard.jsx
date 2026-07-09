@@ -1,53 +1,37 @@
-import { FaStar, FaMapMarkerAlt } from "react-icons/fa";
-
 function RestaurantCard({ restaurant }) {
   return (
     <div
       style={{
-        width: "300px",
+        width: "280px",
         border: "1px solid #ddd",
-        borderRadius: "12px",
-        overflow: "hidden",
-        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+        borderRadius: "10px",
+        padding: "15px",
         background: "#fff",
       }}
     >
       <img
-        src={restaurant.image}
-        alt={restaurant.name}
+        src={
+          restaurant.logo_url ||
+          "https://via.placeholder.com/280x180"
+        }
+        alt={restaurant.restaurant_name}
         style={{
           width: "100%",
           height: "180px",
           objectFit: "cover",
+          borderRadius: "8px",
         }}
       />
 
-      <div style={{ padding: "15px" }}>
-        <h2>{restaurant.name}</h2>
+      <h3>{restaurant.restaurant_name}</h3>
 
-        <p>
-          <FaMapMarkerAlt color="red" /> {restaurant.location}
-        </p>
+      <p>{restaurant.address}</p>
 
-        <p>
-          <FaStar color="gold" /> {restaurant.rating}
-        </p>
+      <p>
+        {restaurant.city}, {restaurant.state}
+      </p>
 
-        <button
-          style={{
-            width: "100%",
-            padding: "10px",
-            background: "#ff6b00",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontSize: "16px",
-          }}
-        >
-          View Menu
-        </button>
-      </div>
+      <button>View Menu</button>
     </div>
   );
 }

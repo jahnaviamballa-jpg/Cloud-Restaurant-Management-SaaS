@@ -1,47 +1,50 @@
+import { useEffect, useState } from "react";
+import { getRestaurants } from "../api/restaurantApi";
 import RestaurantCard from "../components/RestaurantCard";
 
-const restaurants = [
-  {
-    id: 1,
-    name: "Paradise Restaurant",
-    location: "Hyderabad",
-    rating: 4.7,
-    image: "https://picsum.photos/300/200?random=1",
-  },
-  {
-    id: 2,
-    name: "Meghana Foods",
-    location: "Bengaluru",
-    rating: 4.8,
-    image: "https://picsum.photos/300/200?random=2",
-  },
-  {
-    id: 3,
-    name: "Bawarchi",
-    location: "Hyderabad",
-    rating: 4.6,
-    image: "https://picsum.photos/300/200?random=3",
-  },
-];
-
 function RestaurantList() {
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        const data = await getRestaurants();
+        setRestaurants(data);
+      } catch (err) {
+        console.error(err);
+        setError("Unable to load restaurants. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRestaurants();
+  }, []);
+
+  if (loading) {
+    return <h2>Loading Restaurants...</h2>;
+  }
+
+  if (error) {
+    return <h2>{error}</h2>;
+  }
+
   return (
-    <div style={{ padding: "30px" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
-        Restaurants
-      </h1>
+    <div style={{ padding: "20px" }}>
+      <h1>Restaurants</h1>
 
       <div
         style={{
           display: "flex",
-          justifyContent: "center",
-          gap: "25px",
           flexWrap: "wrap",
+          gap: "20px",
         }}
       >
         {restaurants.map((restaurant) => (
           <RestaurantCard
-            key={restaurant.id}
+            key={restaurant.restaurant_id}
             restaurant={restaurant}
           />
         ))}
