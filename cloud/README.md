@@ -96,3 +96,20 @@ Responsible for:
 - Deployment Documentation
 - Cloud Architecture
 - Monitoring & Security Planning
+## Running with Docker
+
+### 1. Install Docker Desktop
+
+Download Docker Desktop and ensure it is running.
+
+### 2. Run Docker Compose
+
+docker compose -f cloud/docker/docker-compose.yml up
+
+### 3. Open Frontend
+
+http://localhost:5173
+
+### 4. Open Backend Swagger
+
+http://localhost:8000/docs

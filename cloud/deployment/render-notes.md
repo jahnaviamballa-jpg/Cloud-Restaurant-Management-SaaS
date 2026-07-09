@@ -1,4 +1,4 @@
-# Render Notes
+git restore cloud/deployment/render-notes.md# Render Notes
 
 ## What is Render?
 Render is a cloud platform used to deploy web applications easily.
