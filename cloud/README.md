@@ -103,9 +103,9 @@ Responsible for:
 Download Docker Desktop and ensure it is running.
 
 ### 2. Run Docker Compose
-
+----
 docker compose -f cloud/docker/docker-compose.yml up
-
+----
 ### 3. Open Frontend
 
 http://localhost:5173
