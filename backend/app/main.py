@@ -1,12 +1,22 @@
 from fastapi import FastAPI
+from app.database import engine, Base
 
-app = FastAPI(
-    title="Cloud Restaurant Management SaaS",
-    version="1.0.0"
-)
+# Import models so SQLAlchemy knows about them
+from app.models import restaurant
+
+app = FastAPI(title="Restaurant Management SaaS")
+
+# Create all tables
+Base.metadata.create_all(bind=engine)
 
 @app.get("/")
 def home():
     return {
-        "message": "Cloud Restaurant Management SaaS Backend Running Successfully"
+        "message": "Backend Running Successfully"
+    }
+
+@app.get("/health")
+def health():
+    return {
+        "status": "Database Connected"
     }
