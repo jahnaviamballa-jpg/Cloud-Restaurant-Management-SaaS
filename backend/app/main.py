@@ -4,6 +4,7 @@ from app.database import engine, Base
 # Import models
 from app.models import restaurant, user
 from app.routers.auth import router as auth_router
+from app.routers.restaurant import router as restaurant_router
 
 app = FastAPI(
     title="Restaurant Management SaaS",
@@ -14,6 +15,11 @@ app = FastAPI(
 Base.metadata.create_all(bind=engine)
 
 app.include_router(auth_router)
+app.include_router(
+    restaurant_router,
+    prefix="/restaurants",
+    tags=["Restaurant"],
+)
 
 @app.get("/")
 def home():
