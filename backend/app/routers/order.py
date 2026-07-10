@@ -6,6 +6,7 @@ from app.models.order import Order
 from app.models.order_item import OrderItem
 from app.models.restaurant import Restaurant
 from app.models.menu import Menu
+from app.models.inventory import Inventory
 
 from app.schemas.order_schema import (
     OrderCreate,
@@ -22,6 +23,7 @@ router = APIRouter()
 @router.post("/", response_model=OrderResponse, status_code=201)
 def place_order(order: OrderCreate, db: Session = Depends(get_db)):
 
+    # Check Restaurant
     restaurant = db.query(Restaurant).filter(
         Restaurant.restaurant_id == order.restaurant_id
     ).first()
@@ -34,6 +36,7 @@ def place_order(order: OrderCreate, db: Session = Depends(get_db)):
 
     total_amount = 0
 
+    # Create Order
     new_order = Order(
         restaurant_id=order.restaurant_id,
         customer_id=order.customer_id,
@@ -47,6 +50,9 @@ def place_order(order: OrderCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_order)
 
+    low_stock_items = []
+
+    # Process Each Menu Item
     for item in order.items:
 
         menu = db.query(Menu).filter(
@@ -78,10 +84,46 @@ def place_order(order: OrderCreate, db: Session = Depends(get_db)):
 
         db.add(order_item)
 
+        # -----------------------------
+        # Automatic Stock Deduction
+        # -----------------------------
+        inventory = db.query(Inventory).filter(
+            Inventory.restaurant_id == order.restaurant_id
+        ).first()
+
+        if inventory:
+
+            inventory.quantity -= 1
+
+            if inventory.quantity < 0:
+                inventory.quantity = 0
+
+            if inventory.quantity <= inventory.minimum_stock:
+                low_stock_items.append({
+                    "item": inventory.item_name,
+                    "remaining_quantity": inventory.quantity
+                })
+
+    # Update Total Amount
     new_order.total_amount = total_amount
 
     db.commit()
     db.refresh(new_order)
+
+    # Return Low Stock Alert (Optional)
+    if low_stock_items:
+        return {
+            "id": new_order.id,
+            "restaurant_id": new_order.restaurant_id,
+            "customer_id": new_order.customer_id,
+            "total_amount": new_order.total_amount,
+            "order_status": new_order.order_status,
+            "payment_status": new_order.payment_status,
+            "payment_method": new_order.payment_method,
+            "created_at": new_order.created_at,
+            "updated_at": new_order.updated_at,
+            "low_stock_alert": low_stock_items
+        }
 
     return new_order
 

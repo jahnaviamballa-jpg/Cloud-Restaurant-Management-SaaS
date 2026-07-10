@@ -6,7 +6,9 @@ from app.models import restaurant, user
 from app.models.menu import Menu
 from app.models.order import Order
 from app.models.order_item import OrderItem
+from app.models.inventory import Inventory
 from app.routers.order import router as order_router
+from app.routers.inventory import router as inventory_router
 
 from app.routers.auth import router as auth_router
 from app.routers.restaurant import router as restaurant_router
@@ -34,6 +36,11 @@ app.include_router(
     order_router,
     prefix="/orders",
     tags=["Orders"]
+)
+app.include_router(
+    inventory_router,
+    prefix="/inventory",
+    tags=["Inventory"]
 )
 
 @app.get("/")

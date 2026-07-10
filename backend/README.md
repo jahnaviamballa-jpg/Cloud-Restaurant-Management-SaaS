@@ -33,3 +33,20 @@ Update restaurant details.
 
 ### DELETE /restaurants/{id}
 Delete a restaurant.
+
+## Order APIs
+
+POST /orders
+Place a new order.
+
+GET /orders
+Retrieve all orders.
+
+GET /orders/{order_id}
+Retrieve an order by ID.
+
+PUT /orders/{order_id}/status
+Update the status of an order.
+
+DELETE /orders/{order_id}
+Delete an order.
