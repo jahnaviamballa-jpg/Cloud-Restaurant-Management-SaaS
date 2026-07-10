@@ -3,8 +3,10 @@ from app.database import engine, Base
 
 # Import models
 from app.models import restaurant, user
+from app.models.menu import Menu
 from app.routers.auth import router as auth_router
 from app.routers.restaurant import router as restaurant_router
+from app.routers.menu import router as menu_router
 
 app = FastAPI(
     title="Restaurant Management SaaS",
@@ -19,6 +21,10 @@ app.include_router(
     restaurant_router,
     prefix="/restaurants",
     tags=["Restaurant"],
+)
+app.include_router(
+    menu_router,
+    tags=["Menu"]
 )
 
 @app.get("/")
