@@ -129,3 +129,69 @@ Returns:
 - Low Stock Count
 - Critical Stock Count
 - Average Days Remaining
+
+# Backend Features
+
+## Authentication APIs
+- Register
+- Login
+
+## Restaurant APIs
+- Create Restaurant
+- Get Restaurants
+- Update Restaurant
+- Delete Restaurant
+
+## Menu APIs
+- Add Menu Item
+- Get Menu
+- Update Menu
+- Delete Menu
+
+## Order APIs
+- Place Order
+- Get Orders
+- Update Order Status
+- Delete Order
+
+## Inventory APIs
+- Add Inventory
+- Update Inventory
+- Delete Inventory
+- Automatic Stock Deduction
+- Low Stock Alerts
+
+## AI Prediction APIs
+- GET /predictions
+- GET /predictions/{id}
+- GET /analytics/inventory (Prediction Analytics)
+
+## Analytics APIs
+- GET /analytics/sales
+- GET /analytics/revenue
+- GET /analytics/top-items
+- GET /analytics/orders
+- GET /analytics/inventory
+
+## Reports APIs
+- GET /reports/sales
+- GET /reports/inventory
+- GET /reports/orders
+
+## Notification APIs
+- GET /notifications
+- GET /notifications/low-stock
+
+## Installation
+
+1. Clone the repository
+2. Create a virtual environment
+3. Install requirements
+4. Configure `.env`
+5. Run:
+   uvicorn app.main:app --reload
+
+## Environment Variables
+
+DATABASE_URL=<your_database_url>
+SECRET_KEY=<your_secret_key>

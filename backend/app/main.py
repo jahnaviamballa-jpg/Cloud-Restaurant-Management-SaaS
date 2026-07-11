@@ -14,6 +14,8 @@ from app.routers.auth import router as auth_router
 from app.routers.restaurant import router as restaurant_router
 from app.routers.menu import router as menu_router
 from app.routers.analytics import router as analytics_router
+from app.routers.reports import router as reports_router
+from app.routers.notifications import router as notifications_router
 
 app = FastAPI(
     title="Restaurant Management SaaS",
@@ -52,6 +54,17 @@ app.include_router(
     analytics_router,
     prefix="/analytics",
     tags=["Analytics"]
+)
+app.include_router(
+    reports_router,
+    prefix="/reports",
+    tags=["Reports"]
+)
+
+app.include_router(
+    notifications_router,
+    prefix="/notifications",
+    tags=["Notifications"]
 )
 
 @app.get("/")
