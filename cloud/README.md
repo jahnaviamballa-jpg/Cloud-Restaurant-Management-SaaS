@@ -113,3 +113,27 @@ http://localhost:5173
 ### 4. Open Backend Swagger
 
 http://localhost:8000/docs
+
+---
+
+## Backend Deployment
+
+### Platform
+
+Render
+
+### Live API
+
+https://your-backend.onrender.com
+
+### Swagger
+
+https://your-backend.onrender.com/docs
+
+### Deployment Steps
+
+1. Create Render account.
+2. Connect GitHub repository.
+3. Configure backend.
+4. Add environment variables.
+5. Deploy the application.
