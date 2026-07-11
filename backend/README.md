@@ -94,3 +94,38 @@ Days Remaining < 10
 
 Days Remaining ≥ 10
 → Stock Sufficient
+
+## Analytics APIs
+
+### GET /analytics/sales
+Returns:
+- Today Orders
+- Weekly Orders
+- Monthly Orders
+
+### GET /analytics/revenue
+Returns:
+- Today Revenue
+- Weekly Revenue
+- Monthly Revenue
+
+### GET /analytics/top-items
+Returns:
+- Top Selling Menu Items
+- Number of Orders
+- Revenue Generated
+
+### GET /analytics/orders
+Returns:
+- Pending Orders
+- Preparing Orders
+- Ready Orders
+- Served Orders
+- Cancelled Orders
+
+### GET /analytics/inventory
+Returns:
+- Total Inventory Items
+- Low Stock Count
+- Critical Stock Count
+- Average Days Remaining

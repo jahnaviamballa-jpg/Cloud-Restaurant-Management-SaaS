@@ -13,6 +13,7 @@ from app.routers.prediction import router as prediction_router
 from app.routers.auth import router as auth_router
 from app.routers.restaurant import router as restaurant_router
 from app.routers.menu import router as menu_router
+from app.routers.analytics import router as analytics_router
 
 app = FastAPI(
     title="Restaurant Management SaaS",
@@ -46,6 +47,11 @@ app.include_router(
     prediction_router,
     prefix="/predictions",
     tags=["AI Prediction"]
+)
+app.include_router(
+    analytics_router,
+    prefix="/analytics",
+    tags=["Analytics"]
 )
 
 @app.get("/")
