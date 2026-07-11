@@ -50,3 +50,47 @@ Update the status of an order.
 
 DELETE /orders/{order_id}
 Delete an order.
+
+## AI Inventory Prediction APIs
+
+### Get All Predictions
+GET /predictions
+
+Returns inventory prediction for all items.
+
+---
+
+### Get Prediction by Item
+GET /predictions/{inventory_id}
+
+Returns prediction details for a single inventory item.
+
+---
+
+### Inventory Analytics
+GET /predictions/analytics/inventory
+
+Returns:
+- Total inventory items
+- Low stock items
+- Critical stock items
+- Average days remaining
+
+---
+
+## Prediction Formula
+
+Days Remaining = Current Stock / Average Daily Usage
+
+---
+
+## Reorder Recommendation Logic
+
+Days Remaining < 5
+→ Reorder Immediately (50 units)
+
+Days Remaining < 10
+→ Plan Reorder (20 units)
+
+Days Remaining ≥ 10
+→ Stock Sufficient
