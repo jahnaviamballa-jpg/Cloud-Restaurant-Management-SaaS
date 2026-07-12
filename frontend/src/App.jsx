@@ -1,4 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ManagerDashboard from "./pages/ManagerDashboard";
+import Inventory from "./pages/Inventory";
+import AddInventory from "./pages/AddInventory";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -26,6 +29,9 @@ function App() {
         <Route path="/orders" element={<Orders />} />
         <Route path="/reservations" element={<Reservations />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/manager-dashboard" element={<ManagerDashboard />} />
+<Route path="/inventory" element={<Inventory />} />
+<Route path="/add-inventory" element={<AddInventory />} />
       </Routes>
     </BrowserRouter>
   );
