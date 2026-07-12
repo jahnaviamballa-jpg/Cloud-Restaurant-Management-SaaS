@@ -1,14 +1,24 @@
-import { FaStar } from "react-icons/fa";
+import { useState } from "react";
 
 function FoodCard({ food }) {
+  const [hover, setHover] = useState(false);
+
   return (
     <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
       style={{
-        width: "280px",
+        width: "300px",
+        maxWidth: "100%",
         background: "#fff",
         borderRadius: "12px",
         overflow: "hidden",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+        boxShadow: hover
+          ? "0 8px 20px rgba(0,0,0,0.2)"
+          : "0 4px 10px rgba(0,0,0,0.1)",
+        transform: hover ? "translateY(-8px)" : "translateY(0)",
+        transition: "0.3s",
+        cursor: "pointer",
       }}
     >
       <img
@@ -24,42 +34,32 @@ function FoodCard({ food }) {
       <div style={{ padding: "15px" }}>
         <h3>{food.name}</h3>
 
-        <p style={{ color: "#666" }}>{food.description}</p>
+        <p>{food.description}</p>
 
-        <p>
-          <strong>₹{food.price}</strong>
-        </p>
+        <h4>₹{food.price}</h4>
 
-        <p>
-          <FaStar color="gold" /> {food.rating}
-        </p>
+        <p>⭐ {food.rating}</p>
 
         <span
           style={{
-            display: "inline-block",
-            padding: "5px 10px",
-            borderRadius: "20px",
-            background: food.isVeg ? "green" : "red",
-            color: "#fff",
-            fontSize: "12px",
-            marginBottom: "10px",
+            color: food.isVeg ? "green" : "red",
+            fontWeight: "bold",
           }}
         >
-          {food.isVeg ? "Veg" : "Non-Veg"}
+          {food.isVeg ? "🟢 Veg" : "🔴 Non-Veg"}
         </span>
-
-        <br />
 
         <button
           style={{
             width: "100%",
+            marginTop: "15px",
             padding: "10px",
-            background: "#ff6b00",
-            color: "#fff",
+            background: "#ff5722",
+            color: "white",
             border: "none",
             borderRadius: "8px",
             cursor: "pointer",
-            marginTop: "10px",
+            fontWeight: "bold",
           }}
         >
           Add to Cart
