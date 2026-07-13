@@ -125,3 +125,24 @@ Member 1 - Backend
 Member 2 - Frontend
 
 Member 3 - Cloud & DevOps
+## Project Overview
+
+## Features
+
+## Technology Stack
+
+## Installation
+
+## Deployment
+
+## API Documentation
+
+## Team Members
+
+## Folder Structure
+
+## Screenshots
+
+## Future Scope
+
+## License
