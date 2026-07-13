@@ -6,11 +6,11 @@ Cloud Restaurant Management SaaS
 
 ## Frontend URL
 
-https://your-frontend.onrender.com
+https://cloud-restaurant-management-saas.onrender.com
 
 ## Backend URL
 
-https://your-backend.onrender.com
+https://restaurant-backend-wcoz.onrender.com
 
 ## Deployment Platform
 
