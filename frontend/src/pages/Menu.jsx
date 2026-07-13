@@ -1,17 +1,40 @@
-import { useState } from "react";
-import foods from "../data/foods";
+import { useState, useEffect } from "react";
+import { getMenuByRestaurant } from "../api/menuApi";
 import FoodCard from "../components/FoodCard";
 import SearchBar from "../components/SearchBar";
 import CategoryFilter from "../components/CategoryFilter";
 
 function Menu() {
+  const [foods, setFoods] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        setLoading(true);
+
+        // Restaurant ID = 1 (change later if needed)
+        const data = await getMenuByRestaurant(1);
+
+        setFoods(data);
+      } catch (err) {
+        console.error(err);
+        setError("Unable to load menu. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMenu();
+  }, []);
 
   const filteredFoods = foods.filter((food) => {
-    const matchesSearch = food.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      food.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      food.category.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesCategory =
       selectedCategory === "All" ||
@@ -19,6 +42,36 @@ function Menu() {
 
     return matchesSearch && matchesCategory;
   });
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: "80px",
+          fontSize: "24px",
+          fontWeight: "bold",
+        }}
+      >
+        Loading Menu...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        style={{
+          color: "red",
+          textAlign: "center",
+          marginTop: "80px",
+          fontSize: "20px",
+        }}
+      >
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: "30px", background: "#f5f5f5" }}>
@@ -42,9 +95,7 @@ function Menu() {
           }}
         />
 
-        <h1>🍽️ Paradise Restaurant</h1>
-        <p>⭐ 4.7</p>
-        <p>📍 Hyderabad</p>
+        <h1>🍽️ Restaurant Menu</h1>
       </div>
 
       <SearchBar

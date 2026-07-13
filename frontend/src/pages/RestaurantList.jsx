@@ -3,6 +3,7 @@ import { getRestaurants } from "../api/restaurantApi";
 import RestaurantCard from "../components/RestaurantCard";
 
 function RestaurantList() {
+  console.log("RestaurantList Loaded");
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
