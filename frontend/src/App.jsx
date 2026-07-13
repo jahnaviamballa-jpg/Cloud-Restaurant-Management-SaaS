@@ -1,11 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-<<<<<<< HEAD
-import ManagerDashboard from "./pages/ManagerDashboard";
-import Inventory from "./pages/Inventory";
-import AddInventory from "./pages/AddInventory";
-=======
 
->>>>>>> 0527d18 (feat: build AI inventory prediction dashboard UI)
 import Navbar from "./components/Navbar";
 
 import Home from "./pages/Home";
@@ -19,8 +13,16 @@ import Orders from "./pages/Orders";
 import Reservations from "./pages/Reservations";
 import Profile from "./pages/Profile";
 
+import ManagerDashboard from "./pages/ManagerDashboard";
+import Inventory from "./pages/Inventory";
+import AddInventory from "./pages/AddInventory";
+
 import PredictionDashboard from "./pages/PredictionDashboard";
 import PredictionDetails from "./pages/PredictionDetails";
+
+import AnalyticsDashboard from "./pages/AnalyticsDashboard";
+import SalesReport from "./pages/SalesReport";
+import RevenueReport from "./pages/RevenueReport";
 
 function App() {
   return (
@@ -38,6 +40,7 @@ function App() {
         <Route path="/orders" element={<Orders />} />
         <Route path="/reservations" element={<Reservations />} />
         <Route path="/profile" element={<Profile />} />
+
         <Route
           path="/manager-dashboard"
           element={<ManagerDashboard />}
@@ -61,6 +64,21 @@ function App() {
         <Route
           path="/predictions/:id"
           element={<PredictionDetails />}
+        />
+
+        <Route
+          path="/analytics-dashboard"
+          element={<AnalyticsDashboard />}
+        />
+
+        <Route
+          path="/sales-report"
+          element={<SalesReport />}
+        />
+
+        <Route
+          path="/revenue-report"
+          element={<RevenueReport />}
         />
       </Routes>
     </BrowserRouter>
