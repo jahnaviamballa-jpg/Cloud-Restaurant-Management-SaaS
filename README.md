@@ -81,3 +81,47 @@ https://restaurant-backend-wcoz.onrender.com
 - Notifications
 - Analytics
 - AI Recommendations
+
+# Project Architecture
+
+React → FastAPI → PostgreSQL → Cloud
+
+# Cloud Deployment
+
+Deployed using Render.
+
+# Technology Stack
+
+- React
+- FastAPI
+- PostgreSQL
+- Docker
+- Render
+- GitHub Actions
+
+# API Documentation
+
+Swagger:
+https://your-backend.onrender.com/docs
+
+# Deployment URLs
+
+Frontend:
+https://your-frontend.onrender.com
+
+Backend:
+https://your-backend.onrender.com
+
+# Future Scope
+
+- AI recommendations
+- Advanced analytics
+- Notifications
+
+# Contributors
+
+Member 1 - Backend
+
+Member 2 - Frontend
+
+Member 3 - Cloud & DevOps
