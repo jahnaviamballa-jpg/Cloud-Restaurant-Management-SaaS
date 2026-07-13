@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Navbar from "./components/Navbar";
 
@@ -24,10 +26,56 @@ import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import SalesReport from "./pages/SalesReport";
 import RevenueReport from "./pages/RevenueReport";
 
-function App() {
+import NotFound from "./pages/NotFound";
+import ServerError from "./pages/ServerError";
+
+function AppContent() {
+  const location = useLocation();
+
+  const validPaths = [
+    "/",
+    "/login",
+    "/register",
+    "/restaurants",
+    "/dashboard",
+    "/menu",
+    "/cart",
+    "/orders",
+    "/reservations",
+    "/profile",
+    "/manager-dashboard",
+    "/inventory",
+    "/add-inventory",
+    "/predictions",
+    "/analytics-dashboard",
+    "/sales-report",
+    "/revenue-report",
+    "/server-error",
+  ];
+
+  const isPredictionDetails =
+    location.pathname.startsWith("/predictions/");
+
+  const isValidPath =
+    validPaths.includes(location.pathname) || isPredictionDetails;
+
+  const hideNavbar =
+    !isValidPath || location.pathname === "/server-error";
+
   return (
-    <BrowserRouter>
-      <Navbar />
+    <>
+      {!hideNavbar && <Navbar />}
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -46,10 +94,7 @@ function App() {
           element={<ManagerDashboard />}
         />
 
-        <Route
-          path="/inventory"
-          element={<Inventory />}
-        />
+        <Route path="/inventory" element={<Inventory />} />
 
         <Route
           path="/add-inventory"
@@ -71,16 +116,28 @@ function App() {
           element={<AnalyticsDashboard />}
         />
 
-        <Route
-          path="/sales-report"
-          element={<SalesReport />}
-        />
+        <Route path="/sales-report" element={<SalesReport />} />
 
         <Route
           path="/revenue-report"
           element={<RevenueReport />}
         />
+
+        <Route
+          path="/server-error"
+          element={<ServerError />}
+        />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }
