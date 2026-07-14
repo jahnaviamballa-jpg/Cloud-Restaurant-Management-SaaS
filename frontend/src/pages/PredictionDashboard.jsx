@@ -1,99 +1,259 @@
+import { useState, useEffect } from "react";
+
 import PredictionCard from "../components/PredictionCard";
 import PredictionTable from "../components/PredictionTable";
 import PredictionChart from "../components/PredictionChart";
 import SuggestionCard from "../components/SuggestionCard";
 
+import {
+  getPredictions,
+  getInventoryAnalytics,
+} from "../api/predictionApi";
+
+
 function PredictionDashboard() {
-  const predictions = [
-    {
-      id: 1,
-      item: "Rice",
-      currentStock: "120 Kg",
-      predictedUsage: "15 Kg/day",
-      daysRemaining: "8 Days",
-      recommendedOrder: "Order 80 Kg",
-      status: "🟡 Medium",
-    },
-    {
-      id: 2,
-      item: "Chicken",
-      currentStock: "12 Kg",
-      predictedUsage: "10 Kg/day",
-      daysRemaining: "1 Day",
-      recommendedOrder: "Order 40 Kg",
-      status: "🔴 Critical",
-    },
-  ];
+
+  const [predictions, setPredictions] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+
+    const fetchPredictionData = async () => {
+
+      try {
+
+        const predictionResponse = await getPredictions();
+        const analyticsResponse = await getInventoryAnalytics();
+
+
+        console.log(
+          "Prediction Response:",
+          predictionResponse
+        );
+
+        console.log(
+          "Inventory Analytics:",
+          analyticsResponse
+        );
+
+
+        setPredictions(
+          Array.isArray(predictionResponse)
+            ? predictionResponse
+            : []
+        );
+
+
+        setAnalytics(analyticsResponse);
+
+
+      } catch (error) {
+
+        console.error(
+          "Prediction Fetch Error:",
+          error
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+
+    fetchPredictionData();
+
+  }, []);
+
+
+
+  if (loading) {
+
+    return (
+      <h2
+        style={{
+          textAlign:"center",
+          marginTop:"100px"
+        }}
+      >
+        Loading AI Predictions...
+      </h2>
+    );
+
+  }
+
+
 
   return (
+
     <div
       style={{
-        padding: "30px",
-        background: "#f5f5f5",
-        minHeight: "100vh",
+        padding:"30px",
+        background:"#f5f5f5",
+        minHeight:"100vh"
       }}
     >
-      <h1>🤖 AI Inventory Prediction Dashboard</h1>
+
+
+      <h1>
+        🤖 AI Inventory Prediction Dashboard
+      </h1>
+
+
+
+      {/* Summary Cards */}
 
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: "20px",
-          marginTop: "25px",
+          display:"grid",
+          gridTemplateColumns:
+          "repeat(auto-fit,minmax(200px,1fr))",
+          gap:"20px",
+          marginTop:"25px"
         }}
       >
+
+
         <PredictionCard
           icon="📦"
           title="Total Inventory Items"
-          value="25"
+          value={
+            analytics?.total_items || 0
+          }
         />
+
 
         <PredictionCard
           icon="⚠️"
           title="Low Stock Items"
-          value="5"
+          value={
+            analytics?.low_stock || 0
+          }
         />
+
 
         <PredictionCard
           icon="🤖"
           title="AI Predictions"
-          value="12"
+          value={
+            predictions.length
+          }
         />
+
 
         <PredictionCard
           icon="📈"
-          title="Weekly Consumption"
-          value="320 Kg"
+          title="Critical Stock"
+          value={
+            analytics?.critical_stock || 0
+          }
         />
+
+
       </div>
 
-      <div style={{ marginTop: "30px" }}>
-        <PredictionTable predictions={predictions} />
-      </div>
 
-      <PredictionChart />
+
+
+      {/* Prediction Table */}
 
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "20px",
-          marginTop: "30px",
+          marginTop:"30px"
         }}
       >
-        <SuggestionCard
-          message="Chicken stock will run out in 2 days."
-          recommendation="Recommended reorder: 50 Kg"
+
+        <PredictionTable
+          predictions={predictions.map((item)=>({
+
+            id:item.inventory_id,
+
+            item:item.item_name,
+
+            currentStock:
+              `${item.current_stock}`,
+
+            predictedUsage:
+              `${item.daily_usage}/day`,
+
+            daysRemaining:
+              `${item.days_remaining} Days`,
+
+            recommendedOrder:
+              item.recommendation,
+
+            status:
+              item.recommendation ===
+              "Reorder Immediately"
+              ? "🔴 Critical"
+              : "🟡 Medium"
+
+          }))}
         />
 
-        <SuggestionCard
-          message="Rice demand expected to increase this weekend."
-          recommendation="Increase stock by 20%."
-        />
+
       </div>
+
+
+
+      <PredictionChart />
+
+
+
+
+      {/* Suggestions */}
+
+      <div
+        style={{
+          display:"grid",
+          gridTemplateColumns:
+          "repeat(auto-fit,minmax(280px,1fr))",
+          gap:"20px",
+          marginTop:"30px"
+        }}
+      >
+
+
+        {
+          predictions
+          .filter(
+            item =>
+            item.recommendation !==
+            "Stock Sufficient"
+          )
+          .map((item,index)=>(
+
+            <SuggestionCard
+
+              key={index}
+
+              message={
+                `${item.item_name} stock status: ${item.recommendation}`
+              }
+
+              recommendation={
+                `Recommended reorder quantity: ${item.reorder_quantity}`
+              }
+
+            />
+
+          ))
+        }
+
+
+      </div>
+
+
+
     </div>
+
   );
+
 }
+
 
 export default PredictionDashboard;
