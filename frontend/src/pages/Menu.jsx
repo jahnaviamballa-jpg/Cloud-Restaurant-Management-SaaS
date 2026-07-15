@@ -15,13 +15,26 @@ function Menu() {
     const fetchMenu = async () => {
       try {
         setLoading(true);
+        setError("");
 
-        // Restaurant ID = 1 (change later if needed)
         const data = await getMenuByRestaurant(1);
 
-        setFoods(data);
+        console.log("Menu API Response:", data);
+
+        const menuItems = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.menu)
+          ? data.menu
+          : Array.isArray(data?.items)
+          ? data.items
+          : Array.isArray(data?.data)
+          ? data.data
+          : [];
+
+        setFoods(menuItems);
       } catch (err) {
-        console.error(err);
+        console.error("Menu Error:", err);
+        setFoods([]);
         setError("Unable to load menu. Please try again later.");
       } finally {
         setLoading(false);
@@ -32,13 +45,16 @@ function Menu() {
   }, []);
 
   const filteredFoods = foods.filter((food) => {
+    const name = food?.name || "";
+    const category = food?.category || "";
+
     const matchesSearch =
-      food.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      food.category.toLowerCase().includes(searchTerm.toLowerCase());
+      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      category.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesCategory =
       selectedCategory === "All" ||
-      food.category === selectedCategory;
+      category === selectedCategory;
 
     return matchesSearch && matchesCategory;
   });

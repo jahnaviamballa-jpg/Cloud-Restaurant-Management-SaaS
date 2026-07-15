@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { getInventory, createInventory } from "../api/inventoryApi";
+import {
+  getInventory,
+  createInventory,
+} from "../api/inventoryApi";
 import InventoryTable from "../components/InventoryTable";
 import LowStockAlert from "../components/LowStockAlert";
 
@@ -18,28 +21,51 @@ function Inventory() {
     supplier_name: "",
   });
 
-  useEffect(() => {
-    const fetchInventory = async () => {
-      try {
-        const data = await getInventory();
-        setItems(data);
-      } catch (err) {
-        console.error(err);
-        setError("Unable to load inventory.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadInventory = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-    fetchInventory();
+      const data = await getInventory();
+
+      console.log("Inventory API Response:", data);
+
+      const inventoryItems = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.items)
+        ? data.items
+        : Array.isArray(data?.inventory)
+        ? data.inventory
+        : Array.isArray(data?.data)
+        ? data.data
+        : [];
+
+      setItems(inventoryItems);
+    } catch (err) {
+      console.error("Inventory Error:", err);
+      setItems([]);
+      setError("Unable to load inventory.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadInventory();
   }, []);
 
   const handleAddInventory = async () => {
     try {
-      await createInventory(newItem);
+      const inventoryData = {
+        ...newItem,
+        restaurant_id: Number(newItem.restaurant_id),
+        quantity: Number(newItem.quantity),
+        minimum_stock: Number(newItem.minimum_stock),
+      };
 
-      const data = await getInventory();
-      setItems(data);
+      await createInventory(inventoryData);
+
+      await loadInventory();
 
       setNewItem({
         restaurant_id: 1,
@@ -53,7 +79,7 @@ function Inventory() {
 
       alert("Inventory Added Successfully!");
     } catch (error) {
-      console.error(error);
+      console.error("Add Inventory Error:", error);
       alert("Failed to Add Inventory");
     }
   };
@@ -63,11 +89,16 @@ function Inventory() {
   }
 
   if (error) {
-    return <h2 style={{ color: "red" }}>{error}</h2>;
+    return (
+      <h2 style={{ color: "red", textAlign: "center" }}>
+        {error}
+      </h2>
+    );
   }
 
   const lowStock = items.find(
-    (item) => item.quantity <= item.minimum_stock
+    (item) =>
+      Number(item.quantity) <= Number(item.minimum_stock)
   );
 
   return (
@@ -80,7 +111,10 @@ function Inventory() {
           placeholder="Item Name"
           value={newItem.item_name}
           onChange={(e) =>
-            setNewItem({ ...newItem, item_name: e.target.value })
+            setNewItem({
+              ...newItem,
+              item_name: e.target.value,
+            })
           }
         />
 
@@ -89,7 +123,10 @@ function Inventory() {
           placeholder="Category"
           value={newItem.category}
           onChange={(e) =>
-            setNewItem({ ...newItem, category: e.target.value })
+            setNewItem({
+              ...newItem,
+              category: e.target.value,
+            })
           }
         />
 
@@ -98,7 +135,10 @@ function Inventory() {
           placeholder="Quantity"
           value={newItem.quantity}
           onChange={(e) =>
-            setNewItem({ ...newItem, quantity: e.target.value })
+            setNewItem({
+              ...newItem,
+              quantity: e.target.value,
+            })
           }
         />
 
@@ -107,7 +147,10 @@ function Inventory() {
           placeholder="Unit"
           value={newItem.unit}
           onChange={(e) =>
-            setNewItem({ ...newItem, unit: e.target.value })
+            setNewItem({
+              ...newItem,
+              unit: e.target.value,
+            })
           }
         />
 
