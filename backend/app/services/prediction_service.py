@@ -1,9 +1,16 @@
-def calculate_daily_usage():
+def calculate_daily_usage(item_name=None):
     """
-    Dummy average daily usage.
+    Returns average daily usage for prediction testing.
     Later this can be replaced with actual order history analysis.
     """
-    return 5
+
+    usage_data = {
+        "AI Test Chicken": 5,
+        "AI Test Rice": 10,
+        "AI Test Oil": 5,
+    }
+
+    return usage_data.get(item_name, 5)
 
 
 def predict_days_remaining(current_stock, daily_usage):
@@ -12,6 +19,9 @@ def predict_days_remaining(current_stock, daily_usage):
     """
 
     if daily_usage <= 0:
+        return 0
+
+    if current_stock < 0:
         return 0
 
     return round(current_stock / daily_usage, 2)
@@ -25,20 +35,19 @@ def suggest_reorder_quantity(days_remaining):
     if days_remaining < 5:
         return {
             "recommendation": "Reorder Immediately",
-            "quantity": 50
+            "quantity": 50,
         }
 
     elif days_remaining < 10:
         return {
             "recommendation": "Plan Reorder",
-            "quantity": 20
+            "quantity": 20,
         }
 
-    else:
-        return {
-            "recommendation": "Stock Sufficient",
-            "quantity": 0
-        }
+    return {
+        "recommendation": "Stock Sufficient",
+        "quantity": 0,
+    }
 
 
 def generate_inventory_summary(inventory_items):
@@ -53,12 +62,11 @@ def generate_inventory_summary(inventory_items):
     total_days = 0
 
     for item in inventory_items:
-
-        daily_usage = calculate_daily_usage()
+        daily_usage = calculate_daily_usage(item.item_name)
 
         days = predict_days_remaining(
             item.quantity,
-            daily_usage
+            daily_usage,
         )
 
         total_days += days
@@ -79,5 +87,5 @@ def generate_inventory_summary(inventory_items):
         "total_items": total_items,
         "low_stock": low_stock,
         "critical_stock": critical_stock,
-        "average_days_remaining": average_days
+        "average_days_remaining": average_days,
     }

@@ -25,8 +25,7 @@ def get_predictions(db: Session = Depends(get_db)):
 
     for item in inventory_items:
 
-        daily_usage = calculate_daily_usage()
-
+        daily_usage = calculate_daily_usage(item.item_name)
         days_remaining = predict_days_remaining(
             item.quantity,
             daily_usage
@@ -68,7 +67,7 @@ def get_prediction(
             detail="Inventory item not found"
         )
 
-    daily_usage = calculate_daily_usage()
+    daily_usage = calculate_daily_usage(item.item_name)
 
     days_remaining = predict_days_remaining(
         item.quantity,
