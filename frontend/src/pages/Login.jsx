@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FaEnvelope, FaLock, FaUtensils } from "react-icons/fa";
+import { login } from "../api/authApi";
 
 function Login() {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
 
     if (!email || !password) {
@@ -22,26 +23,48 @@ function Login() {
     setLoading(true);
 
     try {
-      setTimeout(() => {
-        localStorage.setItem("token", "demo-token");
+      const response = await login({
+        email,
+        password,
+      });
 
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            email,
-            restaurant,
-          })
-        );
+      localStorage.setItem("token", response.access_token);
 
-        toast.success("✅ Login Successful");
+      localStorage.setItem(
+        "user",
+        JSON.stringify(response.user)
+      );
 
-        setLoading(false);
+      toast.success("✅ Login Successful");
 
-        navigate("/manager-dashboard");
-      }, 1000);
+      const role = response.user.role.toLowerCase();
+
+      switch (role) {
+        case "owner":
+          navigate("/owner-dashboard");
+          break;
+
+        case "manager":
+          navigate("/manager-dashboard");
+          break;
+
+        case "chef":
+          navigate("/chef-dashboard");
+          break;
+
+        case "customer":
+          navigate("/dashboard");
+          break;
+
+        default:
+          navigate("/dashboard");
+      }
     } catch (error) {
+      toast.error(
+        error.response?.data?.detail || "Login Failed"
+      );
+    } finally {
       setLoading(false);
-      toast.error("❌ API Error. Please try again.");
     }
   };
 
@@ -52,7 +75,7 @@ function Login() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "var(--page-background, #f5f5f5)",
+        background: "#f5f5f5",
         padding: "20px",
       }}
     >
@@ -60,7 +83,7 @@ function Login() {
         style={{
           width: "100%",
           maxWidth: "380px",
-          background: "var(--card-background, #ffffff)",
+          background: "#fff",
           padding: "30px",
           borderRadius: "12px",
           boxShadow: "0 5px 15px rgba(0,0,0,0.15)",
@@ -74,12 +97,15 @@ function Login() {
           Login to continue
         </p>
 
-        <form onSubmit={handleLogin} style={{ marginTop: "20px" }}>
+        <form
+          onSubmit={handleLogin}
+          style={{ marginTop: "20px" }}
+        >
           <label>Select Restaurant</label>
 
           <select
             value={restaurant}
-            onChange={(event) => setRestaurant(event.target.value)}
+            onChange={(e) => setRestaurant(e.target.value)}
             style={{
               width: "100%",
               padding: "10px",
@@ -100,9 +126,9 @@ function Login() {
               alignItems: "center",
               border: "1px solid #ccc",
               padding: "10px",
+              borderRadius: "6px",
               marginTop: "5px",
               marginBottom: "15px",
-              borderRadius: "6px",
             }}
           >
             <FaEnvelope color="#666" />
@@ -111,13 +137,12 @@ function Login() {
               type="email"
               placeholder="Enter Email"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               style={{
                 border: "none",
                 outline: "none",
                 marginLeft: "10px",
                 width: "100%",
-                background: "transparent",
               }}
             />
           </div>
@@ -130,9 +155,9 @@ function Login() {
               alignItems: "center",
               border: "1px solid #ccc",
               padding: "10px",
+              borderRadius: "6px",
               marginTop: "5px",
               marginBottom: "20px",
-              borderRadius: "6px",
             }}
           >
             <FaLock color="#666" />
@@ -141,13 +166,12 @@ function Login() {
               type="password"
               placeholder="Enter Password"
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               style={{
                 border: "none",
                 outline: "none",
                 marginLeft: "10px",
                 width: "100%",
-                background: "transparent",
               }}
             />
           </div>
@@ -163,18 +187,24 @@ function Login() {
               border: "none",
               borderRadius: "6px",
               cursor: loading ? "not-allowed" : "pointer",
-              fontSize: "16px",
               fontWeight: "bold",
+              fontSize: "16px",
             }}
           >
             <FaUtensils style={{ marginRight: "8px" }} />
-
             {loading ? "Logging in..." : "Login"}
           </button>
 
-          <p style={{ textAlign: "center", marginTop: "20px" }}>
+          <p
+            style={{
+              textAlign: "center",
+              marginTop: "20px",
+            }}
+          >
             Don't have an account?{" "}
-            <Link to="/register">Create Account</Link>
+            <Link to="/register">
+              Create Account
+            </Link>
           </p>
         </form>
       </div>

@@ -60,7 +60,10 @@ function Home() {
           </button>
 
           <button
-            onClick={() => navigate("/register")}
+            onClick={() => {
+  console.log("Register button clicked");
+  navigate("/register");
+}}
             style={{
               padding: "12px 30px",
               fontSize: "18px",

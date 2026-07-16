@@ -93,6 +93,14 @@ def login(user: UserLogin):
     db.close()
 
     return {
-        "access_token": token,
-        "token_type": "bearer"
+    "access_token": token,
+    "token_type": "bearer",
+    "user": {
+        "id": db_user.id,
+        "name": db_user.name,
+        "email": db_user.email,
+        "role": db_user.role,
+        "restaurant_id": db_user.restaurant_id,
+        "phone": db_user.phone
     }
+}

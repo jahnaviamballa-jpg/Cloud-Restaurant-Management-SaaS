@@ -23,3 +23,9 @@ export const getOrderStatistics = async () => {
   const response = await api.get("/analytics/orders");
   return response.data;
 };
+
+// Get inventory analytics
+export const getInventoryAnalytics = async () => {
+  const response = await api.get("/analytics/inventory");
+  return response.data;
+};

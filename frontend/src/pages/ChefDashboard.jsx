@@ -1,33 +1,24 @@
 import { useEffect, useState } from "react";
 import DashboardCard from "../components/DashboardCard";
-import { getInventoryStats } from "../api/inventoryStatsApi";
 import { getOrderStats } from "../api/orderApi";
 
-function ManagerDashboard() {
-  const [inventory, setInventory] = useState({
-    total_items: 0,
-    low_stock: 0,
-    critical_stock: 0,
-  });
-
+function ChefDashboard() {
   const [orders, setOrders] = useState({
     pending: 0,
     preparing: 0,
     ready: 0,
     served: 0,
+    cancelled: 0,
   });
 
   useEffect(() => {
-    loadDashboard();
+    loadOrders();
   }, []);
 
-  const loadDashboard = async () => {
+  const loadOrders = async () => {
     try {
-      const inventoryData = await getInventoryStats();
-      const orderData = await getOrderStats();
-
-      setInventory(inventoryData);
-      setOrders(orderData);
+      const data = await getOrderStats();
+      setOrders(data);
     } catch (error) {
       console.error(error);
     }
@@ -35,36 +26,18 @@ function ManagerDashboard() {
 
   return (
     <div style={{ padding: "30px" }}>
-      <h1>👨‍💼 Manager Dashboard</h1>
+      <h1>👨‍🍳 Chef Dashboard</h1>
 
       <div
         style={{
           display: "flex",
-          flexWrap: "wrap",
           gap: "20px",
+          flexWrap: "wrap",
           marginTop: "30px",
         }}
       >
         <DashboardCard
-          title="Inventory Items"
-          value={inventory.total_items}
-          icon="📦"
-        />
-
-        <DashboardCard
-          title="Low Stock"
-          value={inventory.low_stock}
-          icon="⚠️"
-        />
-
-        <DashboardCard
-          title="Critical Stock"
-          value={inventory.critical_stock}
-          icon="🚨"
-        />
-
-        <DashboardCard
-          title="Pending Orders"
+          title="Pending"
           value={orders.pending}
           icon="🛒"
         />
@@ -72,7 +45,7 @@ function ManagerDashboard() {
         <DashboardCard
           title="Preparing"
           value={orders.preparing}
-          icon="👨‍🍳"
+          icon="🔥"
         />
 
         <DashboardCard
@@ -86,9 +59,15 @@ function ManagerDashboard() {
           value={orders.served}
           icon="🍽️"
         />
+
+        <DashboardCard
+          title="Cancelled"
+          value={orders.cancelled}
+          icon="❌"
+        />
       </div>
     </div>
   );
 }
 
-export default ManagerDashboard;
+export default ChefDashboard;

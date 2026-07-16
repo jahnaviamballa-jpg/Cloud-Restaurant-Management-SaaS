@@ -3,19 +3,27 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
 import RestaurantList from "./pages/RestaurantList";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
+
+import ManagerDashboard from "./pages/ManagerDashboard";
+import OwnerDashboard from "./pages/OwnerDashboard";
+import ChefDashboard from "./pages/ChefDashboard";
+import CustomerDashboard from "./pages/CustomerDashboard";
+
+
 import Menu from "./pages/Menu";
 import Cart from "./pages/Cart";
 import Orders from "./pages/Orders";
 import Reservations from "./pages/Reservations";
 import Profile from "./pages/Profile";
 
-import ManagerDashboard from "./pages/ManagerDashboard";
 import Inventory from "./pages/Inventory";
 import AddInventory from "./pages/AddInventory";
 
@@ -38,12 +46,14 @@ function AppContent() {
     "/register",
     "/restaurants",
     "/dashboard",
+    "/manager-dashboard",
+    "/owner-dashboard",
+    "/chef-dashboard",
     "/menu",
     "/cart",
     "/orders",
     "/reservations",
     "/profile",
-    "/manager-dashboard",
     "/inventory",
     "/add-inventory",
     "/predictions",
@@ -69,7 +79,6 @@ function AppContent() {
       <ToastContainer
         position="top-right"
         autoClose={3000}
-        hideProgressBar={false}
         newestOnTop
         closeOnClick
         pauseOnHover
@@ -78,49 +87,221 @@ function AppContent() {
       />
 
       <Routes>
+
+        {/* Public Routes */}
+
         <Route path="/" element={<Home />} />
+
         <Route path="/login" element={<Login />} />
+
         <Route path="/register" element={<Register />} />
-        <Route path="/restaurants" element={<RestaurantList />} />
-        <Route path="/dashboard" element={<RestaurantDashboard />} />
-        <Route path="/menu" element={<Menu />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/orders" element={<Orders />} />
-        <Route path="/reservations" element={<Reservations />} />
-        <Route path="/profile" element={<Profile />} />
+
+        {/* Customer */}
+
+      <Route
+  path="/dashboard"
+  element={
+    <ProtectedRoute allowedRoles={["Customer"]}>
+      <CustomerDashboard />
+    </ProtectedRoute>
+  }
+/>
+
+        {/* Manager */}
 
         <Route
           path="/manager-dashboard"
-          element={<ManagerDashboard />}
+          element={
+            <ProtectedRoute allowedRoles={["Manager"]}>
+              <ManagerDashboard />
+            </ProtectedRoute>
+          }
         />
 
-        <Route path="/inventory" element={<Inventory />} />
+        {/* Owner */}
+
+        <Route
+          path="/owner-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["Owner"]}>
+              <OwnerDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Chef */}
+
+        <Route
+          path="/chef-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["Chef"]}>
+              <ChefDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Common Protected Routes */}
+
+        <Route
+          path="/restaurants"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Customer",
+                "Manager",
+                "Owner",
+              ]}
+            >
+              <RestaurantList />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/menu"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Customer",
+                "Manager",
+                "Chef",
+              ]}
+            >
+              <Menu />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute allowedRoles={["Customer"]}>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Customer",
+                "Manager",
+                "Chef",
+              ]}
+            >
+              <Orders />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/reservations"
+          element={
+            <ProtectedRoute allowedRoles={["Customer"]}>
+              <Reservations />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Customer",
+                "Manager",
+                "Chef",
+                "Owner",
+              ]}
+            >
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/inventory"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Manager",
+                "Owner",
+              ]}
+            >
+              <Inventory />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/add-inventory"
-          element={<AddInventory />}
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Manager",
+                "Owner",
+              ]}
+            >
+              <AddInventory />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/predictions"
-          element={<PredictionDashboard />}
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Manager",
+                "Owner",
+              ]}
+            >
+              <PredictionDashboard />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/predictions/:id"
-          element={<PredictionDetails />}
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Manager",
+                "Owner",
+              ]}
+            >
+              <PredictionDetails />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/analytics-dashboard"
-          element={<AnalyticsDashboard />}
+          element={
+            <ProtectedRoute allowedRoles={["Owner"]}>
+              <AnalyticsDashboard />
+            </ProtectedRoute>
+          }
         />
 
-        <Route path="/sales-report" element={<SalesReport />} />
+        <Route
+          path="/sales-report"
+          element={
+            <ProtectedRoute allowedRoles={["Owner"]}>
+              <SalesReport />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/revenue-report"
-          element={<RevenueReport />}
+          element={
+            <ProtectedRoute allowedRoles={["Owner"]}>
+              <RevenueReport />
+            </ProtectedRoute>
+          }
         />
 
         <Route
@@ -128,7 +309,11 @@ function AppContent() {
           element={<ServerError />}
         />
 
-        <Route path="*" element={<NotFound />} />
+        <Route
+          path="*"
+          element={<NotFound />}
+        />
+
       </Routes>
     </>
   );
