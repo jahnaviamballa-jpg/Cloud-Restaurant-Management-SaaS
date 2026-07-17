@@ -1,89 +1,57 @@
-import { useEffect, useState } from "react";
 import DashboardCard from "../components/DashboardCard";
-import { getInventoryStats } from "../api/inventoryStatsApi";
-import { getOrderStats } from "../api/orderApi";
 
 function ManagerDashboard() {
-  const [inventory, setInventory] = useState({
-    total_items: 0,
-    low_stock: 0,
-    critical_stock: 0,
-  });
-
-  const [orders, setOrders] = useState({
-    pending: 0,
-    preparing: 0,
-    ready: 0,
-    served: 0,
-  });
-
-  useEffect(() => {
-    loadDashboard();
-  }, []);
-
-  const loadDashboard = async () => {
-    try {
-      const inventoryData = await getInventoryStats();
-      const orderData = await getOrderStats();
-
-      setInventory(inventoryData);
-      setOrders(orderData);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <div style={{ padding: "30px" }}>
-      <h1>👨‍💼 Manager Dashboard</h1>
+      <h1>👨‍💼 Restaurant Manager Dashboard</h1>
 
       <div
         style={{
           display: "flex",
-          flexWrap: "wrap",
           gap: "20px",
+          flexWrap: "wrap",
           marginTop: "30px",
         }}
       >
         <DashboardCard
           title="Inventory Items"
-          value={inventory.total_items}
+          value="14"
           icon="📦"
         />
 
         <DashboardCard
           title="Low Stock"
-          value={inventory.low_stock}
+          value="3"
           icon="⚠️"
         />
 
         <DashboardCard
           title="Critical Stock"
-          value={inventory.critical_stock}
+          value="6"
           icon="🚨"
         />
 
         <DashboardCard
           title="Pending Orders"
-          value={orders.pending}
+          value="4"
           icon="🛒"
         />
 
         <DashboardCard
-          title="Preparing"
-          value={orders.preparing}
+          title="Preparing Orders"
+          value="0"
           icon="👨‍🍳"
         />
 
         <DashboardCard
-          title="Ready"
-          value={orders.ready}
+          title="Ready Orders"
+          value="0"
           icon="✅"
         />
 
         <DashboardCard
-          title="Served"
-          value={orders.served}
+          title="Served Orders"
+          value="0"
           icon="🍽️"
         />
       </div>
