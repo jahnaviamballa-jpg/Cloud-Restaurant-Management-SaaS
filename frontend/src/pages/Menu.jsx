@@ -3,21 +3,21 @@ import { getMenuByRestaurant } from "../api/menuApi";
 import FoodCard from "../components/FoodCard";
 import SearchBar from "../components/SearchBar";
 import CategoryFilter from "../components/CategoryFilter";
-
+import { getSelectedRestaurant } from "../utils/restaurant";
 function Menu() {
   const [foods, setFoods] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const restaurant = getSelectedRestaurant();
   useEffect(() => {
     const fetchMenu = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const data = await getMenuByRestaurant(1);
+        const data = await getMenuByRestaurant();
 
         console.log("Menu API Response:", data);
 
@@ -89,17 +89,27 @@ function Menu() {
     );
   }
 
-  return (
-    <div style={{ padding: "30px", background: "#f5f5f5" }}>
+ return (
+  <div
+    style={{
+      minHeight: "100vh",
+      padding: "40px",
+      background:
+        "linear-gradient(rgba(0,0,0,.20),rgba(0,0,0,.25)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundAttachment: "fixed",
+    }}
+  >
       <div
-        style={{
-          background: "#fff",
-          borderRadius: "12px",
-          padding: "20px",
-          marginBottom: "25px",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-        }}
-      >
+  style={{
+    background: "rgba(18,18,24,.70)",
+    borderRadius: "25px",
+    padding: "30px",
+    marginBottom: "30px",
+    border: "1px solid rgba(255,255,255,.08)",
+  }}
+>
         <img
           src="https://picsum.photos/1000/250"
           alt="Restaurant"
@@ -111,18 +121,48 @@ function Menu() {
           }}
         />
 
-        <h1>🍽️ Restaurant Menu</h1>
+       <h1
+  style={{
+    color: "white",
+    fontSize: "38px",
+    marginTop: "25px",
+    marginBottom: "8px",
+  }}
+>
+  🍽️ {restaurant?.name || "Restaurant"} Menu
+</h1>
+
+<p
+  style={{
+    color: "#cfcfcf",
+    fontSize: "17px",
+  }}
+>
+  Freshly prepared delicious meals for you.
+</p>
       </div>
 
-      <SearchBar
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-      />
+      <div
+  style={{
+    background: "rgba(20,20,28,.75)",
+    borderRadius: "20px",
+    padding: "25px",
+    marginBottom: "30px",
+    border: "1px solid rgba(255,255,255,.08)",
+  }}
+>
+  <SearchBar
+    searchTerm={searchTerm}
+    setSearchTerm={setSearchTerm}
+  />
 
-      <CategoryFilter
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-      />
+  <div style={{ marginTop: "20px" }}>
+    <CategoryFilter
+      selectedCategory={selectedCategory}
+      setSelectedCategory={setSelectedCategory}
+    />
+  </div>
+</div>
 
       <div
         style={{

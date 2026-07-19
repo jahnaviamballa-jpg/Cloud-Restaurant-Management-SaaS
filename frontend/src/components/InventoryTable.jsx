@@ -15,23 +15,31 @@ function InventoryTable({ items }) {
 
   return (
     <div
-      style={{
-        overflowX: "auto",
-        marginTop: "20px",
-      }}
-    >
+  style={{
+    overflowX: "auto",
+    marginTop: "30px",
+    background: "rgba(20,20,28,.92)",
+    borderRadius: "20px",
+    border: "1px solid rgba(255,255,255,.08)",
+    backdropFilter: "blur(12px)",
+    boxShadow: "0 12px 30px rgba(0,0,0,.35)",
+  }}
+>
       <table
         style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          backgroundColor: "#fff",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-          borderRadius: "10px",
-          overflow: "hidden",
-        }}
+  width: "100%",
+  borderCollapse: "collapse",
+  color: "white",
+}}
       >
         <thead>
-          <tr style={{ backgroundColor: "#0d6efd", color: "#fff" }}>
+          <tr
+  style={{
+    background: "linear-gradient(90deg,#7C3AED,#F97316)",
+    color: "white",
+  }}
+>
+  <th style={styles.th}>Image</th>
             <th style={styles.th}>Item Name</th>
             <th style={styles.th}>Category</th>
             <th style={styles.th}>Quantity</th>
@@ -39,12 +47,85 @@ function InventoryTable({ items }) {
             <th style={styles.th}>Minimum Stock</th>
             <th style={styles.th}>Supplier</th>
             <th style={styles.th}>Status</th>
+            <th style={styles.th}>Actions</th>
           </tr>
         </thead>
 
         <tbody>
           {items.map((item) => (
             <tr key={item.inventory_id}>
+              <td style={styles.td}>
+  <img
+    src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=500&q=80"
+    alt={item.item_name}
+    style={{
+      width: "70px",
+      height: "70px",
+      borderRadius: "12px",
+      objectFit: "cover",
+    }}
+  />
+</td>
+
+<td style={styles.td}>{item.item_name}</td>
+
+<td style={styles.td}>{item.category}</td>
+
+<td style={styles.td}>{item.quantity}</td>
+
+<td style={styles.td}>{item.unit}</td>
+
+<td style={styles.td}>{item.minimum_stock}</td>
+
+<td style={styles.td}>{item.supplier_name}</td>
+
+<td style={styles.td}>
+  <span
+    style={{
+      padding: "8px 16px",
+      borderRadius: "30px",
+      color: "white",
+      fontWeight: "600",
+      background:
+        item.quantity <= item.minimum_stock
+          ? "#DC2626"
+          : "#22C55E",
+    }}
+  >
+    {item.quantity <= item.minimum_stock
+      ? "Low Stock"
+      : "In Stock"}
+  </span>
+</td>
+
+<td style={styles.td}>
+  <button
+    style={{
+      padding: "8px 14px",
+      border: "none",
+      borderRadius: "8px",
+      background: "#7C3AED",
+      color: "white",
+      marginRight: "10px",
+      cursor: "pointer",
+    }}
+  >
+    ✏️
+  </button>
+
+  <button
+    style={{
+      padding: "8px 14px",
+      border: "none",
+      borderRadius: "8px",
+      background: "#DC2626",
+      color: "white",
+      cursor: "pointer",
+    }}
+  >
+    🗑
+  </button>
+</td>
               <td style={styles.td}>{item.item_name}</td>
               <td style={styles.td}>{item.category}</td>
               <td style={styles.td}>{item.quantity}</td>
@@ -53,16 +134,23 @@ function InventoryTable({ items }) {
               <td style={styles.td}>{item.supplier_name}</td>
 
               <td style={styles.td}>
-                {item.quantity <= item.minimum_stock ? (
-                  <span style={{ color: "red", fontWeight: "bold" }}>
-                    ⚠️ Low Stock
-                  </span>
-                ) : (
-                  <span style={{ color: "green", fontWeight: "bold" }}>
-                    ✅ In Stock
-                  </span>
-                )}
-              </td>
+  <span
+    style={{
+      padding: "8px 16px",
+      borderRadius: "30px",
+      color: "white",
+      fontWeight: "600",
+      background:
+        item.quantity <= item.minimum_stock
+          ? "#DC2626"
+          : "#22C55E",
+    }}
+  >
+    {item.quantity <= item.minimum_stock
+      ? "Low Stock"
+      : "In Stock"}
+  </span>
+</td>
             </tr>
           ))}
         </tbody>
@@ -73,15 +161,17 @@ function InventoryTable({ items }) {
 
 const styles = {
   th: {
-    padding: "12px",
-    border: "1px solid #ddd",
+    padding: "18px",
     textAlign: "center",
+    fontWeight: "700",
+    fontSize: "15px",
   },
 
   td: {
-    padding: "12px",
-    border: "1px solid #ddd",
+    padding: "18px",
     textAlign: "center",
+    borderBottom: "1px solid rgba(255,255,255,.08)",
+    color: "#E5E7EB",
   },
 };
 

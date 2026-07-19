@@ -11,6 +11,10 @@ class RestaurantCreate(BaseModel):
     city: str
     state: str
     pincode: str
+
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+
     description: Optional[str] = None
     logo_url: Optional[str] = None
 
@@ -24,6 +28,10 @@ class RestaurantUpdate(BaseModel):
     city: Optional[str] = None
     state: Optional[str] = None
     pincode: Optional[str] = None
+
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+
     description: Optional[str] = None
     logo_url: Optional[str] = None
 
@@ -38,6 +46,10 @@ class RestaurantResponse(BaseModel):
     city: Optional[str]
     state: Optional[str]
     pincode: Optional[str]
+
+    latitude: Optional[float]
+    longitude: Optional[float]
+
     description: Optional[str]
     logo_url: Optional[str]
 

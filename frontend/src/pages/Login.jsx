@@ -1,67 +1,75 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { FaEnvelope, FaLock, FaUtensils } from "react-icons/fa";
+import {
+  FaEnvelope,
+  FaLock,
+  FaUtensils,
+} from "react-icons/fa";
+
 import { login } from "../api/authApi";
+import "../styles/auth.css";
 
 function Login() {
   const navigate = useNavigate();
 
-  const [restaurant, setRestaurant] = useState("Paradise Restaurant");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
     if (!email || !password) {
-      toast.warning("⚠ Please enter email and password");
+      toast.warning("Please enter email and password");
       return;
     }
 
-    setLoading(true);
-
     try {
+      setLoading(true);
+
       const response = await login({
         email,
         password,
       });
-
-      localStorage.setItem("token", response.access_token);
+console.log(response);
+      localStorage.setItem(
+        "token",
+        response.access_token
+      );
 
       localStorage.setItem(
         "user",
         JSON.stringify(response.user)
       );
 
-      toast.success("✅ Login Successful");
+      toast.success("Login Successful");
 
-      const role = response.user.role.toLowerCase();
+      const role =
+        response.user.role.toLowerCase();
 
-      switch (role) {
-        case "owner":
-          navigate("/owner-dashboard");
-          break;
+      if (role === "customer") {
+        const restaurant =
+          localStorage.getItem("restaurant");
 
-        case "manager":
-          navigate("/manager-dashboard");
-          break;
-
-        case "chef":
-          navigate("/chef-dashboard");
-          break;
-
-        case "customer":
+        if (restaurant) {
           navigate("/dashboard");
-          break;
-
-        default:
-          navigate("/dashboard");
+        } else {
+          navigate("/select-restaurant");
+        }
+      } else if (role === "manager") {
+        navigate("/manager-dashboard");
+      } else if (role === "owner") {
+        navigate("/owner-dashboard");
+      } else if (role === "chef") {
+        navigate("/chef-dashboard");
+      } else {
+        navigate("/");
       }
     } catch (error) {
       toast.error(
-        error.response?.data?.detail || "Login Failed"
+        error.response?.data?.detail ||
+          "Login Failed"
       );
     } finally {
       setLoading(false);
@@ -69,147 +77,91 @@ function Login() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f5f5f5",
-        padding: "20px",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "380px",
-          background: "#fff",
-          padding: "30px",
-          borderRadius: "12px",
-          boxShadow: "0 5px 15px rgba(0,0,0,0.15)",
-        }}
-      >
-        <h2 style={{ textAlign: "center", color: "#ff6b00" }}>
-          Restaurant Login
+  <div className="auth-page">
+
+    <div className="auth-left">
+      <h1>Cloud Restaurant</h1>
+
+      <h2>Restaurant Management SaaS</h2>
+
+      <p>
+        Manage Restaurants, Orders, Inventory,
+        Reservations, Analytics and Customer Experience
+        from one powerful cloud platform.
+      </p>
+    </div>
+
+    <div className="auth-right">
+
+      <div className="auth-card">
+
+        <div className="logo">
+          🍽
+        </div>
+
+        <h2 className="auth-title">
+          Welcome Back
         </h2>
 
-        <p style={{ textAlign: "center" }}>
+        <p className="auth-subtitle">
           Login to continue
         </p>
 
-        <form
-          onSubmit={handleLogin}
-          style={{ marginTop: "20px" }}
-        >
-          <label>Select Restaurant</label>
-
-          <select
-            value={restaurant}
-            onChange={(e) => setRestaurant(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "10px",
-              marginTop: "5px",
-              marginBottom: "15px",
-            }}
-          >
-            <option>Paradise Restaurant</option>
-            <option>Meghana Foods</option>
-            <option>Bawarchi</option>
-          </select>
+        <form onSubmit={handleLogin}>
 
           <label>Email</label>
 
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              border: "1px solid #ccc",
-              padding: "10px",
-              borderRadius: "6px",
-              marginTop: "5px",
-              marginBottom: "15px",
-            }}
-          >
-            <FaEnvelope color="#666" />
-
+          <div className="input-box">
+            <FaEnvelope />
             <input
               type="email"
               placeholder="Enter Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                border: "none",
-                outline: "none",
-                marginLeft: "10px",
-                width: "100%",
-              }}
+              onChange={(e)=>setEmail(e.target.value)}
             />
           </div>
 
           <label>Password</label>
 
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              border: "1px solid #ccc",
-              padding: "10px",
-              borderRadius: "6px",
-              marginTop: "5px",
-              marginBottom: "20px",
-            }}
-          >
-            <FaLock color="#666" />
-
+          <div className="input-box">
+            <FaLock />
             <input
               type="password"
               placeholder="Enter Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{
-                border: "none",
-                outline: "none",
-                marginLeft: "10px",
-                width: "100%",
-              }}
+              onChange={(e)=>setPassword(e.target.value)}
             />
           </div>
 
           <button
             type="submit"
+            className="auth-btn"
             disabled={loading}
-            style={{
-              width: "100%",
-              padding: "12px",
-              background: loading ? "#999" : "#ff6b00",
-              color: "#fff",
-              border: "none",
-              borderRadius: "6px",
-              cursor: loading ? "not-allowed" : "pointer",
-              fontWeight: "bold",
-              fontSize: "16px",
-            }}
           >
-            <FaUtensils style={{ marginRight: "8px" }} />
+            <FaUtensils style={{marginRight:10}}/>
+
             {loading ? "Logging in..." : "Login"}
+
           </button>
 
-          <p
-            style={{
-              textAlign: "center",
-              marginTop: "20px",
-            }}
-          >
-            Don't have an account?{" "}
-            <Link to="/register">
-              Create Account
-            </Link>
-          </p>
         </form>
+
+        <div className="auth-footer">
+
+          Don't have an account?
+
+          <Link to="/register">
+            Register
+          </Link>
+
+        </div>
+
       </div>
+
     </div>
-  );
+
+  </div>
+);
 }
 
 export default Login;

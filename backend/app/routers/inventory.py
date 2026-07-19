@@ -41,10 +41,35 @@ def add_inventory(item: InventoryCreate, db: Session = Depends(get_db)):
 # -----------------------------
 # Get All Inventory
 # -----------------------------
-@router.get("/", response_model=list[InventoryResponse])
-def get_inventory(db: Session = Depends(get_db)):
-    return db.query(Inventory).all()
+@router.get(
+    "/restaurants/{restaurant_id}/inventory",
+    response_model=list[InventoryResponse],
+)
+def get_inventory(
+    restaurant_id: int,
+    db: Session = Depends(get_db),
+):
+    restaurant = (
+        db.query(Restaurant)
+        .filter(
+            Restaurant.restaurant_id == restaurant_id
+        )
+        .first()
+    )
 
+    if not restaurant:
+        raise HTTPException(
+            status_code=404,
+            detail="Restaurant not found",
+        )
+
+    return (
+        db.query(Inventory)
+        .filter(
+            Inventory.restaurant_id == restaurant_id
+        )
+        .all()
+    )
 
 # -----------------------------
 # Get Inventory By ID
@@ -126,4 +151,36 @@ def delete_inventory(id: int, db: Session = Depends(get_db)):
 
     return {
         "message": "Inventory item deleted successfully"
+    }
+@router.get("/restaurants/{restaurant_id}/inventory/stats")
+def get_inventory_stats(
+    restaurant_id: int,
+    db: Session = Depends(get_db),
+):
+    items = (
+        db.query(Inventory)
+        .filter(
+            Inventory.restaurant_id == restaurant_id
+        )
+        .all()
+    )
+
+    total_items = len(items)
+
+    low_stock = sum(
+        1
+        for item in items
+        if item.quantity <= item.minimum_stock
+    )
+
+    critical_stock = sum(
+        1
+        for item in items
+        if item.quantity <= (item.minimum_stock // 2)
+    )
+
+    return {
+        "total_items": total_items,
+        "low_stock": low_stock,
+        "critical_stock": critical_stock,
     }

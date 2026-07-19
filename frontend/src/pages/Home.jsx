@@ -6,73 +6,210 @@ function Home() {
   return (
     <div
       style={{
-        minHeight: "90vh",
+        minHeight: "100vh",
+        background:
+          "linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.60)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        textAlign: "center",
-        background: "#f5f5f5",
-        padding: "20px",
+        padding: "40px",
       }}
     >
       <div
         style={{
-          background: "white",
-          padding: "50px",
-          borderRadius: "15px",
-          boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
-          maxWidth: "600px",
           width: "100%",
+          maxWidth: "1200px",
+          background: "rgba(18,18,24,.75)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(255,255,255,.08)",
+          borderRadius: "30px",
+          padding: "60px",
+          color: "white",
+          textAlign: "center",
+          boxShadow: "0 20px 50px rgba(0,0,0,.40)",
         }}
       >
-        <h1 style={{ fontSize: "40px", marginBottom: "20px" }}>
-          🍽️ Cloud Restaurant Management
+        <h1
+          style={{
+            fontSize: "58px",
+            marginBottom: "20px",
+            lineHeight: "1.2",
+          }}
+        >
+          🍽️ Cloud Restaurant Management SaaS
         </h1>
 
         <p
           style={{
-            fontSize: "18px",
-            color: "#555",
-            marginBottom: "35px",
+            fontSize: "22px",
+            color: "#D1D5DB",
+            maxWidth: "900px",
+            margin: "0 auto 45px",
+            lineHeight: "1.8",
           }}
         >
-          Manage restaurants, orders, inventory and analytics from one
-          powerful cloud platform.
+          Manage restaurants, online orders, reservations, inventory,
+          billing, analytics and AI predictions through one powerful
+          cloud-based platform.
         </p>
+
+        {/* Features */}
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit,minmax(220px,1fr))",
+            gap: "25px",
+            marginBottom: "50px",
+          }}
+        >
+          {[
+            {
+              icon: "☁️",
+              title: "Cloud Based",
+              desc: "Access your restaurant from anywhere.",
+            },
+            {
+              icon: "📊",
+              title: "Analytics",
+              desc: "Real-time reports & dashboards.",
+            },
+            {
+              icon: "🤖",
+              title: "AI Prediction",
+              desc: "Predict inventory before shortages.",
+            },
+            {
+              icon: "🛒",
+              title: "Online Orders",
+              desc: "Fast order management system.",
+            },
+          ].map((feature) => (
+            <div
+              key={feature.title}
+              style={{
+                background: "rgba(20,20,28,.92)",
+                padding: "30px",
+                borderRadius: "20px",
+                border: "1px solid rgba(255,255,255,.08)",
+                transition: ".3s",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.transform =
+                  "translateY(-8px)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform =
+                  "translateY(0)")
+              }
+            >
+              <div
+                style={{
+                  fontSize: "45px",
+                  marginBottom: "15px",
+                }}
+              >
+                {feature.icon}
+              </div>
+
+              <h2
+                style={{
+                  marginBottom: "12px",
+                }}
+              >
+                {feature.title}
+              </h2>
+
+              <p
+                style={{
+                  color: "#BDBDBD",
+                  lineHeight: "1.7",
+                }}
+              >
+                {feature.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Buttons */}
 
         <div
           style={{
             display: "flex",
             justifyContent: "center",
+            flexWrap: "wrap",
             gap: "20px",
           }}
         >
           <button
             onClick={() => navigate("/login")}
             style={{
-              padding: "12px 30px",
+              padding: "16px 40px",
+              border: "none",
+              borderRadius: "14px",
               fontSize: "18px",
+              fontWeight: "600",
               cursor: "pointer",
-              borderRadius: "8px",
+              color: "white",
+              background:
+                "linear-gradient(90deg,#7C3AED,#F97316)",
+              transition: ".3s",
             }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform =
+                "translateY(-5px)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.transform =
+                "translateY(0)")
+            }
           >
-            Login
+            🔐 Login
           </button>
 
           <button
-            onClick={() => {
-  console.log("Register button clicked");
-  navigate("/register");
-}}
+            onClick={() => navigate("/register")}
             style={{
-              padding: "12px 30px",
+              padding: "16px 40px",
+              borderRadius: "14px",
+              border: "1px solid rgba(255,255,255,.20)",
+              background: "rgba(255,255,255,.08)",
+              color: "white",
               fontSize: "18px",
+              fontWeight: "600",
               cursor: "pointer",
-              borderRadius: "8px",
+              transition: ".3s",
             }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.background =
+                "rgba(255,255,255,.15)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.background =
+                "rgba(255,255,255,.08)")
+            }
           >
-            Register
+            ✨ Register
           </button>
+        </div>
+
+        {/* Footer */}
+
+        <div
+          style={{
+            marginTop: "60px",
+            borderTop: "1px solid rgba(255,255,255,.08)",
+            paddingTop: "25px",
+            color: "#9CA3AF",
+          }}
+        >
+          © 2026 Cloud Restaurant Management SaaS Platform
         </div>
       </div>
     </div>

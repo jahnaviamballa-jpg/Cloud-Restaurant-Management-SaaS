@@ -1,8 +1,18 @@
 import api from "./api";
+import { getRestaurantId } from "../utils/restaurant";
 
-// Get menu for a restaurant
-export const getMenuByRestaurant = async (restaurantId) => {
-  const response = await api.get(`/restaurants/${restaurantId}/menu`);
+// Get menu for selected restaurant
+export const getMenuByRestaurant = async () => {
+  const restaurantId = getRestaurantId();
+
+  if (!restaurantId) {
+    throw new Error("No restaurant selected");
+  }
+
+  const response = await api.get(
+    `/restaurants/${restaurantId}/menu`
+  );
+
   return response.data;
 };
 

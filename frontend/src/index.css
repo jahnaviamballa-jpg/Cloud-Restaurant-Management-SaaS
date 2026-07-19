@@ -206,3 +206,6 @@ body[data-theme="dark"] div {
     font-size: 14px;
   }
 }
+.search-input::placeholder {
+  color: #bdbdbd;
+}

@@ -131,9 +131,37 @@ def place_order(order: OrderCreate, db: Session = Depends(get_db)):
 # -----------------------------
 # Get All Orders
 # -----------------------------
-@router.get("/", response_model=list[OrderResponse])
-def get_orders(db: Session = Depends(get_db)):
-    return db.query(Order).all()
+@router.get(
+    "/restaurants/{restaurant_id}/orders",
+    response_model=list[OrderResponse],
+)
+def get_orders(
+    restaurant_id: int,
+    db: Session = Depends(get_db),
+):
+    restaurant = (
+        db.query(Restaurant)
+        .filter(
+            Restaurant.restaurant_id == restaurant_id
+        )
+        .first()
+    )
+
+    if not restaurant:
+        raise HTTPException(
+            status_code=404,
+            detail="Restaurant not found",
+        )
+
+    orders = (
+        db.query(Order)
+        .filter(
+            Order.restaurant_id == restaurant_id
+        )
+        .all()
+    )
+
+    return orders
 
 
 # -----------------------------
@@ -207,4 +235,35 @@ def delete_order(order_id: int, db: Session = Depends(get_db)):
 
     return {
         "message": "Order deleted successfully"
+    }
+@router.get("/restaurants/{restaurant_id}/orders/stats")
+def get_order_stats(
+    restaurant_id: int,
+    db: Session = Depends(get_db),
+):
+    pending = db.query(Order).filter(
+        Order.restaurant_id == restaurant_id,
+        Order.order_status == "Pending",
+    ).count()
+
+    preparing = db.query(Order).filter(
+        Order.restaurant_id == restaurant_id,
+        Order.order_status == "Preparing",
+    ).count()
+
+    ready = db.query(Order).filter(
+        Order.restaurant_id == restaurant_id,
+        Order.order_status == "Ready",
+    ).count()
+
+    served = db.query(Order).filter(
+        Order.restaurant_id == restaurant_id,
+        Order.order_status == "Served",
+    ).count()
+
+    return {
+        "pending": pending,
+        "preparing": preparing,
+        "ready": ready,
+        "served": served,
     }

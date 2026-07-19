@@ -38,17 +38,21 @@ def create_restaurant(
         )
 
     new_restaurant = Restaurant(
-        restaurant_name=restaurant.restaurant_name,
-        owner_name=restaurant.owner_name,
-        email=restaurant.email,
-        phone=restaurant.phone,
-        address=restaurant.address,
-        city=restaurant.city,
-        state=restaurant.state,
-        pincode=restaurant.pincode,
-        description=restaurant.description,
-        logo_url=restaurant.logo_url,
-    )
+    restaurant_name=restaurant.restaurant_name,
+    owner_name=restaurant.owner_name,
+    email=restaurant.email,
+    phone=restaurant.phone,
+    address=restaurant.address,
+    city=restaurant.city,
+    state=restaurant.state,
+    pincode=restaurant.pincode,
+
+    latitude=restaurant.latitude,
+    longitude=restaurant.longitude,
+
+    description=restaurant.description,
+    logo_url=restaurant.logo_url,
+)
 
     db.add(new_restaurant)
     db.commit()

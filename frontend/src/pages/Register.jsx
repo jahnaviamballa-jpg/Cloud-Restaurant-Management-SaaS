@@ -7,9 +7,8 @@ import {
   FaLock,
   FaUserTag,
 } from "react-icons/fa";
-
 import { register } from "../api/authApi";
-
+import "../styles/auth.css";
 function Register() {
   const navigate = useNavigate();
 
@@ -37,7 +36,6 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setError("");
 
     if (formData.password !== formData.confirmPassword) {
@@ -57,14 +55,11 @@ function Register() {
         phone: formData.phone || null,
       };
 
-      console.log("Register Data:", registerData);
-
       const response = await register(registerData);
 
       console.log("Register Response:", response);
 
       alert("Account created successfully");
-
       navigate("/login");
     } catch (err) {
       console.error("Register Error:", err);
@@ -94,48 +89,45 @@ function Register() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f5f5f5",
-        padding: "20px",
-      }}
-    >
-      <div
-        style={{
-          width: "420px",
-          background: "#fff",
-          padding: "30px",
-          borderRadius: "12px",
-          boxShadow: "0 5px 15px rgba(0,0,0,0.15)",
-        }}
-      >
-        <h2
-          style={{
-            textAlign: "center",
-            color: "#ff6b00",
-          }}
-        >
+  <div className="auth-page">
+
+    <div className="auth-left">
+
+      <h1>Cloud Restaurant</h1>
+
+      <h2>Restaurant Management SaaS</h2>
+
+      <p>
+        Join the next-generation cloud platform for
+        restaurants. Manage orders, menus, inventory,
+        reservations and analytics from one place.
+      </p>
+
+    </div>
+
+    <div className="auth-right">
+
+      <div className="auth-card">
+
+        <div className="logo">
+          🍽
+        </div>
+
+        <h2 className="auth-title">
           Create Account
         </h2>
 
-        <p
-          style={{
-            textAlign: "center",
-            color: "#666",
-          }}
-        >
+        <p className="auth-subtitle">
           Register to continue
         </p>
 
         {error && (
           <p
             style={{
-              color: "red",
+              color: "#ff4d4f",
               textAlign: "center",
+              marginBottom: "15px",
+              fontWeight: "600",
             }}
           >
             {error}
@@ -143,11 +135,11 @@ function Register() {
         )}
 
         <form onSubmit={handleSubmit}>
+
           <label>Full Name</label>
 
-          <div style={inputContainer}>
-            <FaUser color="#666" />
-
+          <div className="input-box">
+            <FaUser />
             <input
               name="name"
               type="text"
@@ -155,15 +147,13 @@ function Register() {
               value={formData.name}
               onChange={handleChange}
               required
-              style={inputStyle}
             />
           </div>
 
           <label>Email</label>
 
-          <div style={inputContainer}>
-            <FaEnvelope color="#666" />
-
+          <div className="input-box">
+            <FaEnvelope />
             <input
               name="email"
               type="email"
@@ -171,30 +161,26 @@ function Register() {
               value={formData.email}
               onChange={handleChange}
               required
-              style={inputStyle}
             />
           </div>
 
           <label>Phone Number</label>
 
-          <div style={inputContainer}>
-            <FaPhone color="#666" />
-
+          <div className="input-box">
+            <FaPhone />
             <input
               name="phone"
               type="tel"
               placeholder="Enter Phone Number"
               value={formData.phone}
               onChange={handleChange}
-              style={inputStyle}
             />
           </div>
 
           <label>Password</label>
 
-          <div style={inputContainer}>
-            <FaLock color="#666" />
-
+          <div className="input-box">
+            <FaLock />
             <input
               name="password"
               type="password"
@@ -202,15 +188,13 @@ function Register() {
               value={formData.password}
               onChange={handleChange}
               required
-              style={inputStyle}
             />
           </div>
 
           <label>Confirm Password</label>
 
-          <div style={inputContainer}>
-            <FaLock color="#666" />
-
+          <div className="input-box">
+            <FaLock />
             <input
               name="confirmPassword"
               type="password"
@@ -218,63 +202,56 @@ function Register() {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              style={inputStyle}
             />
           </div>
 
           <label>Select Role</label>
 
-          <div style={inputContainer}>
-            <FaUserTag color="#666" />
+          <div className="input-box">
+
+            <FaUserTag />
 
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
-              style={{
-                ...inputStyle,
-                background: "transparent",
-              }}
             >
-              <option value="Customer">Customer</option>
-              <option value="Manager">Manager</option>
-              <option value="Chef">Chef</option>
-              <option value="Owner">Owner</option>
+              <option>Customer</option>
+              <option>Manager</option>
+              <option>Chef</option>
+              <option>Owner</option>
             </select>
+
           </div>
 
           <button
             type="submit"
+            className="auth-btn"
             disabled={loading}
-            style={{
-              width: "100%",
-              padding: "12px",
-              background: "#ff6b00",
-              color: "#fff",
-              border: "none",
-              borderRadius: "6px",
-              cursor: loading ? "not-allowed" : "pointer",
-              fontSize: "16px",
-              fontWeight: "bold",
-              opacity: loading ? 0.7 : 1,
-            }}
           >
-            {loading ? "Registering..." : "Register"}
+            {loading
+              ? "Creating Account..."
+              : "Create Account"}
           </button>
+
         </form>
 
-        <p
-          style={{
-            textAlign: "center",
-            marginTop: "20px",
-          }}
-        >
-          Already have an account?{" "}
-          <Link to="/login">Login</Link>
-        </p>
+        <div className="auth-footer">
+
+          Already have an account?
+
+          <Link to="/login">
+            Login
+          </Link>
+
+        </div>
+
       </div>
+
     </div>
-  );
+
+  </div>
+);
 }
 
 export default Register;

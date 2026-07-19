@@ -33,9 +33,9 @@ function OwnerDashboard() {
 
       setOrders(
         (orderData.pending || 0) +
-        (orderData.preparing || 0) +
-        (orderData.ready || 0) +
-        (orderData.served || 0)
+          (orderData.preparing || 0) +
+          (orderData.ready || 0) +
+          (orderData.served || 0)
       );
     } catch (error) {
       console.error(error);
@@ -43,40 +43,260 @@ function OwnerDashboard() {
   };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h1>👑 Owner Dashboard</h1>
-
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: "40px",
+        background:
+          "linear-gradient(rgba(0,0,0,.20),rgba(0,0,0,.25)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
       <div
         style={{
-          display: "flex",
-          gap: "20px",
-          flexWrap: "wrap",
-          marginTop: "30px",
+          background: "rgba(18,18,24,.75)",
+          borderRadius: "25px",
+          padding: "35px",
+          border: "1px solid rgba(255,255,255,.08)",
+          backdropFilter: "blur(12px)",
         }}
       >
-        <DashboardCard
-          title="Restaurants"
-          value={restaurantCount}
-          icon="🍽️"
-        />
+        <h1
+          style={{
+            color: "white",
+            fontSize: "42px",
+            marginBottom: "10px",
+          }}
+        >
+          👑 Owner Dashboard
+        </h1>
 
-        <DashboardCard
-          title="Total Orders"
-          value={orders}
-          icon="🛒"
-        />
+        <p
+          style={{
+            color: "#CFCFD5",
+            fontSize: "18px",
+            marginBottom: "35px",
+          }}
+        >
+          Welcome back! Here's a complete overview of your restaurant business.
+        </p>
 
-        <DashboardCard
-          title="Revenue"
-          value={`₹${revenue}`}
-          icon="💰"
-        />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit,minmax(250px,1fr))",
+            gap: "25px",
+          }}
+        >
+          <DashboardCard
+            title="Restaurants"
+            value={restaurantCount}
+            icon="🍽️"
+          />
 
-        <DashboardCard
-          title="Sales"
-          value={sales}
-          icon="📈"
-        />
+          <DashboardCard
+            title="Total Orders"
+            value={orders}
+            icon="🛒"
+          />
+
+          <DashboardCard
+            title="Revenue"
+            value={`₹${revenue}`}
+            icon="💰"
+          />
+
+          <DashboardCard
+            title="Sales"
+            value={sales}
+            icon="📈"
+          />
+        </div>
+
+        {/* Quick Actions */}
+
+        <div
+          style={{
+            marginTop: "45px",
+          }}
+        >
+          <h2
+            style={{
+              color: "white",
+              marginBottom: "20px",
+            }}
+          >
+            ⚡ Quick Actions
+          </h2>
+
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "20px",
+            }}
+          >
+            {[
+              "➕ Add Restaurant",
+              "👨‍🍳 Manage Staff",
+              "📦 Inventory",
+              "📊 Analytics",
+              "🧾 Reports",
+              "⚙ Settings",
+            ].map((item) => (
+              <button
+                key={item}
+                style={{
+                  padding: "15px 28px",
+                  border: "none",
+                  borderRadius: "14px",
+                  background:
+                    "linear-gradient(90deg,#7C3AED,#F97316)",
+                  color: "white",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: ".3s",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform =
+                    "translateY(-5px)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform =
+                    "translateY(0)")
+                }
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Business Overview */}
+
+        <div
+          style={{
+            marginTop: "45px",
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit,minmax(320px,1fr))",
+            gap: "25px",
+          }}
+        >
+          <div
+            style={{
+              background: "rgba(20,20,28,.92)",
+              borderRadius: "20px",
+              padding: "30px",
+              border: "1px solid rgba(255,255,255,.08)",
+            }}
+          >
+            <h2
+              style={{
+                color: "white",
+                marginBottom: "20px",
+              }}
+            >
+              📈 Business Growth
+            </h2>
+
+            <h1
+              style={{
+                color: "#22C55E",
+                fontSize: "50px",
+              }}
+            >
+              +28%
+            </h1>
+
+            <p
+              style={{
+                color: "#BDBDBD",
+              }}
+            >
+              Compared to last month.
+            </p>
+          </div>
+
+          <div
+            style={{
+              background: "rgba(20,20,28,.92)",
+              borderRadius: "20px",
+              padding: "30px",
+              border: "1px solid rgba(255,255,255,.08)",
+            }}
+          >
+            <h2
+              style={{
+                color: "white",
+                marginBottom: "20px",
+              }}
+            >
+              ⭐ Customer Satisfaction
+            </h2>
+
+            <h1
+              style={{
+                color: "#FACC15",
+                fontSize: "50px",
+              }}
+            >
+              4.9★
+            </h1>
+
+            <p
+              style={{
+                color: "#BDBDBD",
+              }}
+            >
+              Based on customer ratings.
+            </p>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+
+        <div
+          style={{
+            marginTop: "45px",
+            background: "rgba(20,20,28,.92)",
+            borderRadius: "20px",
+            padding: "30px",
+            border: "1px solid rgba(255,255,255,.08)",
+          }}
+        >
+          <h2
+            style={{
+              color: "white",
+              marginBottom: "25px",
+            }}
+          >
+            🕒 Recent Activity
+          </h2>
+
+          {[
+            "🛒 18 new orders received",
+            "💰 Revenue increased today",
+            "📦 Inventory updated",
+            "⭐ New customer review received",
+            "👨‍🍳 Staff attendance completed",
+          ].map((activity) => (
+            <div
+              key={activity}
+              style={{
+                color: "#E5E7EB",
+                padding: "15px 0",
+                borderBottom:
+                  "1px solid rgba(255,255,255,.06)",
+              }}
+            >
+              {activity}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

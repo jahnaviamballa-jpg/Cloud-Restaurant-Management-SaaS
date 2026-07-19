@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime,Float
 from datetime import datetime
 from app.database import Base
 
@@ -19,6 +19,9 @@ class Restaurant(Base):
     city = Column(String(100), nullable=True)
     state = Column(String(100), nullable=True)
     pincode = Column(String(20), nullable=True)
+    
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
 
     description = Column(String(500), nullable=True)
     logo_url = Column(String(255), nullable=True)

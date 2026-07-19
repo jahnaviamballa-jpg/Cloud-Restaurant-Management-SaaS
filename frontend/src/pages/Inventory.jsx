@@ -102,8 +102,91 @@ function Inventory() {
   );
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h1>Inventory</h1>
+  <div
+    style={{
+      minHeight: "100vh",
+      padding: "40px",
+      background:
+        "linear-gradient(rgba(0,0,0,.20),rgba(0,0,0,.25)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundAttachment: "fixed",
+    }}
+  >
+    <div
+      style={{
+        background: "rgba(18,18,24,.75)",
+        borderRadius: "25px",
+        padding: "35px",
+        border: "1px solid rgba(255,255,255,.08)",
+      }}
+    >
+      <h1
+  style={{
+    color: "white",
+    fontSize: "42px",
+    marginBottom: "10px",
+  }}
+>
+  📦 Inventory Management
+</h1>
+
+<p
+  style={{
+    color: "#CFCFD5",
+    marginBottom: "30px",
+    fontSize: "18px",
+  }}
+>
+  Manage stock, suppliers and inventory items.
+</p>
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+    gap: "20px",
+    marginBottom: "35px",
+  }}
+>
+  <div style={cardStyle}>
+    <h3>Total Items</h3>
+    <h1>{items.length}</h1>
+  </div>
+
+  <div style={cardStyle}>
+    <h3>Low Stock</h3>
+    <h1>
+      {
+        items.filter(
+          (i) =>
+            Number(i.quantity) <= Number(i.minimum_stock)
+        ).length
+      }
+    </h1>
+  </div>
+
+  <div style={cardStyle}>
+    <h3>Suppliers</h3>
+    <h1>
+      {
+        new Set(
+          items.map((i) => i.supplier_name)
+        ).size
+      }
+    </h1>
+  </div>
+
+  <div style={cardStyle}>
+    <h3>Categories</h3>
+    <h1>
+      {
+        new Set(
+          items.map((i) => i.category)
+        ).size
+      }
+    </h1>
+  </div>
+</div>
 
       <div className="inventory-form">
         <input
@@ -189,7 +272,15 @@ function Inventory() {
 
       <InventoryTable items={items} />
     </div>
+  </div>
   );
 }
-
+const cardStyle = {
+  background: "rgba(20,20,28,.92)",
+  borderRadius: "18px",
+  padding: "22px",
+  border: "1px solid rgba(255,255,255,.08)",
+  textAlign: "center",
+  color: "white",
+};
 export default Inventory;

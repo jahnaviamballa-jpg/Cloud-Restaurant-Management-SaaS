@@ -2,47 +2,90 @@ import { Link } from "react-router-dom";
 
 function ServerError() {
   return (
-    <div className="server-error-page">
-      <h1>500</h1>
+    <div
+      style={{
+        minHeight: "100vh",
+        background:
+          "linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.60)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "40px",
+      }}
+    >
+      <div
+        style={{
+          background: "rgba(18,18,24,.78)",
+          backdropFilter: "blur(12px)",
+          borderRadius: "30px",
+          padding: "60px",
+          textAlign: "center",
+          border: "1px solid rgba(255,255,255,.08)",
+          maxWidth: "700px",
+          width: "100%",
+        }}
+      >
+        <div
+          style={{
+            fontSize: "120px",
+            marginBottom: "10px",
+          }}
+        >
+          ⚠️
+        </div>
 
-      <h2>⚠️ Something Went Wrong</h2>
+        <h1
+          style={{
+            color: "#EF4444",
+            fontSize: "90px",
+            margin: 0,
+          }}
+        >
+          500
+        </h1>
 
-      <p>
-        We are having trouble connecting to the server.
-        Please try again later.
-      </p>
+        <h2
+          style={{
+            color: "white",
+            marginTop: "15px",
+          }}
+        >
+          Server Error
+        </h2>
 
-      <Link to="/">
-        <button>🔄 Return Home</button>
-      </Link>
+        <p
+          style={{
+            color: "#CFCFD5",
+            lineHeight: "1.8",
+            marginTop: "20px",
+          }}
+        >
+          Something went wrong while connecting to the server.
+          Please try again after a few moments.
+        </p>
 
-      <style>{`
-        .server-error-page {
-          min-height: 80vh;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          text-align: center;
-          padding: 20px;
-        }
-
-        .server-error-page h1 {
-          font-size: 100px;
-          color: #dc3545;
-          margin: 0;
-        }
-
-        .server-error-page button {
-          background: #ff6b00;
-          color: white;
-          border: none;
-          padding: 12px 20px;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: bold;
-        }
-      `}</style>
+        <Link to="/">
+          <button
+            style={{
+              marginTop: "35px",
+              padding: "15px 35px",
+              border: "none",
+              borderRadius: "12px",
+              background:
+                "linear-gradient(90deg,#7C3AED,#F97316)",
+              color: "white",
+              fontSize: "17px",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+          >
+            🔄 Return Home
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }

@@ -1,37 +1,31 @@
 import api from "./api";
+import { getRestaurantId } from "../utils/restaurant";
 
-// Inventory Statistics
-export const getInventoryStats = async () => {
-  const response = await api.get("/inventory/stats");
-  return response.data;
-};
-
-// Get all inventory items
 export const getInventory = async () => {
-  const response = await api.get("/inventory");
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/restaurants/${restaurantId}/inventory`
+  );
+
   return response.data;
 };
 
-// Get inventory item by ID
-export const getInventoryItem = async (id) => {
-  const response = await api.get(`/inventory/${id}`);
-  return response.data;
+export const createInventory = async (data) => {
+  const restaurantId = getRestaurantId();
+
+  return api.post("/inventory/", {
+    ...data,
+    restaurant_id: restaurantId,
+  });
 };
 
-// Create inventory item
-export const createInventory = async (itemData) => {
-  const response = await api.post("/inventory", itemData);
-  return response.data;
-};
+export const getInventoryStats = async () => {
+  const restaurantId = getRestaurantId();
 
-// Update inventory item
-export const updateInventory = async (id, itemData) => {
-  const response = await api.put(`/inventory/${id}`, itemData);
-  return response.data;
-};
+  const response = await api.get(
+    `/restaurants/${restaurantId}/inventory/stats`
+  );
 
-// Delete inventory item
-export const deleteInventory = async (id) => {
-  const response = await api.delete(`/inventory/${id}`);
   return response.data;
 };
