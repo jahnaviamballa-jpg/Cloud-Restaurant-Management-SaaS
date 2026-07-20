@@ -1,3 +1,5 @@
+from sqlalchemy.orm import Session
+
 from app.models.order import Order
 from app.models.order_item import OrderItem
 from app.models.menu import Menu
@@ -9,10 +11,10 @@ from app.services.prediction_service import (
 )
 
 
-# -----------------------------
+# =====================================================
 # Sales Analytics
-# -----------------------------
-def get_sales_analytics(db):
+# =====================================================
+def get_sales_analytics(db: Session):
 
     total_orders = db.query(Order).count()
 
@@ -23,14 +25,17 @@ def get_sales_analytics(db):
     }
 
 
-# -----------------------------
+# =====================================================
 # Revenue Analytics
-# -----------------------------
-def get_revenue_analytics(db):
+# =====================================================
+def get_revenue_analytics(db: Session):
 
     orders = db.query(Order).all()
 
-    total_revenue = sum(order.total_amount for order in orders)
+    total_revenue = sum(
+        order.total_amount or 0
+        for order in orders
+    )
 
     return {
         "today_revenue": total_revenue,
@@ -39,10 +44,10 @@ def get_revenue_analytics(db):
     }
 
 
-# -----------------------------
+# =====================================================
 # Top Selling Menu Items
-# -----------------------------
-def get_top_selling_items(db):
+# =====================================================
+def get_top_selling_items(db: Session):
 
     menu_items = db.query(Menu).all()
 
@@ -50,32 +55,42 @@ def get_top_selling_items(db):
 
     for menu in menu_items:
 
-        order_items = db.query(OrderItem).filter(
-            OrderItem.menu_id == menu.id
-        ).all()
+        order_items = (
+            db.query(OrderItem)
+            .filter(OrderItem.menu_id == menu.id)
+            .all()
+        )
 
-        total_orders = sum(item.quantity for item in order_items)
+        total_orders = sum(
+            item.quantity
+            for item in order_items
+        )
 
-        revenue = sum(item.subtotal for item in order_items)
+        revenue = sum(
+            item.subtotal
+            for item in order_items
+        )
 
-        result.append({
-            "item": menu.name,
-            "orders": total_orders,
-            "revenue": revenue
-        })
+        result.append(
+            {
+                "item": menu.name,
+                "orders": total_orders,
+                "revenue": revenue,
+            }
+        )
 
     result.sort(
-        key=lambda x: x["orders"],
-        reverse=True
+        key=lambda item: item["orders"],
+        reverse=True,
     )
 
-    return result
+    return result[:10]
 
 
-# -----------------------------
+# =====================================================
 # Order Statistics
-# -----------------------------
-def get_order_statistics(db):
+# =====================================================
+def get_order_statistics(db: Session):
 
     orders = db.query(Order).all()
 
@@ -89,7 +104,9 @@ def get_order_statistics(db):
 
     for order in orders:
 
-        status = order.order_status.lower()
+        status = (
+            order.order_status or ""
+        ).lower()
 
         if status in stats:
             stats[status] += 1
@@ -97,10 +114,10 @@ def get_order_statistics(db):
     return stats
 
 
-# -----------------------------
+# =====================================================
 # Inventory Usage Analytics
-# -----------------------------
-def get_inventory_usage(db):
+# =====================================================
+def get_inventory_usage(db: Session):
 
     inventory_items = db.query(Inventory).all()
 
@@ -116,7 +133,7 @@ def get_inventory_usage(db):
 
         days_remaining = predict_days_remaining(
             item.quantity,
-            daily_usage
+            daily_usage,
         )
 
         total_days += days_remaining
@@ -127,7 +144,7 @@ def get_inventory_usage(db):
         if days_remaining < 5:
             critical_stock += 1
 
-    average_days = (
+    average_days_remaining = (
         round(total_days / total_items, 2)
         if total_items > 0
         else 0
@@ -137,5 +154,5 @@ def get_inventory_usage(db):
         "total_items": total_items,
         "low_stock": low_stock,
         "critical_stock": critical_stock,
-        "average_days_remaining": average_days,
+        "average_days_remaining": average_days_remaining,
     }

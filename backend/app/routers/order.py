@@ -1,74 +1,86 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.models.inventory import Inventory
+from app.models.menu import Menu
 from app.models.order import Order
 from app.models.order_item import OrderItem
 from app.models.restaurant import Restaurant
-from app.models.menu import Menu
-from app.models.inventory import Inventory
 
 from app.schemas.order_schema import (
     OrderCreate,
     OrderResponse,
-    OrderStatusUpdate
+    OrderStatusUpdate,
+    PaymentStatusUpdate,
 )
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/orders",
+    tags=["Order Management"],
+)
 
 
-# -----------------------------
+# =====================================================
 # Place Order
-# -----------------------------
-@router.post("/", response_model=OrderResponse, status_code=201)
-def place_order(order: OrderCreate, db: Session = Depends(get_db)):
-
-    # Check Restaurant
-    restaurant = db.query(Restaurant).filter(
-        Restaurant.restaurant_id == order.restaurant_id
-    ).first()
+# POST /orders
+# =====================================================
+@router.post(
+    "/",
+    response_model=OrderResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def place_order(
+    order: OrderCreate,
+    db: Session = Depends(get_db),
+):
+    restaurant = (
+        db.query(Restaurant)
+        .filter(
+            Restaurant.restaurant_id == order.restaurant_id
+        )
+        .first()
+    )
 
     if not restaurant:
         raise HTTPException(
-            status_code=404,
-            detail="Restaurant not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Restaurant not found",
         )
 
-    total_amount = 0
-
-    # Create Order
     new_order = Order(
         restaurant_id=order.restaurant_id,
         customer_id=order.customer_id,
         payment_method=order.payment_method,
         payment_status="Pending",
         order_status="Pending",
-        total_amount=0
+        total_amount=0,
     )
 
     db.add(new_order)
     db.commit()
     db.refresh(new_order)
 
-    low_stock_items = []
+    total_amount = 0
 
-    # Process Each Menu Item
     for item in order.items:
 
-        menu = db.query(Menu).filter(
-            Menu.id == item.menu_id
-        ).first()
+        menu = (
+            db.query(Menu)
+            .filter(Menu.id == item.menu_id)
+            .first()
+        )
 
         if not menu:
             raise HTTPException(
-                status_code=404,
-                detail=f"Menu item {item.menu_id} not found"
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Menu item {item.menu_id} not found",
             )
 
         if not menu.is_available:
             raise HTTPException(
-                status_code=400,
-                detail=f"{menu.name} is unavailable"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"{menu.name} is unavailable",
             )
 
         subtotal = menu.price * item.quantity
@@ -79,60 +91,38 @@ def place_order(order: OrderCreate, db: Session = Depends(get_db)):
             menu_id=item.menu_id,
             quantity=item.quantity,
             price=menu.price,
-            subtotal=subtotal
+            subtotal=subtotal,
         )
 
         db.add(order_item)
 
-        # -----------------------------
-        # Automatic Stock Deduction
-        # -----------------------------
-        inventory = db.query(Inventory).filter(
-            Inventory.restaurant_id == order.restaurant_id
-        ).first()
+        inventory = (
+            db.query(Inventory)
+            .filter(
+                Inventory.restaurant_id == order.restaurant_id
+            )
+            .first()
+        )
 
         if inventory:
+            inventory.quantity = max(
+                inventory.quantity - 1,
+                0,
+            )
 
-            inventory.quantity -= 1
-
-            if inventory.quantity < 0:
-                inventory.quantity = 0
-
-            if inventory.quantity <= inventory.minimum_stock:
-                low_stock_items.append({
-                    "item": inventory.item_name,
-                    "remaining_quantity": inventory.quantity
-                })
-
-    # Update Total Amount
     new_order.total_amount = total_amount
 
     db.commit()
     db.refresh(new_order)
 
-    # Return Low Stock Alert (Optional)
-    if low_stock_items:
-        return {
-            "id": new_order.id,
-            "restaurant_id": new_order.restaurant_id,
-            "customer_id": new_order.customer_id,
-            "total_amount": new_order.total_amount,
-            "order_status": new_order.order_status,
-            "payment_status": new_order.payment_status,
-            "payment_method": new_order.payment_method,
-            "created_at": new_order.created_at,
-            "updated_at": new_order.updated_at,
-            "low_stock_alert": low_stock_items
-        }
-
     return new_order
 
 
-# -----------------------------
+# =====================================================
 # Get All Orders
-# -----------------------------
+# =====================================================
 @router.get(
-    "/restaurants/{restaurant_id}/orders",
+    "/restaurants/{restaurant_id}",
     response_model=list[OrderResponse],
 )
 def get_orders(
@@ -149,11 +139,11 @@ def get_orders(
 
     if not restaurant:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Restaurant not found",
         )
 
-    orders = (
+    return (
         db.query(Order)
         .filter(
             Order.restaurant_id == restaurant_id
@@ -161,82 +151,101 @@ def get_orders(
         .all()
     )
 
-    return orders
 
-
-# -----------------------------
-# Get Order By ID
-# -----------------------------
-@router.get("/{order_id}", response_model=OrderResponse)
-def get_order(order_id: int, db: Session = Depends(get_db)):
-
-    order = db.query(Order).filter(
-        Order.id == order_id
-    ).first()
+# =====================================================
+# Get Single Order
+# =====================================================
+@router.get(
+    "/{order_id}",
+    response_model=OrderResponse,
+)
+def get_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+):
+    order = (
+        db.query(Order)
+        .filter(Order.id == order_id)
+        .first()
+    )
 
     if not order:
         raise HTTPException(
-            status_code=404,
-            detail="Order not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
         )
 
     return order
 
 
-# -----------------------------
+# =====================================================
 # Update Order Status
-# -----------------------------
+# =====================================================
 @router.put("/{order_id}/status")
-def update_status(
+def update_order_status(
     order_id: int,
-    status: OrderStatusUpdate,
-    db: Session = Depends(get_db)
+    order_status: OrderStatusUpdate,
+    db: Session = Depends(get_db),
 ):
-
-    order = db.query(Order).filter(
-        Order.id == order_id
-    ).first()
+    order = (
+        db.query(Order)
+        .filter(Order.id == order_id)
+        .first()
+    )
 
     if not order:
         raise HTTPException(
-            status_code=404,
-            detail="Order not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
         )
 
-    order.order_status = status.order_status
+    order.order_status = order_status.order_status
 
     db.commit()
     db.refresh(order)
 
     return {
         "message": "Order status updated successfully",
-        "order": order
+        "order": order,
     }
 
 
-# -----------------------------
-# Delete Order
-# -----------------------------
-@router.delete("/{order_id}")
-def delete_order(order_id: int, db: Session = Depends(get_db)):
-
-    order = db.query(Order).filter(
-        Order.id == order_id
-    ).first()
+# =====================================================
+# Update Payment Status
+# =====================================================
+@router.put("/{order_id}/payment")
+def update_payment_status(
+    order_id: int,
+    payment_status: PaymentStatusUpdate,
+    db: Session = Depends(get_db),
+):
+    order = (
+        db.query(Order)
+        .filter(Order.id == order_id)
+        .first()
+    )
 
     if not order:
         raise HTTPException(
-            status_code=404,
-            detail="Order not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
         )
 
-    db.delete(order)
+    order.payment_status = payment_status.payment_status
+
     db.commit()
+    db.refresh(order)
 
     return {
-        "message": "Order deleted successfully"
+        "message": "Payment status updated successfully",
+        "order": order,
     }
-@router.get("/restaurants/{restaurant_id}/orders/stats")
+
+
+# =====================================================
+# Order Statistics
+# =====================================================
+@router.get("/restaurants/{restaurant_id}/stats")
 def get_order_stats(
     restaurant_id: int,
     db: Session = Depends(get_db),
@@ -266,4 +275,35 @@ def get_order_stats(
         "preparing": preparing,
         "ready": ready,
         "served": served,
+    }
+
+
+# =====================================================
+# Delete Order
+# =====================================================
+@router.delete(
+    "/{order_id}",
+    status_code=status.HTTP_200_OK,
+)
+def delete_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+):
+    order = (
+        db.query(Order)
+        .filter(Order.id == order_id)
+        .first()
+    )
+
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
+        )
+
+    db.delete(order)
+    db.commit()
+
+    return {
+        "message": "Order deleted successfully",
     }

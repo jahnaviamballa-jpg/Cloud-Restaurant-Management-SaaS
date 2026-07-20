@@ -1,6 +1,81 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import DashboardCard from "../components/DashboardCard";
 
+import { getInventoryStats } from "../api/inventoryApi";
+import { getOrderStats } from "../api/orderApi";
+import { getLowStockNotifications } from "../api/notificationApi";
+import { getSalesReport } from "../api/reportApi";
+
 function ManagerDashboard() {
+  const navigate = useNavigate();
+
+  const [inventory, setInventory] = useState({
+    total_items: 0,
+    low_stock: 0,
+    critical_stock: 0,
+  });
+
+  const [orders, setOrders] = useState({
+    pending: 0,
+    preparing: 0,
+    ready: 0,
+    served: 0,
+  });
+
+  const [alerts, setAlerts] = useState([]);
+
+  const [sales, setSales] = useState({
+    total_revenue: 0,
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  const loadDashboard = async () => {
+    try {
+      setLoading(true);
+
+      const [
+        inventoryData,
+        orderData,
+        alertData,
+        salesData,
+      ] = await Promise.all([
+        getInventoryStats(),
+        getOrderStats(),
+        getLowStockNotifications(),
+        getSalesReport(),
+      ]);
+
+      setInventory(inventoryData);
+      setOrders(orderData);
+      setAlerts(alertData);
+      setSales(salesData);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <h2
+        style={{
+          textAlign: "center",
+          marginTop: "100px",
+        }}
+      >
+        Loading Dashboard...
+      </h2>
+    );
+  }
+
   return (
     <div
       style={{
@@ -49,14 +124,53 @@ function ManagerDashboard() {
             gap: "25px",
           }}
         >
-          <DashboardCard title="Inventory Items" value="14" icon="📦" />
-          <DashboardCard title="Low Stock" value="3" icon="⚠️" />
-          <DashboardCard title="Critical Stock" value="6" icon="🚨" />
-          <DashboardCard title="Pending Orders" value="4" icon="🛒" />
-          <DashboardCard title="Preparing Orders" value="8" icon="👨‍🍳" />
-          <DashboardCard title="Ready Orders" value="12" icon="✅" />
-          <DashboardCard title="Served Orders" value="96" icon="🍽️" />
-          <DashboardCard title="Today's Revenue" value="₹18,450" icon="💰" />
+          <DashboardCard
+            title="Inventory Items"
+            value={inventory.total_items}
+            icon="📦"
+          />
+
+          <DashboardCard
+            title="Low Stock"
+            value={inventory.low_stock}
+            icon="⚠️"
+          />
+
+          <DashboardCard
+            title="Critical Stock"
+            value={inventory.critical_stock}
+            icon="🚨"
+          />
+
+          <DashboardCard
+            title="Pending Orders"
+            value={orders.pending}
+            icon="🛒"
+          />
+
+          <DashboardCard
+            title="Preparing Orders"
+            value={orders.preparing}
+            icon="👨‍🍳"
+          />
+
+          <DashboardCard
+            title="Ready Orders"
+            value={orders.ready}
+            icon="✅"
+          />
+
+          <DashboardCard
+            title="Served Orders"
+            value={orders.served}
+            icon="🍽️"
+          />
+
+          <DashboardCard
+            title="Revenue"
+            value={`₹${sales.total_revenue}`}
+            icon="💰"
+          />
         </div>
 
         <div
@@ -73,7 +187,6 @@ function ManagerDashboard() {
               background: "rgba(20,20,28,.92)",
               borderRadius: "20px",
               padding: "25px",
-              border: "1px solid rgba(255,255,255,.08)",
             }}
           >
             <h2 style={{ color: "white" }}>
@@ -82,15 +195,23 @@ function ManagerDashboard() {
 
             <ul
               style={{
-                color: "#CFCFD5",
-                lineHeight: "35px",
+                color: "#ddd",
                 marginTop: "20px",
+                lineHeight: "35px",
               }}
             >
-              <li>⚠️ Tomatoes - Low Stock</li>
-              <li>⚠️ Cheese - Low Stock</li>
-              <li>🚨 Chicken - Critical Stock</li>
-              <li>🚨 Soft Drinks - Critical Stock</li>
+              {alerts.length === 0 ? (
+                <li>No Low Stock Items</li>
+              ) : (
+                alerts.map((item, index) => (
+                  <li key={index}>
+                    {item.status === "Critical"
+                      ? "🚨"
+                      : "⚠️"}{" "}
+                    {item.item} ({item.quantity})
+                  </li>
+                ))
+              )}
             </ul>
           </div>
 
@@ -99,24 +220,27 @@ function ManagerDashboard() {
               background: "rgba(20,20,28,.92)",
               borderRadius: "20px",
               padding: "25px",
-              border: "1px solid rgba(255,255,255,.08)",
             }}
           >
             <h2 style={{ color: "white" }}>
-              📋 Recent Orders
+              📊 Dashboard Summary
             </h2>
 
             <ul
               style={{
-                color: "#CFCFD5",
-                lineHeight: "35px",
+                color: "#ddd",
                 marginTop: "20px",
+                lineHeight: "35px",
               }}
             >
-              <li>#ORD1001 - Chicken Biryani - Delivered</li>
-              <li>#ORD1002 - Veg Pizza - Preparing</li>
-              <li>#ORD1003 - Burger Combo - Ready</li>
-              <li>#ORD1004 - Pasta - Pending</li>
+              <li>Total Inventory : {inventory.total_items}</li>
+              <li>Pending Orders : {orders.pending}</li>
+              <li>Preparing : {orders.preparing}</li>
+              <li>Ready : {orders.ready}</li>
+              <li>Served : {orders.served}</li>
+              <li>
+                Revenue : ₹{sales.total_revenue}
+              </li>
             </ul>
           </div>
         </div>
@@ -130,6 +254,7 @@ function ManagerDashboard() {
           }}
         >
           <button
+            onClick={() => navigate("/inventory")}
             style={{
               padding: "16px 30px",
               border: "none",
@@ -145,6 +270,7 @@ function ManagerDashboard() {
           </button>
 
           <button
+            onClick={() => navigate("/reports")}
             style={{
               padding: "16px 30px",
               border: "none",
@@ -159,6 +285,7 @@ function ManagerDashboard() {
           </button>
 
           <button
+            onClick={() => navigate("/analytics")}
             style={{
               padding: "16px 30px",
               border: "none",
@@ -169,7 +296,7 @@ function ManagerDashboard() {
               fontWeight: "700",
             }}
           >
-            👨‍🍳 Staff Management
+            📈 Analytics
           </button>
         </div>
       </div>

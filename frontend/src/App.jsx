@@ -5,7 +5,7 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-
+import EditRestaurant from "./pages/EditRestaurant";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -31,6 +31,7 @@ import Profile from "./pages/Profile";
 
 import Inventory from "./pages/Inventory";
 import AddInventory from "./pages/AddInventory";
+import AddRestaurant from "./pages/AddRestaurant";
 
 import PredictionDashboard from "./pages/PredictionDashboard";
 import PredictionDetails from "./pages/PredictionDetails";
@@ -41,6 +42,9 @@ import RevenueReport from "./pages/RevenueReport";
 
 import NotFound from "./pages/NotFound";
 import ServerError from "./pages/ServerError";
+
+import AddMenuItem from "./pages/AddMenuItem";
+import EditMenuItem from "./pages/EditMenuItem";
 
 function AppContent() {
   const location = useLocation();
@@ -167,7 +171,16 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+  path="/edit-restaurant/:restaurantId"
+  element={
+    <ProtectedRoute
+      allowedRoles={["Owner"]}
+    >
+      <EditRestaurant />
+    </ProtectedRoute>
+  }
+/>
         {/* Customer */}
 
         <Route
@@ -252,7 +265,16 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+  path="/edit-menu/:menuId"
+  element={
+    <ProtectedRoute
+      allowedRoles={["Owner", "Manager"]}
+    >
+      <EditMenuItem />
+    </ProtectedRoute>
+  }
+/>
         {/* Cart */}
 
         <Route
@@ -343,6 +365,16 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/add-restaurant"
+  element={
+    <ProtectedRoute
+      allowedRoles={["Owner"]}
+    >
+      <AddRestaurant />
+    </ProtectedRoute>
+  }
+/>
 
         {/* Predictions */}
 
@@ -420,6 +452,18 @@ function AppContent() {
           path="*"
           element={<NotFound />}
         />
+        <Route
+  path="/add-menu-item"
+  element={
+    <ProtectedRoute
+      allowedRoles={["Owner", "Manager"]}
+    >
+      <AddMenuItem />
+    </ProtectedRoute>
+  }
+/>
+
+
 
       </Routes>
     </>

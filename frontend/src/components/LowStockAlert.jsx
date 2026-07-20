@@ -4,15 +4,49 @@ function LowStockAlert({ item }) {
   return (
     <div
       style={{
-        background: "#ffe5e5",
-        color: "red",
-        padding: "15px",
-        borderRadius: "10px",
-        marginBottom: "20px",
-        fontWeight: "bold",
+        background: "rgba(220,38,38,.15)",
+        border: "1px solid rgba(220,38,38,.4)",
+        color: "#FCA5A5",
+        padding: "18px 22px",
+        borderRadius: "16px",
+        marginBottom: "25px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        boxShadow: "0 10px 25px rgba(0,0,0,.25)",
       }}
     >
-      ⚠️ {item} stock is below the minimum level.
+      <div>
+        <h3
+          style={{
+            margin: 0,
+            color: "#F87171",
+            fontSize: "20px",
+          }}
+        >
+          ⚠️ Low Stock Alert
+        </h3>
+
+        <p
+          style={{
+            marginTop: "8px",
+            marginBottom: 0,
+            color: "#FECACA",
+            fontSize: "16px",
+          }}
+        >
+          <strong>{item}</strong> stock is below the minimum level.
+          Please restock it as soon as possible.
+        </p>
+      </div>
+
+      <div
+        style={{
+          fontSize: "40px",
+        }}
+      >
+        📦
+      </div>
     </div>
   );
 }

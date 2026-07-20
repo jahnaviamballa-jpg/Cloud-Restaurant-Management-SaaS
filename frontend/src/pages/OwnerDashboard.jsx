@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import DashboardCard from "../components/DashboardCard";
 
 import { getRestaurants } from "../api/restaurantApi";
@@ -9,6 +11,8 @@ import {
 } from "../api/analyticsApi";
 
 function OwnerDashboard() {
+  const navigate = useNavigate();
+
   const [restaurantCount, setRestaurantCount] = useState(0);
   const [sales, setSales] = useState(0);
   const [revenue, setRevenue] = useState(0);
@@ -21,15 +25,32 @@ function OwnerDashboard() {
   const loadDashboard = async () => {
     try {
       const restaurants = await getRestaurants();
+
       const salesData = await getSalesAnalytics();
-      const revenueData = await getRevenueAnalytics();
-      const orderData = await getOrderStatistics();
 
-      setRestaurantCount(restaurants.length);
+      const revenueData =
+        await getRevenueAnalytics();
 
-      setSales(salesData.total_sales || 0);
+      const orderData =
+        await getOrderStatistics();
 
-      setRevenue(revenueData.total_revenue || 0);
+      setRestaurantCount(
+        Array.isArray(restaurants)
+          ? restaurants.length
+          : 0
+      );
+
+      setSales(
+        salesData.total_sales ||
+          salesData.sales ||
+          0
+      );
+
+      setRevenue(
+        revenueData.total_revenue ||
+          revenueData.revenue ||
+          0
+      );
 
       setOrders(
         (orderData.pending || 0) +
@@ -59,7 +80,8 @@ function OwnerDashboard() {
           background: "rgba(18,18,24,.75)",
           borderRadius: "25px",
           padding: "35px",
-          border: "1px solid rgba(255,255,255,.08)",
+          border:
+            "1px solid rgba(255,255,255,.08)",
           backdropFilter: "blur(12px)",
         }}
       >
@@ -80,7 +102,8 @@ function OwnerDashboard() {
             marginBottom: "35px",
           }}
         >
-          Welcome back! Here's a complete overview of your restaurant business.
+          Welcome back! Here's a complete
+          overview of your restaurant business.
         </p>
 
         <div
@@ -98,7 +121,7 @@ function OwnerDashboard() {
           />
 
           <DashboardCard
-            title="Total Orders"
+            title="Orders"
             value={orders}
             icon="🛒"
           />
@@ -119,63 +142,70 @@ function OwnerDashboard() {
         {/* Quick Actions */}
 
         <div
-          style={{
-            marginTop: "45px",
-          }}
-        >
-          <h2
-            style={{
-              color: "white",
-              marginBottom: "20px",
-            }}
-          >
-            ⚡ Quick Actions
-          </h2>
+  style={{
+    marginTop: "45px",
+  }}
+>
+  <h2
+    style={{
+      color: "white",
+      marginBottom: "20px",
+    }}
+  >
+    ⚡ Quick Actions
+  </h2>
 
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "20px",
-            }}
-          >
-            {[
-              "➕ Add Restaurant",
-              "👨‍🍳 Manage Staff",
-              "📦 Inventory",
-              "📊 Analytics",
-              "🧾 Reports",
-              "⚙ Settings",
-            ].map((item) => (
-              <button
-                key={item}
-                style={{
-                  padding: "15px 28px",
-                  border: "none",
-                  borderRadius: "14px",
-                  background:
-                    "linear-gradient(90deg,#7C3AED,#F97316)",
-                  color: "white",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  transition: ".3s",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.transform =
-                    "translateY(-5px)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.transform =
-                    "translateY(0)")
-                }
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-        </div>
+  <div
+    style={{
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "20px",
+    }}
+  >
+    <button
+      style={buttonStyle}
+      onClick={() => navigate("/add-restaurant")}
+    >
+      ➕ Add Restaurant
+    </button>
 
-        {/* Business Overview */}
+    <button
+      style={buttonStyle}
+      onClick={() => navigate("/restaurants")}
+    >
+      🍽️ View Restaurants
+    </button>
+
+    <button
+      style={buttonStyle}
+      onClick={() => navigate("/inventory")}
+    >
+      📦 Inventory
+    </button>
+
+    <button
+      style={buttonStyle}
+      onClick={() => navigate("/analytics-dashboard")}
+    >
+      📊 Analytics
+    </button>
+
+    <button
+      style={buttonStyle}
+      onClick={() => navigate("/sales-report")}
+    >
+      📈 Sales Report
+    </button>
+
+    <button
+      style={buttonStyle}
+      onClick={() => navigate("/revenue-report")}
+    >
+      💰 Revenue Report
+    </button>
+  </div>
+</div>
+                {/* Business Overview */}
 
         <div
           style={{
@@ -191,7 +221,8 @@ function OwnerDashboard() {
               background: "rgba(20,20,28,.92)",
               borderRadius: "20px",
               padding: "30px",
-              border: "1px solid rgba(255,255,255,.08)",
+              border:
+                "1px solid rgba(255,255,255,.08)",
             }}
           >
             <h2
@@ -207,6 +238,7 @@ function OwnerDashboard() {
               style={{
                 color: "#22C55E",
                 fontSize: "50px",
+                margin: 0,
               }}
             >
               +28%
@@ -215,6 +247,7 @@ function OwnerDashboard() {
             <p
               style={{
                 color: "#BDBDBD",
+                marginTop: "15px",
               }}
             >
               Compared to last month.
@@ -226,7 +259,8 @@ function OwnerDashboard() {
               background: "rgba(20,20,28,.92)",
               borderRadius: "20px",
               padding: "30px",
-              border: "1px solid rgba(255,255,255,.08)",
+              border:
+                "1px solid rgba(255,255,255,.08)",
             }}
           >
             <h2
@@ -242,6 +276,7 @@ function OwnerDashboard() {
               style={{
                 color: "#FACC15",
                 fontSize: "50px",
+                margin: 0,
               }}
             >
               4.9★
@@ -250,6 +285,7 @@ function OwnerDashboard() {
             <p
               style={{
                 color: "#BDBDBD",
+                marginTop: "15px",
               }}
             >
               Based on customer ratings.
@@ -265,7 +301,8 @@ function OwnerDashboard() {
             background: "rgba(20,20,28,.92)",
             borderRadius: "20px",
             padding: "30px",
-            border: "1px solid rgba(255,255,255,.08)",
+            border:
+              "1px solid rgba(255,255,255,.08)",
           }}
         >
           <h2
@@ -283,14 +320,16 @@ function OwnerDashboard() {
             "📦 Inventory updated",
             "⭐ New customer review received",
             "👨‍🍳 Staff attendance completed",
-          ].map((activity) => (
+          ].map((activity, index) => (
             <div
-              key={activity}
+              key={index}
               style={{
                 color: "#E5E7EB",
                 padding: "15px 0",
                 borderBottom:
-                  "1px solid rgba(255,255,255,.06)",
+                  index !== 4
+                    ? "1px solid rgba(255,255,255,.06)"
+                    : "none",
               }}
             >
               {activity}
@@ -301,5 +340,19 @@ function OwnerDashboard() {
     </div>
   );
 }
+
+const buttonStyle = {
+  padding: "15px 28px",
+  border: "none",
+  borderRadius: "14px",
+  background:
+    "linear-gradient(90deg,#7C3AED,#F97316)",
+  color: "white",
+  fontWeight: "600",
+  fontSize: "15px",
+  cursor: "pointer",
+  transition: "0.3s ease",
+  boxShadow: "0 8px 20px rgba(0,0,0,.25)",
+};
 
 export default OwnerDashboard;

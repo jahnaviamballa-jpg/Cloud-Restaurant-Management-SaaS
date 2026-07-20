@@ -1,28 +1,61 @@
-from pydantic import BaseModel, Field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, Field, ConfigDict
 
 
+# ----------------------------------------
+# Create Menu Item
+# ----------------------------------------
 class MenuCreate(BaseModel):
-    category: str = Field(..., min_length=1)
-    name: str = Field(..., min_length=1)
-    description: Optional[str] = None
+    category: str = Field(..., min_length=1, max_length=100)
+    name: str = Field(..., min_length=1, max_length=150)
+    description: Optional[str] = Field(
+        default=None,
+        max_length=500
+    )
     price: float = Field(..., gt=0)
-    image_url: Optional[str] = None
+    image_url: Optional[str] = Field(
+        default=None,
+        max_length=255
+    )
     is_available: bool = True
     is_veg: bool = False
 
 
+# ----------------------------------------
+# Update Menu Item
+# ----------------------------------------
 class MenuUpdate(BaseModel):
-    category: Optional[str] = None
-    name: Optional[str] = None
-    description: Optional[str] = None
-    price: Optional[float] = Field(None, gt=0)
-    image_url: Optional[str] = None
+    category: Optional[str] = Field(
+        default=None,
+        min_length=1,
+        max_length=100,
+    )
+    name: Optional[str] = Field(
+        default=None,
+        min_length=1,
+        max_length=150,
+    )
+    description: Optional[str] = Field(
+        default=None,
+        max_length=500,
+    )
+    price: Optional[float] = Field(
+        default=None,
+        gt=0,
+    )
+    image_url: Optional[str] = Field(
+        default=None,
+        max_length=255,
+    )
     is_available: Optional[bool] = None
     is_veg: Optional[bool] = None
 
 
+# ----------------------------------------
+# Menu Response
+# ----------------------------------------
 class MenuResponse(BaseModel):
     id: int
     restaurant_id: int
@@ -36,5 +69,6 @@ class MenuResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(
+        from_attributes=True
+    )

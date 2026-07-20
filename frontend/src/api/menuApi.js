@@ -1,13 +1,11 @@
 import api from "./api";
 import { getRestaurantId } from "../utils/restaurant";
 
-// Get menu for selected restaurant
+// ========================================
+// Get Menu By Restaurant
+// ========================================
 export const getMenuByRestaurant = async () => {
   const restaurantId = getRestaurantId();
-
-  if (!restaurantId) {
-    throw new Error("No restaurant selected");
-  }
 
   const response = await api.get(
     `/restaurants/${restaurantId}/menu`
@@ -16,8 +14,67 @@ export const getMenuByRestaurant = async () => {
   return response.data;
 };
 
-// Get a single menu item
-export const getMenuItem = async (menuId) => {
-  const response = await api.get(`/menu/${menuId}`);
+// ========================================
+// Get All Menu Items (Alias)
+// ========================================
+export const getMenu = async () => {
+  return getMenuByRestaurant();
+};
+
+// ========================================
+// Get Single Menu Item
+// ========================================
+export const getMenuItem = async (id) => {
+  const response = await api.get(`/menu/${id}`);
+  return response.data;
+};
+
+// ========================================
+// Create Menu Item
+// ========================================
+export const createMenuItem = async (data) => {
+  const restaurantId = getRestaurantId();
+
+  const response = await api.post(
+    `/restaurants/${restaurantId}/menu`,
+    data
+  );
+
+  return response.data;
+};
+
+// ========================================
+// Update Menu Item
+// ========================================
+export const updateMenuItem = async (id, data) => {
+  const response = await api.put(
+    `/menu/${id}`,
+    data
+  );
+
+  return response.data;
+};
+
+// ========================================
+// Delete Menu Item
+// ========================================
+export const deleteMenuItem = async (id) => {
+  const response = await api.delete(
+    `/menu/${id}`
+  );
+
+  return response.data;
+};
+
+// ========================================
+// Menu Statistics
+// ========================================
+export const getMenuStats = async () => {
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/menu/restaurants/${restaurantId}/stats`
+  );
+
   return response.data;
 };

@@ -1,35 +1,63 @@
-def calculate_daily_usage(item_name=None):
+from typing import Optional
+
+
+# =====================================================
+# Default Daily Usage Data
+# =====================================================
+
+DEFAULT_DAILY_USAGE = {
+    "AI Test Chicken": 5,
+    "AI Test Rice": 10,
+    "AI Test Oil": 5,
+}
+
+
+# =====================================================
+# Calculate Daily Usage
+# =====================================================
+def calculate_daily_usage(
+    item_name: Optional[str] = None,
+) -> float:
     """
-    Returns average daily usage for prediction testing.
-    Later this can be replaced with actual order history analysis.
+    Returns the estimated average daily usage of an item.
+
+    Later this can be replaced with:
+    - Order history analysis
+    - Machine Learning prediction
+    - Time-series forecasting
     """
 
-    usage_data = {
-        "AI Test Chicken": 5,
-        "AI Test Rice": 10,
-        "AI Test Oil": 5,
-    }
-
-    return usage_data.get(item_name, 5)
+    return DEFAULT_DAILY_USAGE.get(item_name, 5)
 
 
-def predict_days_remaining(current_stock, daily_usage):
+# =====================================================
+# Predict Remaining Days
+# =====================================================
+def predict_days_remaining(
+    current_stock: int,
+    daily_usage: float,
+) -> float:
     """
-    Days Remaining = Current Stock / Daily Usage
+    Predict how many days the stock will last.
     """
 
-    if daily_usage <= 0:
+    if current_stock <= 0:
         return 0
 
-    if current_stock < 0:
+    if daily_usage <= 0:
         return 0
 
     return round(current_stock / daily_usage, 2)
 
 
-def suggest_reorder_quantity(days_remaining):
+# =====================================================
+# Suggest Reorder Quantity
+# =====================================================
+def suggest_reorder_quantity(
+    days_remaining: float,
+) -> dict:
     """
-    Returns recommendation and reorder quantity.
+    Returns reorder recommendation.
     """
 
     if days_remaining < 5:
@@ -38,7 +66,7 @@ def suggest_reorder_quantity(days_remaining):
             "quantity": 50,
         }
 
-    elif days_remaining < 10:
+    if days_remaining < 10:
         return {
             "recommendation": "Plan Reorder",
             "quantity": 20,
@@ -50,9 +78,14 @@ def suggest_reorder_quantity(days_remaining):
     }
 
 
-def generate_inventory_summary(inventory_items):
+# =====================================================
+# Inventory Summary Analytics
+# =====================================================
+def generate_inventory_summary(
+    inventory_items,
+):
     """
-    Generates analytics for dashboard.
+    Generate inventory analytics for dashboard.
     """
 
     total_items = len(inventory_items)
@@ -62,19 +95,22 @@ def generate_inventory_summary(inventory_items):
     total_days = 0
 
     for item in inventory_items:
-        daily_usage = calculate_daily_usage(item.item_name)
 
-        days = predict_days_remaining(
+        daily_usage = calculate_daily_usage(
+            item.item_name
+        )
+
+        days_remaining = predict_days_remaining(
             item.quantity,
             daily_usage,
         )
 
-        total_days += days
+        total_days += days_remaining
 
         if item.quantity <= item.minimum_stock:
             low_stock += 1
 
-        if days < 5:
+        if days_remaining < 5:
             critical_stock += 1
 
     average_days = (

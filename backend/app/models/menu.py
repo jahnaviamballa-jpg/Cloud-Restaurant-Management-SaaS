@@ -1,48 +1,100 @@
+from datetime import datetime
+
 from sqlalchemy import (
+    Boolean,
     Column,
+    DateTime,
+    Float,
+    ForeignKey,
     Integer,
     String,
-    Float,
-    Boolean,
-    DateTime,
-    ForeignKey
 )
 from sqlalchemy.orm import relationship
-from datetime import datetime
+
 from app.database import Base
 
 
 class Menu(Base):
     __tablename__ = "menu"
 
-    id = Column(Integer, primary_key=True, index=True)
+    # =====================================================
+    # Primary Key
+    # =====================================================
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+    )
 
+    # =====================================================
+    # Foreign Key
+    # =====================================================
     restaurant_id = Column(
         Integer,
         ForeignKey("restaurants.restaurant_id"),
-        nullable=False
+        nullable=False,
     )
 
-    category = Column(String(100), nullable=False)
+    # =====================================================
+    # Menu Details
+    # =====================================================
+    category = Column(
+        String(100),
+        nullable=False,
+    )
 
-    name = Column(String(150), nullable=False)
+    name = Column(
+        String(150),
+        nullable=False,
+    )
 
-    description = Column(String(500))
+    description = Column(
+        String(500),
+    )
 
-    price = Column(Float, nullable=False)
+    price = Column(
+        Float,
+        nullable=False,
+    )
 
-    image_url = Column(String(255))
+    image_url = Column(
+        String(255),
+    )
 
-    is_available = Column(Boolean, default=True)
+    is_available = Column(
+        Boolean,
+        default=True,
+    )
 
-    is_veg = Column(Boolean, default=False)
+    is_veg = Column(
+        Boolean,
+        default=False,
+    )
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    # =====================================================
+    # Timestamps
+    # =====================================================
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+    )
 
     updated_at = Column(
         DateTime,
         default=datetime.utcnow,
-        onupdate=datetime.utcnow
+        onupdate=datetime.utcnow,
     )
 
-    restaurant = relationship("Restaurant")
+    # =====================================================
+    # Relationships
+    # =====================================================
+    restaurant = relationship(
+        "Restaurant",
+        back_populates="menu_items",
+    )
+
+    order_items = relationship(
+        "OrderItem",
+        back_populates="menu",
+        cascade="all, delete-orphan",
+    )

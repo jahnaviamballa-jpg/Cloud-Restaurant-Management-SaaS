@@ -1,30 +1,45 @@
-function CartItem({ item }) {
+function CartItem({
+  item,
+  increaseQuantity,
+  decreaseQuantity,
+  removeItem,
+}) {
   return (
     <div
-  onMouseEnter={(e) => {
-    e.currentTarget.style.transform = "translateY(-5px)";
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.transform = "translateY(0)";
-  }}
-  style={{
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    background: "rgba(20,20,28,.92)",
-    padding: "22px",
-    marginBottom: "20px",
-    borderRadius: "18px",
-    border: "1px solid rgba(255,255,255,.08)",
-    backdropFilter: "blur(10px)",
-    boxShadow: "0 12px 30px rgba(0,0,0,.30)",
-    transition: ".3s",
-  }}
->
-    
-      <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform =
+          "translateY(-5px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform =
+          "translateY(0)";
+      }}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        background: "rgba(20,20,28,.92)",
+        padding: "22px",
+        marginBottom: "20px",
+        borderRadius: "18px",
+        border: "1px solid rgba(255,255,255,.08)",
+        backdropFilter: "blur(10px)",
+        boxShadow: "0 12px 30px rgba(0,0,0,.30)",
+        transition: ".3s",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "15px",
+        }}
+      >
         <img
-          src={item.image}
+          src={
+            item.image ||
+            "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
+          }
           alt={item.name}
           style={{
             width: "100px",
@@ -35,102 +50,111 @@ function CartItem({ item }) {
         />
 
         <div>
-  <h2
-    style={{
-      color: "white",
-      marginBottom: "10px",
-    }}
-  >
-    {item.name}
-  </h2>
+          <h2
+            style={{
+              color: "white",
+              marginBottom: "10px",
+            }}
+          >
+            {item.name}
+          </h2>
 
-  <h3
-    style={{
-      color: "#F97316",
-      margin: 0,
-    }}
-  >
-    ₹{item.price}
-  </h3>
+          <h3
+            style={{
+              color: "#F97316",
+              margin: 0,
+            }}
+          >
+            ₹{item.price}
+          </h3>
 
-  <p
-    style={{
-      color: "#BDBDBD",
-      marginTop: "10px",
-      fontSize: "15px",
-    }}
-  >
-    Freshly prepared with premium ingredients.
-  </p>
-</div>
+          <p
+            style={{
+              color: "#BDBDBD",
+              marginTop: "10px",
+              fontSize: "15px",
+            }}
+          >
+            Freshly prepared with premium
+            ingredients.
+          </p>
+        </div>
       </div>
 
       <div style={{ textAlign: "center" }}>
-       <div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "12px",
-  }}
->
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "12px",
+          }}
+        >
+          <button
+            onClick={() =>
+              decreaseQuantity(item.id)
+            }
+            style={{
+              width: "45px",
+              height: "45px",
+              borderRadius: "50%",
+              border: "none",
+              background: "#7C3AED",
+              color: "white",
+              fontSize: "22px",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            −
+          </button>
 
-  <button
-    style={{
-      width: "45px",
-      height: "45px",
-      borderRadius: "50%",
-      border: "none",
-      background: "#7C3AED",
-      color: "white",
-      fontSize: "22px",
-fontWeight: "bold",
-      cursor: "pointer",
-    }}
-  >
-    −
-  </button>
+          <span
+            style={{
+              color: "white",
+              fontSize: "18px",
+              fontWeight: "bold",
+              minWidth: "30px",
+            }}
+          >
+            {item.quantity}
+          </span>
 
-  <span
-    style={{
-      color: "white",
-      fontSize: "18px",
-      fontWeight: "bold",
-      minWidth: "30px",
-    }}
-  >
-    {item.quantity}
-  </span>
+          <button
+            onClick={() =>
+              increaseQuantity(item.id)
+            }
+            style={{
+              width: "45px",
+              height: "45px",
+              borderRadius: "50%",
+              border: "none",
+              background: "#F97316",
+              color: "white",
+              fontSize: "20px",
+              cursor: "pointer",
+            }}
+          >
+            +
+          </button>
+        </div>
 
-  <button
-    style={{
-      width: "45px",
-      height: "45px",
-      borderRadius: "50%",
-      border: "none",
-      background: "#F97316",
-      color: "white",
-      fontSize: "20px",
-      cursor: "pointer",
-    }}
-  >
-    +
-  </button>
-</div>
-
-        <br /><br />
+        <br />
 
         <button
+          onClick={() =>
+            removeItem(item.id)
+          }
           style={{
-  marginTop: "18px",
-  padding: "10px 18px",
-  border: "none",
-  borderRadius: "10px",
-  background: "#DC2626",
-  color: "white",
-  fontWeight: "600",
-  cursor: "pointer",
-}}
+            marginTop: "18px",
+            padding: "10px 18px",
+            border: "none",
+            borderRadius: "10px",
+            background: "#DC2626",
+            color: "white",
+            fontWeight: "600",
+            cursor: "pointer",
+          }}
         >
           🗑 Remove Item
         </button>

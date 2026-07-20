@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -10,23 +10,36 @@ from app.schemas.inventory_schema import (
     InventoryResponse,
 )
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/inventory",
+    tags=["Inventory Management"],
+)
 
 
-# -----------------------------
-# Add Inventory
-# -----------------------------
-@router.post("/", response_model=InventoryResponse, status_code=201)
-def add_inventory(item: InventoryCreate, db: Session = Depends(get_db)):
-
-    restaurant = db.query(Restaurant).filter(
-        Restaurant.restaurant_id == item.restaurant_id
-    ).first()
+# =====================================================
+# Add Inventory Item
+# =====================================================
+@router.post(
+    "/",
+    response_model=InventoryResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def add_inventory(
+    item: InventoryCreate,
+    db: Session = Depends(get_db),
+):
+    restaurant = (
+        db.query(Restaurant)
+        .filter(
+            Restaurant.restaurant_id == item.restaurant_id
+        )
+        .first()
+    )
 
     if not restaurant:
         raise HTTPException(
-            status_code=404,
-            detail="Restaurant not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Restaurant not found",
         )
 
     inventory = Inventory(**item.model_dump())
@@ -38,11 +51,11 @@ def add_inventory(item: InventoryCreate, db: Session = Depends(get_db)):
     return inventory
 
 
-# -----------------------------
-# Get All Inventory
-# -----------------------------
+# =====================================================
+# Get Inventory By Restaurant
+# =====================================================
 @router.get(
-    "/restaurants/{restaurant_id}/inventory",
+    "/restaurants/{restaurant_id}",
     response_model=list[InventoryResponse],
 )
 def get_inventory(
@@ -59,7 +72,7 @@ def get_inventory(
 
     if not restaurant:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Restaurant not found",
         )
 
@@ -71,88 +84,107 @@ def get_inventory(
         .all()
     )
 
-# -----------------------------
-# Get Inventory By ID
-# -----------------------------
-@router.get("/{id}", response_model=InventoryResponse)
-def get_inventory_item(id: int, db: Session = Depends(get_db)):
 
-    item = db.query(Inventory).filter(
-        Inventory.id == id
-    ).first()
+# =====================================================
+# Get Inventory Item
+# =====================================================
+@router.get(
+    "/{id}",
+    response_model=InventoryResponse,
+)
+def get_inventory_item(
+    id: int,
+    db: Session = Depends(get_db),
+):
+    item = (
+        db.query(Inventory)
+        .filter(Inventory.id == id)
+        .first()
+    )
 
     if not item:
         raise HTTPException(
-            status_code=404,
-            detail="Inventory item not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Inventory item not found",
         )
 
     return item
 
 
-# -----------------------------
+# =====================================================
 # Update Inventory
-# -----------------------------
-@router.put("/{id}")
+# =====================================================
+@router.put(
+    "/{id}",
+    response_model=InventoryResponse,
+)
 def update_inventory(
     id: int,
     updated_item: InventoryUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
-
-    item = db.query(Inventory).filter(
-        Inventory.id == id
-    ).first()
+    item = (
+        db.query(Inventory)
+        .filter(Inventory.id == id)
+        .first()
+    )
 
     if not item:
         raise HTTPException(
-            status_code=404,
-            detail="Inventory item not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Inventory item not found",
         )
 
-    # Update only the provided fields
-    for key, value in updated_item.model_dump(exclude_unset=True).items():
+    update_data = updated_item.model_dump(
+        exclude_unset=True
+    )
+
+    for key, value in update_data.items():
         setattr(item, key, value)
 
     db.commit()
     db.refresh(item)
 
-    # -----------------------------
-    # Low Stock Alert
-    # -----------------------------
-    if item.quantity <= item.minimum_stock:
-        return {
-            "message": "Low Stock Alert",
-            "item": item.item_name,
-            "remaining_quantity": item.quantity
-        }
-
     return item
 
 
-# -----------------------------
+# =====================================================
 # Delete Inventory
-# -----------------------------
-@router.delete("/{id}")
-def delete_inventory(id: int, db: Session = Depends(get_db)):
-
-    item = db.query(Inventory).filter(
-        Inventory.id == id
-    ).first()
+# =====================================================
+@router.delete(
+    "/{id}",
+    status_code=status.HTTP_200_OK,
+)
+def delete_inventory(
+    id: int,
+    db: Session = Depends(get_db),
+):
+    item = (
+        db.query(Inventory)
+        .filter(Inventory.id == id)
+        .first()
+    )
 
     if not item:
         raise HTTPException(
-            status_code=404,
-            detail="Inventory item not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Inventory item not found",
         )
 
     db.delete(item)
     db.commit()
 
     return {
-        "message": "Inventory item deleted successfully"
+        "message": "Inventory deleted successfully"
     }
-@router.get("/restaurants/{restaurant_id}/inventory/stats")
+
+
+# =====================================================
+# Inventory Statistics
+# =====================================================
+@router.get(
+    "/restaurants/{restaurant_id}/stats"
+)
 def get_inventory_stats(
     restaurant_id: int,
     db: Session = Depends(get_db),
@@ -176,11 +208,49 @@ def get_inventory_stats(
     critical_stock = sum(
         1
         for item in items
-        if item.quantity <= (item.minimum_stock // 2)
+        if item.quantity <= max(
+            1,
+            item.minimum_stock // 2,
+        )
     )
 
     return {
         "total_items": total_items,
         "low_stock": low_stock,
         "critical_stock": critical_stock,
+    }
+
+
+# =====================================================
+# Low Stock Items
+# =====================================================
+@router.get(
+    "/restaurants/{restaurant_id}/low-stock"
+)
+def get_low_stock_items(
+    restaurant_id: int,
+    db: Session = Depends(get_db),
+):
+    items = (
+        db.query(Inventory)
+        .filter(
+            Inventory.restaurant_id == restaurant_id
+        )
+        .all()
+    )
+
+    result = [
+        {
+            "id": item.id,
+            "item_name": item.item_name,
+            "quantity": item.quantity,
+            "minimum_stock": item.minimum_stock,
+        }
+        for item in items
+        if item.quantity <= item.minimum_stock
+    ]
+
+    return {
+        "count": len(result),
+        "items": result,
     }

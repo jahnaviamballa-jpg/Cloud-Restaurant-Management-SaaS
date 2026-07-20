@@ -1,30 +1,62 @@
+import { useEffect, useState } from "react";
+import { getOrders } from "../api/orderApi";
 function Orders() {
-  const orders = [
-    {
-      id: "#ORD1001",
-      item: "Chicken Biryani",
-      quantity: 2,
-      total: 598,
-      status: "Delivered",
-      color: "#22C55E",
-    },
-    {
-      id: "#ORD1002",
-      item: "Veg Pizza",
-      quantity: 1,
-      total: 399,
-      status: "Preparing",
-      color: "#F97316",
-    },
-    {
-      id: "#ORD1003",
-      item: "Mango Juice",
-      quantity: 3,
-      total: 297,
-      status: "Out for Delivery",
-      color: "#3B82F6",
-    },
-  ];
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadOrders();
+  }, []);
+
+  const loadOrders = async () => {
+    try {
+      setLoading(true);
+
+      const data = await getOrders();
+
+      setOrders(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to load orders");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Pending":
+        return "#7C3AED";
+
+      case "Preparing":
+        return "#F97316";
+
+      case "Ready":
+        return "#22C55E";
+
+      case "Served":
+        return "#2563EB";
+
+      case "Cancelled":
+        return "#DC2626";
+
+      default:
+        return "#6B7280";
+    }
+  };
+
+  if (loading) {
+    return (
+      <h2
+        style={{
+          textAlign: "center",
+          marginTop: "100px",
+        }}
+      >
+        Loading Orders...
+      </h2>
+    );
+  }
 
   return (
     <div
@@ -35,7 +67,6 @@ function Orders() {
           "linear-gradient(rgba(0,0,0,.20),rgba(0,0,0,.25)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundAttachment: "fixed",
       }}
     >
       <div
@@ -43,14 +74,12 @@ function Orders() {
           background: "rgba(18,18,24,.75)",
           borderRadius: "25px",
           padding: "35px",
-          border: "1px solid rgba(255,255,255,.08)",
         }}
       >
         <h1
           style={{
             color: "white",
             fontSize: "42px",
-            marginBottom: "10px",
           }}
         >
           📦 My Orders
@@ -58,127 +87,111 @@ function Orders() {
 
         <p
           style={{
-            color: "#CFCFD5",
-            fontSize: "18px",
+            color: "#ccc",
             marginBottom: "35px",
           }}
         >
-          Track all your restaurant orders in one place.
+          Track your orders in real time.
         </p>
 
-        <div
+        <button
+          onClick={loadOrders}
           style={{
-            display: "grid",
-            gap: "25px",
+            marginBottom: "30px",
+            padding: "12px 25px",
+            border: "none",
+            borderRadius: "10px",
+            background:
+              "linear-gradient(90deg,#7C3AED,#F97316)",
+            color: "white",
+            cursor: "pointer",
+            fontWeight: "bold",
           }}
         >
-          {orders.map((order) => (
+          🔄 Refresh Orders
+        </button>
+
+        {orders.length === 0 ? (
+          <h2
+            style={{
+              color: "white",
+              textAlign: "center",
+            }}
+          >
+            No Orders Found
+          </h2>
+        ) : (
+          orders.map((order) => (
             <div
               key={order.id}
               style={{
-                background: "rgba(20,20,28,.92)",
+                background:
+                  "rgba(20,20,28,.92)",
                 borderRadius: "20px",
                 padding: "25px",
-                border: "1px solid rgba(255,255,255,.08)",
-                transition: ".3s",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-5px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
+                marginBottom: "20px",
+                border:
+                  "1px solid rgba(255,255,255,.08)",
               }}
             >
+              <h2 style={{ color: "white" }}>
+                Order #{order.id}
+              </h2>
+
+              <p style={{ color: "#ccc" }}>
+                Customer ID : {order.customer_id}
+              </p>
+
+              <p style={{ color: "#ccc" }}>
+                Restaurant ID : {order.restaurant_id}
+              </p>
+
+              <p style={{ color: "#ccc" }}>
+                Payment : {order.payment_method}
+              </p>
+
+              <p style={{ color: "#ccc" }}>
+                Amount : ₹{order.total_amount}
+              </p>
+
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: "20px",
+                  gap: "15px",
+                  marginTop: "15px",
                 }}
               >
-                <div>
-                  <h2
-                    style={{
-                      color: "white",
-                      marginBottom: "10px",
-                    }}
-                  >
-                    🍽️ {order.item}
-                  </h2>
-
-                  <p style={{ color: "#BDBDBD" }}>
-                    Order ID: {order.id}
-                  </p>
-
-                  <p style={{ color: "#BDBDBD" }}>
-                    Quantity: {order.quantity}
-                  </p>
-
-                  <h3
-                    style={{
-                      color: "#F97316",
-                      marginTop: "15px",
-                    }}
-                  >
-                    ₹{order.total}
-                  </h3>
-                </div>
-
-                <div
+                <span
                   style={{
-                    textAlign: "right",
+                    background: getStatusColor(
+                      order.order_status
+                    ),
+                    padding: "8px 18px",
+                    borderRadius: "20px",
+                    color: "white",
                   }}
                 >
-                  <span
-                    style={{
-                      background: order.color,
-                      color: "white",
-                      padding: "10px 18px",
-                      borderRadius: "30px",
-                      fontWeight: "600",
-                      display: "inline-block",
-                    }}
-                  >
-                    {order.status}
-                  </span>
+                  {order.order_status}
+                </span>
 
-                  <br />
-                  <br />
-
-                  <button
-                    style={{
-                      padding: "12px 22px",
-                      border: "none",
-                      borderRadius: "12px",
-                      background:
-                        "linear-gradient(90deg,#7C3AED,#F97316)",
-                      color: "white",
-                      cursor: "pointer",
-                      fontWeight: "600",
-                    }}
-                  >
-                    View Details
-                  </button>
-                </div>
+                <span
+                  style={{
+                    background:
+                      order.payment_status ===
+                      "Paid"
+                        ? "#22C55E"
+                        : "#DC2626",
+                    padding: "8px 18px",
+                    borderRadius: "20px",
+                    color: "white",
+                  }}
+                >
+                  {order.payment_status}
+                </span>
               </div>
             </div>
-          ))}
-        </div>
-
-        <div
-          style={{
-            marginTop: "60px",
-            textAlign: "center",
-            color: "#888",
-            borderTop: "1px solid rgba(255,255,255,.08)",
-            paddingTop: "25px",
-          }}
-        >
-          © 2026 Cloud Restaurant Management SaaS Platform. All Rights Reserved.
-        </div>
+          ))
+        )}
       </div>
     </div>
   );

@@ -1,19 +1,79 @@
 import api from "./api";
+import { getRestaurantId } from "../utils/restaurant";
 
-// Get all AI inventory predictions
+// =====================================================
+// Get All Predictions
+// =====================================================
 export const getPredictions = async () => {
-  const response = await api.get("/predictions");
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/predictions/restaurants/${restaurantId}`
+  );
+
   return response.data;
 };
 
-// Get prediction by item ID
-export const getPredictionByItem = async (id) => {
-  const response = await api.get(`/predictions/${id}`);
+// =====================================================
+// Get Single Prediction
+// =====================================================
+export const getPrediction = async (id) => {
+  const response = await api.get(
+    `/predictions/${id}`
+  );
+
   return response.data;
 };
 
-// Get inventory analytics
+// =====================================================
+// Prediction Analytics
+// =====================================================
+export const getPredictionAnalytics = async () => {
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/predictions/restaurants/${restaurantId}/analytics`
+  );
+
+  return response.data;
+};
+
+// =====================================================
+// Inventory Analytics
+// Used by Prediction Dashboard
+// =====================================================
 export const getInventoryAnalytics = async () => {
-  const response = await api.get("/analytics/inventory");
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/inventory/restaurants/${restaurantId}/stats`
+  );
+
+  return response.data;
+};
+
+// =====================================================
+// Sales Prediction
+// =====================================================
+export const getSalesPrediction = async () => {
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/predictions/restaurants/${restaurantId}/sales`
+  );
+
+  return response.data;
+};
+
+// =====================================================
+// Demand Prediction
+// =====================================================
+export const getDemandPrediction = async () => {
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/predictions/restaurants/${restaurantId}/demand`
+  );
+
   return response.data;
 };

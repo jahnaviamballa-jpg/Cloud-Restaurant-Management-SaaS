@@ -1,31 +1,81 @@
 import api from "./api";
+import { getRestaurantId } from "../utils/restaurant";
 
-// Get sales analytics
+// ======================================================
+// Sales Analytics
+// ======================================================
 export const getSalesAnalytics = async () => {
-  const response = await api.get("/analytics/sales");
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/analytics/restaurants/${restaurantId}/sales`
+  );
+
   return response.data;
 };
 
-// Get revenue analytics
+// ======================================================
+// Revenue Analytics
+// ======================================================
 export const getRevenueAnalytics = async () => {
-  const response = await api.get("/analytics/revenue");
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/analytics/restaurants/${restaurantId}/revenue`
+  );
+
   return response.data;
 };
 
-// Get top selling items
+// ======================================================
+// Top Selling Items
+// ======================================================
 export const getTopSellingItems = async () => {
-  const response = await api.get("/analytics/top-items");
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/analytics/restaurants/${restaurantId}/top-items`
+  );
+
   return response.data;
 };
 
-// Get order statistics
-export const getOrderStatistics = async () => {
-  const response = await api.get("/analytics/orders");
+// ======================================================
+// Order Analytics
+// ======================================================
+export const getOrderAnalytics = async () => {
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/analytics/restaurants/${restaurantId}/orders`
+  );
+
   return response.data;
 };
 
-// Get inventory analytics
+// ======================================================
+// Inventory Analytics
+// ======================================================
 export const getInventoryAnalytics = async () => {
-  const response = await api.get("/analytics/inventory");
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/analytics/restaurants/${restaurantId}/inventory`
+  );
+
+  return response.data;
+};
+
+// ======================================================
+// Order Statistics
+// Used in Owner Dashboard
+// ======================================================
+export const getOrderStatistics = async () => {
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/orders/restaurants/${restaurantId}/stats`
+  );
+
   return response.data;
 };

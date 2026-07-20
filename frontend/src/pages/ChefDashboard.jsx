@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import DashboardCard from "../components/DashboardCard";
-import { getOrderStats } from "../api/orderApi";
+import {
+  getOrders,
+  getOrderStats,
+  updateOrderStatus,
+} from "../api/orderApi";
 
 function ChefDashboard() {
   const [orders, setOrders] = useState({
@@ -11,16 +15,33 @@ function ChefDashboard() {
     cancelled: 0,
   });
 
+  const [orderList, setOrderList] = useState([]);
+
   useEffect(() => {
     loadOrders();
   }, []);
 
   const loadOrders = async () => {
     try {
-      const data = await getOrderStats();
-      setOrders(data);
+      const [stats, orderData] = await Promise.all([
+        getOrderStats(),
+        getOrders(),
+      ]);
+
+      setOrders(stats);
+      setOrderList(orderData);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const changeStatus = async (id, status) => {
+    try {
+      await updateOrderStatus(id, status);
+      loadOrders();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update order");
     }
   };
 
@@ -99,12 +120,10 @@ function ChefDashboard() {
 
           <DashboardCard
             title="Cancelled"
-            value={orders.cancelled}
+            value={orders.cancelled || 0}
             icon="❌"
           />
         </div>
-
-        {/* Kitchen Performance */}
 
         <div
           style={{
@@ -179,162 +198,95 @@ function ChefDashboard() {
         </div>
 
         {/* Live Kitchen Queue */}
-
-        <div
-          style={{
-            marginTop: "45px",
-            background: "rgba(20,20,28,.92)",
-            borderRadius: "20px",
-            padding: "30px",
-            border: "1px solid rgba(255,255,255,.08)",
-          }}
-        >
-          <h2
-            style={{
-              color: "white",
-              marginBottom: "25px",
-            }}
-          >
-            🍽 Live Kitchen Queue
-          </h2>
-
-          {[
-            {
-              id: "#ORD1001",
-              item: "Chicken Biryani",
-              status: "Preparing",
-            },
-            {
-              id: "#ORD1002",
-              item: "Paneer Pizza",
-              status: "Pending",
-            },
-            {
-              id: "#ORD1003",
-              item: "Burger Combo",
-              status: "Ready",
-            },
-            {
-              id: "#ORD1004",
-              item: "Fried Rice",
-              status: "Preparing",
-            },
-            {
-              id: "#ORD1005",
-              item: "Chocolate Cake",
-              status: "Ready",
-            },
-          ].map((order) => (
-            <div
-              key={order.id}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "18px 0",
-                borderBottom:
-                  "1px solid rgba(255,255,255,.06)",
-              }}
-            >
-              <div>
-                <h3
-                  style={{
-                    color: "white",
-                    margin: 0,
-                  }}
-                >
-                  {order.item}
-                </h3>
-
-                <p
-                  style={{
-                    color: "#BDBDBD",
-                    marginTop: "6px",
-                  }}
-                >
-                  {order.id}
-                </p>
-              </div>
-
-              <span
-                style={{
-                  padding: "8px 18px",
-                  borderRadius: "30px",
-                  color: "white",
-                  fontWeight: "600",
-                  background:
-                    order.status === "Preparing"
-                      ? "#F97316"
-                      : order.status === "Ready"
-                      ? "#22C55E"
-                      : "#7C3AED",
-                }}
-              >
-                {order.status}
-              </span>
-            </div>
-          ))}
-        </div>
-
         {/* Chef Actions */}
 
-        <div
-          style={{
-            marginTop: "45px",
-          }}
-        >
-          <h2
-            style={{
-              color: "white",
-              marginBottom: "20px",
-            }}
-          >
-            ⚡ Quick Actions
-          </h2>
+<div
+  style={{
+    marginTop: "45px",
+  }}
+>
+  <h2
+    style={{
+      color: "white",
+      marginBottom: "20px",
+    }}
+  >
+    ⚡ Quick Actions
+  </h2>
 
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "20px",
-            }}
-          >
-            {[
-              "🍳 Start Cooking",
-              "✅ Mark Ready",
-              "📦 Update Stock",
-              "🧾 View Orders",
-            ].map((button) => (
-              <button
-                key={button}
-                style={{
-                  padding: "15px 28px",
-                  border: "none",
-                  borderRadius: "14px",
-                  background:
-                    "linear-gradient(90deg,#7C3AED,#F97316)",
-                  color: "white",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  transition: ".3s",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.transform =
-                    "translateY(-5px)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.transform =
-                    "translateY(0)")
-                }
-              >
-                {button}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  <div
+    style={{
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "20px",
+    }}
+  >
+    <button
+      onClick={loadOrders}
+      style={{
+        padding: "15px 28px",
+        border: "none",
+        borderRadius: "14px",
+        background:
+          "linear-gradient(90deg,#7C3AED,#F97316)",
+        color: "white",
+        fontWeight: "600",
+        cursor: "pointer",
+      }}
+    >
+      🔄 Refresh Orders
+    </button>
+
+    <button
+      onClick={() => window.location.href = "/orders"}
+      style={{
+        padding: "15px 28px",
+        border: "none",
+        borderRadius: "14px",
+        background: "#22C55E",
+        color: "white",
+        fontWeight: "600",
+        cursor: "pointer",
+      }}
+    >
+      📋 View Orders
+    </button>
+
+    <button
+      onClick={() => window.location.href = "/inventory"}
+      style={{
+        padding: "15px 28px",
+        border: "none",
+        borderRadius: "14px",
+        background: "#3B82F6",
+        color: "white",
+        fontWeight: "600",
+        cursor: "pointer",
+      }}
+    >
+      📦 Inventory
+    </button>
+
+    <button
+      onClick={() => window.location.href = "/manager-dashboard"}
+      style={{
+        padding: "15px 28px",
+        border: "none",
+        borderRadius: "14px",
+        background: "#EF4444",
+        color: "white",
+        fontWeight: "600",
+        cursor: "pointer",
+      }}
+    >
+      🏠 Manager Dashboard
+    </button>
+  </div>
+</div>
+
+</div>
+</div>
+);
 }
 
 export default ChefDashboard;
