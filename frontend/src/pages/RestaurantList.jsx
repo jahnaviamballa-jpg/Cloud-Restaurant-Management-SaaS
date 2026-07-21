@@ -56,6 +56,17 @@ function RestaurantList() {
     }
   };
 
+  const handleViewRestaurant = (restaurant) => {
+    localStorage.setItem(
+      "restaurant",
+      JSON.stringify(restaurant)
+    );
+
+    navigate(
+      `/menu/${restaurant.restaurant_id}`
+    );
+  };
+
   if (loading) {
     return (
       <div
@@ -196,7 +207,8 @@ function RestaurantList() {
                 </p>
 
                 <p style={{ color: "#BDBDBD" }}>
-                  📍 {restaurant.city}, {restaurant.state}
+                  📍 {restaurant.city},{" "}
+                  {restaurant.state}
                 </p>
 
                 <p style={{ color: "#BDBDBD" }}>
@@ -224,8 +236,8 @@ function RestaurantList() {
 
                 <button
                   onClick={() =>
-                    navigate(
-                      `/menu/${restaurant.restaurant_id}`
+                    handleViewRestaurant(
+                      restaurant
                     )
                   }
                   style={{
@@ -295,9 +307,8 @@ function RestaurantList() {
               </div>
             </div>
           ))}
-                  </div>
-
-        {restaurants.length === 0 && (
+        </div>
+                {restaurants.length === 0 && (
           <div
             style={{
               textAlign: "center",
@@ -305,9 +316,9 @@ function RestaurantList() {
               color: "white",
               padding: "40px",
               background: "rgba(20,20,28,.92)",
-              borderRadius: "20px",
               border:
                 "1px solid rgba(255,255,255,.08)",
+              borderRadius: "20px",
             }}
           >
             <h2
@@ -340,8 +351,8 @@ function RestaurantList() {
                   "linear-gradient(90deg,#7C3AED,#F97316)",
                 color: "white",
                 fontWeight: "700",
-                cursor: "pointer",
                 fontSize: "16px",
+                cursor: "pointer",
               }}
             >
               ➕ Add Restaurant

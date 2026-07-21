@@ -9,5 +9,5 @@ export const getSelectedRestaurant = () => {
 export const getRestaurantId = () => {
   const restaurant = getSelectedRestaurant();
 
-  return restaurant?.id;
+  return restaurant?.restaurant_id;
 };

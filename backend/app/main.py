@@ -124,7 +124,7 @@ app.include_router(
 
 
 
-app.include_router(reservation_router.router)
+app.include_router(reservation_router)
 # =====================================================
 # Root Endpoint
 # =====================================================
