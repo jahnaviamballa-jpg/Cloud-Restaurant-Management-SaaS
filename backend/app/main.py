@@ -20,10 +20,13 @@ from app.routers.auth import router as auth_router
 from app.routers.inventory import router as inventory_router
 from app.routers.menu import router as menu_router
 from app.routers.notifications import router as notifications_router
-from app.routers.order import router as order_router
+
 from app.routers.prediction import router as prediction_router
 from app.routers.reports import router as reports_router
 from app.routers.restaurant import router as restaurant_router
+from app.routers.order import router as order_router
+from app.routers.reservation_router import router as reservation_router
+
 
 # =====================================================
 # Create FastAPI Application
@@ -119,6 +122,9 @@ app.include_router(
     tags=["Notifications"],
 )
 
+
+
+app.include_router(reservation_router.router)
 # =====================================================
 # Root Endpoint
 # =====================================================

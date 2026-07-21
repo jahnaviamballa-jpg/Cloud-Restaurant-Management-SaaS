@@ -1,90 +1,105 @@
 import api from "./api";
 import { getRestaurantId } from "../utils/restaurant";
 
-// =====================================================
+// ========================================
 // Get All Orders
-// =====================================================
+// ========================================
 export const getOrders = async () => {
+  const response = await api.get("/orders");
+
+  return response.data;
+};
+
+// ========================================
+// Get Orders By Restaurant
+// ========================================
+export const getOrdersByRestaurant = async () => {
   const restaurantId = getRestaurantId();
 
-  const response = await api.get(
-    `/orders/restaurants/${restaurantId}`
-  );
+  const orders = await getOrders();
 
-  return response.data;
+  return orders.filter(
+    (order) =>
+      order.restaurant_id === restaurantId
+  );
 };
 
-// =====================================================
+// ========================================
 // Get Single Order
-// =====================================================
-export const getOrder = async (orderId) => {
+// ========================================
+export const getOrder = async (id) => {
   const response = await api.get(
-    `/orders/${orderId}`
+    `/orders/${id}`
   );
 
   return response.data;
 };
 
-// =====================================================
-// Place Order
-// =====================================================
-export const placeOrder = async (orderData) => {
+// ========================================
+// Create Order
+// ========================================
+export const createOrder = async (
+  orderData
+) => {
+  const restaurantId = getRestaurantId();
+
   const response = await api.post(
-    "/orders/",
+    "/orders",
+    {
+      ...orderData,
+      restaurant_id: restaurantId,
+    }
+  );
+
+  return response.data;
+};
+
+// ========================================
+// Update Order
+// ========================================
+export const updateOrder = async (
+  id,
+  orderData
+) => {
+  const response = await api.put(
+    `/orders/${id}`,
     orderData
   );
 
   return response.data;
 };
 
-// =====================================================
-// Update Order Status
-// =====================================================
-export const updateOrderStatus = async (
-  orderId,
-  orderStatus
-) => {
-  const response = await api.put(
-    `/orders/${orderId}/status`,
-    {
-      order_status: orderStatus,
-    }
-  );
-
-  return response.data;
-};
-
-// =====================================================
-// Update Payment Status
-// =====================================================
-export const updatePaymentStatus = async (
-  orderId,
-  paymentStatus
-) => {
-  const response = await api.put(
-    `/orders/${orderId}/payment`,
-    {
-      payment_status: paymentStatus,
-    }
-  );
-
-  return response.data;
-};
-
-// =====================================================
+// ========================================
 // Delete Order
-// =====================================================
-export const deleteOrder = async (orderId) => {
+// ========================================
+export const deleteOrder = async (
+  id
+) => {
   const response = await api.delete(
-    `/orders/${orderId}`
+    `/orders/${id}`
   );
 
   return response.data;
 };
 
-// =====================================================
+// ========================================
+// Update Order Status
+// ========================================
+export const updateOrderStatus =
+  async (id, status) => {
+    const response = await api.put(
+      `/orders/${id}`,
+      {
+        status,
+      }
+    );
+
+    return response.data;
+  };
+
+  // ========================================
 // Order Statistics
-// =====================================================
+// ========================================
 export const getOrderStats = async () => {
   const restaurantId = getRestaurantId();
 

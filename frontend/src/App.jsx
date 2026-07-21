@@ -46,6 +46,13 @@ import ServerError from "./pages/ServerError";
 import AddMenuItem from "./pages/AddMenuItem";
 import EditMenuItem from "./pages/EditMenuItem";
 
+import AddOrder from "./pages/AddOrder";
+import EditOrder from "./pages/EditOrder";
+import OrderDetails from "./pages/OrderDetails";
+
+import AddReservation from "./pages/AddReservation";
+import EditReservation from "./pages/EditReservation";
+import ReservationDetails from "./pages/ReservationDetails";
 function AppContent() {
   const location = useLocation();
 
@@ -232,6 +239,48 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
+        
+        <Route
+  path="/add-reservation"
+  element={
+    <ProtectedRoute
+      allowedRoles={[
+        "Customer",
+        "Manager",
+        "Owner",
+      ]}
+    >
+      <AddReservation />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit-reservation/:reservationId"
+  element={
+    <ProtectedRoute
+      allowedRoles={[
+        "Manager",
+        "Owner",
+      ]}
+    >
+      <EditReservation />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/reservation-details/:reservationId"
+  element={
+    <ProtectedRoute
+      allowedRoles={[
+        "Customer",
+        "Manager",
+        "Owner",
+      ]}
+    >
+      <ReservationDetails />
+    </ProtectedRoute>
+  }
+/>
 
         {/* Restaurant List */}
 
@@ -304,6 +353,43 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+  path="/add-order"
+  element={
+    <ProtectedRoute
+      allowedRoles={["Manager", "Owner"]}
+    >
+      <AddOrder />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/edit-order/:orderId"
+  element={
+    <ProtectedRoute
+      allowedRoles={["Manager", "Owner"]}
+    >
+      <EditOrder />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/order/:orderId"
+  element={
+    <ProtectedRoute
+      allowedRoles={[
+        "Manager",
+        "Owner",
+        "Chef",
+      ]}
+    >
+      <OrderDetails />
+    </ProtectedRoute>
+  }
+/>
 
         {/* Reservations */}
 

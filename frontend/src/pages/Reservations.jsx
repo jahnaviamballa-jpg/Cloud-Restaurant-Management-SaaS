@@ -1,9 +1,143 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
+import { useNavigate } from "react-router-dom";
+
+import {
+  getReservations,
+  deleteReservation,
+} from "../api/reservationApi";
 function Reservations() {
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [guests, setGuests] = useState(2);
+  const navigate = useNavigate();
+
+  const [reservations, setReservations] =
+    useState([]);
+
+  const [filteredReservations,
+    setFilteredReservations] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [search, setSearch] =
+    useState("");
+
+  const [status, setStatus] =
+    useState("All");
+
+  const loadReservations =
+    async () => {
+      try {
+        setLoading(true);
+
+        const data =
+          await getReservations();
+
+        setReservations(data || []);
+        setFilteredReservations(
+          data || []
+        );
+      } catch (error) {
+        console.error(error);
+
+        alert(
+          "Failed to load reservations."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+  useEffect(() => {
+    loadReservations();
+  }, []);
+
+  const handleDelete =
+    async (id) => {
+      if (
+        !window.confirm(
+          "Delete this reservation?"
+        )
+      )
+        return;
+
+      try {
+        await deleteReservation(id);
+
+        alert(
+          "Reservation deleted."
+        );
+
+        loadReservations();
+      } catch (error) {
+        console.error(error);
+
+        alert(
+          "Delete failed."
+        );
+      }
+    };
+
+  const statuses = useMemo(() => {
+    const unique = [
+      ...new Set(
+        reservations.map(
+          (r) => r.status
+        )
+      ),
+    ];
+
+    return ["All", ...unique];
+  }, [reservations]);
+
+  useEffect(() => {
+    let data = [...reservations];
+
+    if (status !== "All") {
+      data = data.filter(
+        (r) =>
+          r.status === status
+      );
+    }
+
+    if (search.trim()) {
+      data = data.filter(
+        (r) =>
+          r.customer_name
+            .toLowerCase()
+            .includes(
+              search.toLowerCase()
+            )
+      );
+    }
+
+    setFilteredReservations(data);
+  }, [
+    reservations,
+    search,
+    status,
+  ]);
+    if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          background: "#111827",
+        }}
+      >
+        <h2 style={{ color: "white" }}>
+          Loading Reservations...
+        </h2>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -11,7 +145,7 @@ function Reservations() {
         minHeight: "100vh",
         padding: "40px",
         background:
-          "linear-gradient(rgba(0,0,0,.20),rgba(0,0,0,.25)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
+          "linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.35)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",
@@ -19,244 +153,337 @@ function Reservations() {
     >
       <div
         style={{
-          maxWidth: "900px",
-          margin: "auto",
-          background: "rgba(18,18,24,.75)",
+          background:
+            "rgba(18,18,24,.78)",
           borderRadius: "25px",
           padding: "35px",
-          border: "1px solid rgba(255,255,255,.08)",
+          border:
+            "1px solid rgba(255,255,255,.08)",
+          backdropFilter:
+            "blur(12px)",
         }}
       >
-        <h1
+        <div
           style={{
-            color: "white",
-            fontSize: "42px",
-            marginBottom: "10px",
+            display: "flex",
+            justifyContent:
+              "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "20px",
+            marginBottom: "30px",
           }}
         >
-          📅 Table Reservation
-        </h1>
+          <div>
+            <h1
+              style={{
+                color: "white",
+                fontSize: "40px",
+                marginBottom: "8px",
+              }}
+            >
+              📅 Reservations
+            </h1>
 
-        <p
-          style={{
-            color: "#CFCFD5",
-            marginBottom: "35px",
-            fontSize: "18px",
-          }}
-        >
-          Reserve your favorite table in advance.
-        </p>
+            <p
+              style={{
+                color: "#CFCFD5",
+              }}
+            >
+              Manage all reservations.
+            </p>
+          </div>
+
+          <button
+            onClick={() =>
+              navigate(
+                "/add-reservation"
+              )
+            }
+            style={{
+              padding: "15px 28px",
+              border: "none",
+              borderRadius: "14px",
+              background:
+                "linear-gradient(90deg,#7C3AED,#F97316)",
+              color: "white",
+              fontWeight: "700",
+              cursor: "pointer",
+            }}
+          >
+            ➕ Add Reservation
+          </button>
+        </div>
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
+            gridTemplateColumns:
+              "2fr 1fr 180px",
             gap: "20px",
+            marginBottom: "35px",
           }}
         >
-          <div>
-            <label
-              style={{
-                color: "white",
-                display: "block",
-                marginBottom: "8px",
-              }}
-            >
-              Reservation Date
-            </label>
-
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "15px",
-                borderRadius: "12px",
-                border: "1px solid rgba(255,255,255,.08)",
-                background: "#181822",
-                color: "white",
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
-
-          <div>
-            <label
-              style={{
-                color: "white",
-                display: "block",
-                marginBottom: "8px",
-              }}
-            >
-              Time
-            </label>
-
-            <input
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "15px",
-                borderRadius: "12px",
-                border: "1px solid rgba(255,255,255,.08)",
-                background: "#181822",
-                color: "white",
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
-
-          <div>
-            <label
-              style={{
-                color: "white",
-                display: "block",
-                marginBottom: "8px",
-              }}
-            >
-              Number of Guests
-            </label>
-
-            <select
-              value={guests}
-              onChange={(e) => setGuests(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "15px",
-                borderRadius: "12px",
-                border: "1px solid rgba(255,255,255,.08)",
-                background: "#181822",
-                color: "white",
-              }}
-            >
-              {[1,2,3,4,5,6,7,8].map((n) => (
-                <option key={n}>{n}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label
-              style={{
-                color: "white",
-                display: "block",
-                marginBottom: "8px",
-              }}
-            >
-              Table Preference
-            </label>
-
-            <select
-              style={{
-                width: "100%",
-                padding: "15px",
-                borderRadius: "12px",
-                border: "1px solid rgba(255,255,255,.08)",
-                background: "#181822",
-                color: "white",
-              }}
-            >
-              <option>Indoor</option>
-              <option>Outdoor</option>
-              <option>Window Seat</option>
-              <option>Family Table</option>
-            </select>
-          </div>
-        </div>
-
-        <div style={{ marginTop: "25px" }}>
-          <label
+          <input
+            type="text"
+            placeholder="🔍 Search customer..."
+            value={search}
+            onChange={(e) =>
+              setSearch(
+                e.target.value
+              )
+            }
             style={{
-              color: "white",
-              display: "block",
-              marginBottom: "8px",
-            }}
-          >
-            Special Request
-          </label>
-
-          <textarea
-            rows="4"
-            placeholder="Birthday celebration, anniversary, decorations..."
-            style={{
-              width: "100%",
-              padding: "15px",
+              padding: "14px",
               borderRadius: "12px",
-              border: "1px solid rgba(255,255,255,.08)",
-              background: "#181822",
+              border:
+                "1px solid rgba(255,255,255,.08)",
+              background:
+                "rgba(255,255,255,.08)",
               color: "white",
-              resize: "none",
-              boxSizing: "border-box",
+              outline: "none",
             }}
           />
-        </div>
 
-        <button
-          style={{
-            width: "100%",
-            marginTop: "35px",
-            padding: "16px",
-            border: "none",
-            borderRadius: "15px",
-            background:
-              "linear-gradient(90deg,#7C3AED,#F97316)",
-            color: "white",
-            fontSize: "18px",
-            fontWeight: "700",
-            cursor: "pointer",
-          }}
-        >
-          🍽️ Book Table
-        </button>
-
-        <div
-          style={{
-            marginTop: "60px",
-            borderTop: "1px solid rgba(255,255,255,.08)",
-            paddingTop: "30px",
-          }}
-        >
-          <h2
+          <select
+            value={status}
+            onChange={(e) =>
+              setStatus(
+                e.target.value
+              )
+            }
             style={{
+              padding: "14px",
+              borderRadius: "12px",
+              border:
+                "1px solid rgba(255,255,255,.08)",
+              background:
+                "rgba(255,255,255,.08)",
               color: "white",
-              marginBottom: "20px",
             }}
           >
-            Recent Reservations
-          </h2>
+            {statuses.map((s) => (
+              <option
+                key={s}
+                value={s}
+                style={{
+                  color: "black",
+                }}
+              >
+                {s}
+              </option>
+            ))}
+          </select>
 
           <div
             style={{
-              background: "rgba(20,20,28,.92)",
-              borderRadius: "18px",
-              padding: "20px",
-              color: "#ddd",
+              display: "flex",
+              justifyContent:
+                "center",
+              alignItems: "center",
+              background:
+                "linear-gradient(90deg,#7C3AED,#F97316)",
+              borderRadius: "12px",
+              color: "white",
+              fontWeight: "700",
             }}
           >
-            <h3 style={{ color: "white" }}>
-              🍽️ Family Dinner
-            </h3>
+            {
+              filteredReservations.length
+            }{" "}
+            Records
+          </div>
+        </div>
 
-            <p>Date: 25 July 2026</p>
-
-            <p>Time: 7:30 PM</p>
-
-            <p>Guests: 4</p>
-
-            <span
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit,minmax(350px,1fr))",
+            gap: "25px",
+          }}
+        >
+                  {filteredReservations.map((reservation) => (
+            <div
+              key={reservation.id}
               style={{
-                background: "#22C55E",
-                padding: "8px 15px",
-                borderRadius: "30px",
-                color: "white",
-                fontWeight: "600",
+                background: "rgba(20,20,28,.92)",
+                borderRadius: "20px",
+                padding: "24px",
+                border:
+                  "1px solid rgba(255,255,255,.08)",
+                boxShadow:
+                  "0 10px 25px rgba(0,0,0,.25)",
               }}
             >
-              Confirmed
-            </span>
-          </div>
+              <h2
+                style={{
+                  color: "white",
+                  marginBottom: "15px",
+                }}
+              >
+                👤 {reservation.customer_name}
+              </h2>
+
+              <p style={{ color: "#D1D5DB" }}>
+                📞 {reservation.customer_phone}
+              </p>
+
+              <p style={{ color: "#D1D5DB" }}>
+                📅 {reservation.reservation_date}
+              </p>
+
+              <p style={{ color: "#D1D5DB" }}>
+                🕒 {reservation.reservation_time}
+              </p>
+
+              <p style={{ color: "#D1D5DB" }}>
+                👥 Guests:{" "}
+                {reservation.number_of_guests}
+              </p>
+
+              <p
+                style={{
+                  marginTop: "15px",
+                  color:
+                    reservation.status ===
+                    "Confirmed"
+                      ? "#22C55E"
+                      : reservation.status ===
+                        "Cancelled"
+                      ? "#EF4444"
+                      : "#FACC15",
+                  fontWeight: "700",
+                }}
+              >
+                {reservation.status}
+              </p>
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  marginTop: "20px",
+                  flexWrap: "wrap",
+                }}
+              >
+                <button
+                  onClick={() =>
+                    navigate(
+                      `/reservation-details/${reservation.id}`
+                    )
+                  }
+                  style={{
+                    flex: 1,
+                    padding: "12px",
+                    border: "none",
+                    borderRadius: "10px",
+                    background: "#2563EB",
+                    color: "white",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                  }}
+                >
+                  👁 View
+                </button>
+
+                <button
+                  onClick={() =>
+                    navigate(
+                      `/edit-reservation/${reservation.id}`
+                    )
+                  }
+                  style={{
+                    flex: 1,
+                    padding: "12px",
+                    border: "none",
+                    borderRadius: "10px",
+                    background: "#7C3AED",
+                    color: "white",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                  }}
+                >
+                  ✏️ Edit
+                </button>
+
+                <button
+                  onClick={() =>
+                    handleDelete(
+                      reservation.id
+                    )
+                  }
+                  style={{
+                    flex: 1,
+                    padding: "12px",
+                    border: "none",
+                    borderRadius: "10px",
+                    background: "#DC2626",
+                    color: "white",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                  }}
+                >
+                  🗑 Delete
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {filteredReservations.length ===
+            0 && (
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                padding: "60px 20px",
+                background:
+                  "rgba(20,20,28,.92)",
+                borderRadius: "20px",
+                border:
+                  "1px solid rgba(255,255,255,.08)",
+              }}
+            >
+              <h2
+                style={{
+                  color: "white",
+                  marginBottom: "15px",
+                }}
+              >
+                📅 No Reservations Found
+              </h2>
+
+              <p
+                style={{
+                  color: "#BDBDBD",
+                  marginBottom: "25px",
+                }}
+              >
+                Try changing the search/filter
+                or create a new reservation.
+              </p>
+
+              <button
+                onClick={() =>
+                  navigate(
+                    "/add-reservation"
+                  )
+                }
+                style={{
+                  padding: "14px 28px",
+                  border: "none",
+                  borderRadius: "12px",
+                  background:
+                    "linear-gradient(90deg,#7C3AED,#F97316)",
+                  color: "white",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                }}
+              >
+                ➕ Add Reservation
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
