@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import Layout from "../components/Layout";
+import ExecutiveKPICard from "../components/ExecutiveKPICard";
+import "../styles/dashboard.css";
 import {
   getOrdersByRestaurant,
   deleteOrder,
@@ -85,6 +87,22 @@ function Orders() {
       "Cancelled",
     ];
   }, []);
+  const totalRevenue = filteredOrders.reduce(
+  (sum, order) => sum + Number(order.total_amount || 0),
+  0
+);
+
+const pendingOrders = filteredOrders.filter(
+  (order) => order.status === "Pending"
+).length;
+
+const preparingOrders = filteredOrders.filter(
+  (order) => order.status === "Preparing"
+).length;
+
+const servedOrders = filteredOrders.filter(
+  (order) => order.status === "Served"
+).length;
 
   useEffect(() => {
     let data = [...orders];
@@ -126,17 +144,12 @@ function Orders() {
   }
 
   return (
+    <Layout>
     <div
-      style={{
-        minHeight: "100vh",
-        padding: "40px",
-        background:
-          "linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.35)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
+  style={{
+    padding: "20px",
+  }}
+>
       <div
         style={{
           background: "rgba(18,18,24,.78)",
@@ -197,6 +210,71 @@ function Orders() {
             ➕ Create Order
           </button>
         </div>
+        {/* ============================== */}
+{/* Order Statistics */}
+{/* ============================== */}
+
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns:
+      "repeat(auto-fit,minmax(220px,1fr))",
+    gap: "20px",
+    marginBottom: "35px",
+  }}
+>
+  <div style={cardStyle}>
+    <h3>🛒 Total Orders</h3>
+
+    <h1>{orders.length}</h1>
+
+    <p>All Orders</p>
+  </div>
+
+  <div style={cardStyle}>
+    <h3>⏳ Pending</h3>
+
+    <h1>
+      {
+        orders.filter(
+          (o) => o.status === "Pending"
+        ).length
+      }
+    </h1>
+
+    <p>Awaiting Preparation</p>
+  </div>
+
+  <div style={cardStyle}>
+    <h3>👨‍🍳 Preparing</h3>
+
+    <h1>
+      {
+        orders.filter(
+          (o) => o.status === "Preparing"
+        ).length
+      }
+    </h1>
+
+    <p>Kitchen Working</p>
+  </div>
+
+  <div style={cardStyle}>
+    <h3>💰 Revenue</h3>
+
+    <h1>
+      ₹
+      {orders.reduce(
+        (sum, item) =>
+          sum +
+          Number(item.total_amount || 0),
+        0
+      )}
+    </h1>
+
+    <p>Total Sales</p>
+  </div>
+</div>
                 <div
           style={{
             display: "grid",
@@ -207,42 +285,18 @@ function Orders() {
           }}
         >
           <input
-            type="text"
-            placeholder="🔍 Search customer..."
-            value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
-            style={{
-              padding: "14px",
-              borderRadius: "12px",
-              border:
-                "1px solid rgba(255,255,255,.08)",
-              background:
-                "rgba(255,255,255,.08)",
-              color: "white",
-              outline: "none",
-              fontSize: "15px",
-            }}
-          />
+  type="text"
+  placeholder="🔍 Search customer..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+  className="dashboard-input"
+/>
 
           <select
-            value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(e.target.value)
-            }
-            style={{
-              padding: "14px",
-              borderRadius: "12px",
-              border:
-                "1px solid rgba(255,255,255,.08)",
-              background:
-                "rgba(255,255,255,.08)",
-              color: "white",
-              outline: "none",
-              fontSize: "15px",
-            }}
-          >
+  value={statusFilter}
+  onChange={(e) => setStatusFilter(e.target.value)}
+  className="dashboard-select"
+>
             {statuses.map((status) => (
               <option
                 key={status}
@@ -476,7 +530,21 @@ function Orders() {
         </div>
       </div>
     </div>
+    </Layout>
   );
 }
+const cardStyle = {
+  background: "rgba(20,20,28,.92)",
+  borderRadius: "18px",
+  padding: "24px",
+  color: "white",
+  textAlign: "center",
+  border: "1px solid rgba(255,255,255,.08)",
+  boxShadow: "0 10px 25px rgba(0,0,0,.25)",
+};
+
+cardStyle.h3 = {
+  marginBottom: "10px",
+};
 
 export default Orders;

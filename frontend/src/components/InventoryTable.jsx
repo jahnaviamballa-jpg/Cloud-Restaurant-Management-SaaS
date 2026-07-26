@@ -54,7 +54,7 @@ function InventoryTable({ items }) {
 
         <tbody>
           {items.map((item) => (
-            <tr key={item.inventory_id}>
+            <tr key={item.id ?? item.inventory_id}>
               <td style={styles.td}>
                 <img
                   src={
@@ -71,13 +71,21 @@ function InventoryTable({ items }) {
                 />
               </td>
 
-              <td style={styles.td}>{item.item_name}</td>
+              <td style={styles.td}>
+                {item.item_name}
+              </td>
 
-              <td style={styles.td}>{item.category}</td>
+              <td style={styles.td}>
+                {item.category}
+              </td>
 
-              <td style={styles.td}>{item.quantity}</td>
+              <td style={styles.td}>
+                {item.quantity}
+              </td>
 
-              <td style={styles.td}>{item.unit}</td>
+              <td style={styles.td}>
+                {item.unit}
+              </td>
 
               <td style={styles.td}>
                 {item.minimum_stock}

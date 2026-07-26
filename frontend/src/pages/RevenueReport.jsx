@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-
+import Layout from "../components/Layout";
 function RevenueReport() {
   const revenueData = [
     {
@@ -62,6 +62,7 @@ function RevenueReport() {
 
 
   return (
+    <Layout>
     <div className="revenue-report-page">
 
       <h1>💰 Revenue Report</h1>
@@ -253,6 +254,7 @@ function RevenueReport() {
 
 
     </div>
+    </Layout>
   );
 }
 

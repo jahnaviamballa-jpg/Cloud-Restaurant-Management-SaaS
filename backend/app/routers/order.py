@@ -17,7 +17,6 @@ from app.schemas.order_schema import (
 )
 
 router = APIRouter(
-    prefix="/orders",
     tags=["Order Management"],
 )
 
@@ -88,6 +87,76 @@ def get_orders(
     )
 
     return orders
+
+
+# =====================================================
+# Order Statistics
+# GET /orders/restaurants/{restaurant_id}/stats
+# =====================================================
+@router.get("/restaurants/{restaurant_id}/stats")
+def get_order_stats(
+    restaurant_id: int,
+    db: Session = Depends(get_db),
+):
+    restaurant = (
+        db.query(Restaurant)
+        .filter(
+            Restaurant.restaurant_id == restaurant_id
+        )
+        .first()
+    )
+
+    if not restaurant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Restaurant not found",
+        )
+
+    orders = (
+        db.query(Order)
+        .filter(
+            Order.restaurant_id == restaurant_id
+        )
+        .all()
+    )
+
+    total_orders = len(orders)
+
+    pending = len(
+        [o for o in orders if o.status == "Pending"]
+    )
+
+    preparing = len(
+        [o for o in orders if o.status == "Preparing"]
+    )
+
+    ready = len(
+        [o for o in orders if o.status == "Ready"]
+    )
+
+    served = len(
+        [o for o in orders if o.status == "Served"]
+    )
+
+    cancelled = len(
+        [o for o in orders if o.status == "Cancelled"]
+    )
+
+    total_revenue = sum(
+        o.total_amount for o in orders
+    )
+
+    return {
+        "total_orders": total_orders,
+        "pending": pending,
+        "preparing": preparing,
+        "ready": ready,
+        "served": served,
+        "cancelled": cancelled,
+        "total_revenue": total_revenue,
+    }
+
+
 # =====================================================
 # Get Single Order
 # GET /orders/{order_id}
@@ -177,6 +246,8 @@ def update_order(
     db.refresh(db_order)
 
     return db_order
+
+
 # =====================================================
 # Delete Order
 # DELETE /orders/{order_id}
@@ -206,70 +277,4 @@ def delete_order(
 
     return {
         "message": "Order deleted successfully"
-    }
-# =====================================================
-# Order Statistics
-# GET /orders/restaurants/{restaurant_id}/stats
-# =====================================================
-@router.get("/restaurants/{restaurant_id}/stats")
-def get_order_stats(
-    restaurant_id: int,
-    db: Session = Depends(get_db),
-):
-    restaurant = (
-        db.query(Restaurant)
-        .filter(
-            Restaurant.restaurant_id == restaurant_id
-        )
-        .first()
-    )
-
-    if not restaurant:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Restaurant not found",
-        )
-
-    orders = (
-        db.query(Order)
-        .filter(
-            Order.restaurant_id == restaurant_id
-        )
-        .all()
-    )
-
-    total_orders = len(orders)
-
-    pending = len(
-        [o for o in orders if o.status == "Pending"]
-    )
-
-    preparing = len(
-        [o for o in orders if o.status == "Preparing"]
-    )
-
-    ready = len(
-        [o for o in orders if o.status == "Ready"]
-    )
-
-    served = len(
-        [o for o in orders if o.status == "Served"]
-    )
-
-    cancelled = len(
-        [o for o in orders if o.status == "Cancelled"]
-    )
-
-    total_revenue = sum(
-        o.total_amount for o in orders
-    )
-
-    return {
-        "total_orders": total_orders,
-        "pending": pending,
-        "preparing": preparing,
-        "ready": ready,
-        "served": served,
-        "cancelled": cancelled,
-        "total_revenue": total_revenue,
     }

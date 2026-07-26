@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import DashboardCard from "../components/DashboardCard";
-import {
-  getCustomerStats,
-  getRecentOrders,
-} from "../api/customerApi";
 import { Link } from "react-router-dom";
+import DashboardCard from "../components/DashboardCard";
+import Layout from "../components/Layout";
+import {
+  getOrderStats,
+  getOrdersByRestaurant,
+} from "../api/orderApi";
 
 function CustomerDashboard() {
   const [stats, setStats] = useState({
@@ -16,27 +17,62 @@ function CustomerDashboard() {
 
   const [orders, setOrders] = useState([]);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     loadDashboard();
   }, []);
 
   const loadDashboard = async () => {
     try {
-      const statsData = await getCustomerStats();
-      setStats(statsData);
+      setLoading(true);
 
-      const ordersData = await getRecentOrders();
+      const statsData = await getOrderStats();
+
+      setStats({
+        total_orders: statsData.total_orders,
+        pending_orders: statsData.pending,
+        completed_orders: statsData.served,
+        total_spent: statsData.total_revenue,
+      });
+
+      const ordersData =
+        await getOrdersByRestaurant();
+
       setOrders(ordersData);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (loading) {
   return (
+    <Layout>
+      <div
+        style={{
+          minHeight: "80vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          color: "white",
+          fontSize: "32px",
+          fontWeight: "bold",
+        }}
+      >
+        Loading Dashboard...
+      </div>
+    </Layout>
+  );
+}
+
+  return (
+  <Layout>
     <div
       style={{
         minHeight: "100vh",
-        padding: "40px",
+        padding: "30px",
         background:
           "linear-gradient(rgba(0,0,0,.20),rgba(0,0,0,.25)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
         backgroundSize: "cover",
@@ -49,7 +85,8 @@ function CustomerDashboard() {
           background: "rgba(18,18,24,.75)",
           borderRadius: "25px",
           padding: "35px",
-          border: "1px solid rgba(255,255,255,.08)",
+          border:
+            "1px solid rgba(255,255,255,.08)",
         }}
       >
         <h1
@@ -69,7 +106,8 @@ function CustomerDashboard() {
             marginBottom: "35px",
           }}
         >
-          Welcome back! Manage your food orders and reservations.
+          Welcome back! Manage your food
+          orders and reservations.
         </p>
 
         <div
@@ -93,7 +131,7 @@ function CustomerDashboard() {
           />
 
           <DashboardCard
-            title="Completed"
+            title="Completed Orders"
             value={stats.completed_orders}
             icon="✅"
           />
@@ -108,10 +146,12 @@ function CustomerDashboard() {
         <div
           style={{
             marginTop: "45px",
-            background: "rgba(20,20,28,.92)",
+            background:
+              "rgba(20,20,28,.92)",
             borderRadius: "20px",
             padding: "30px",
-            border: "1px solid rgba(255,255,255,.08)",
+            border:
+              "1px solid rgba(255,255,255,.08)",
           }}
         >
           <h2
@@ -124,7 +164,11 @@ function CustomerDashboard() {
           </h2>
 
           {orders.length === 0 ? (
-            <p style={{ color: "#CFCFD5" }}>
+            <p
+              style={{
+                color: "#CFCFD5",
+              }}
+            >
               No orders found.
             </p>
           ) : (
@@ -133,7 +177,8 @@ function CustomerDashboard() {
                 key={order.id}
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
+                  justifyContent:
+                    "space-between",
                   alignItems: "center",
                   padding: "18px 0",
                   borderBottom:
@@ -165,18 +210,24 @@ function CustomerDashboard() {
                     padding: "8px 18px",
                     borderRadius: "30px",
                     background:
-                      order.order_status === "Pending"
+                      order.status ===
+                      "Pending"
                         ? "#F97316"
-                        : order.order_status === "Preparing"
+                        : order.status ===
+                          "Preparing"
                         ? "#3B82F6"
-                        : order.order_status === "Ready"
+                        : order.status ===
+                          "Ready"
                         ? "#22C55E"
+                        : order.status ===
+                          "Served"
+                        ? "#16A34A"
                         : "#7C3AED",
                     color: "white",
                     fontWeight: "600",
                   }}
                 >
-                  {order.order_status}
+                  {order.status}
                 </span>
               </div>
             ))
@@ -191,7 +242,7 @@ function CustomerDashboard() {
             flexWrap: "wrap",
           }}
         >
-          <Link to="/restaurants">
+          <Link to="/menu">
             <button
               style={{
                 padding: "15px 30px",
@@ -204,7 +255,7 @@ function CustomerDashboard() {
                 fontWeight: "700",
               }}
             >
-              🍽 Browse Restaurants
+              🍽 Browse Menu
             </button>
           </Link>
 
@@ -242,6 +293,7 @@ function CustomerDashboard() {
         </div>
       </div>
     </div>
+    </Layout>
   );
 }
 

@@ -59,7 +59,7 @@ class OrderItem(Base):
     # =====================================================
     order = relationship(
         "Order",
-        back_populates="items",
+        back_populates="order_items",
     )
 
     menu = relationship(

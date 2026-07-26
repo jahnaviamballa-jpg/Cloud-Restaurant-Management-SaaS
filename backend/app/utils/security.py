@@ -1,39 +1,69 @@
-from pwdlib import PasswordHash
-from jose import jwt
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
-import os
 
-load_dotenv()
+from jose import jwt
+from passlib.context import CryptContext
 
-password_hash = PasswordHash.recommended()
+# =====================================================
+# JWT Configuration
+# =====================================================
 
-SECRET_KEY = os.getenv("SECRET_KEY", "restaurant_secret_key_2026")
-ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(
-    os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)
+SECRET_KEY = "restaurant_secret_key"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 Hours
+
+# =====================================================
+# Password Hashing
+# =====================================================
+
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
 )
 
+# =====================================================
+# Hash Password
+# =====================================================
 
 def hash_password(password: str):
-    return password_hash.hash(password)
+    return pwd_context.hash(password)
 
+# =====================================================
+# Verify Password
+# =====================================================
 
-def verify_password(plain_password: str, hashed_password: str):
-    return password_hash.verify(plain_password, hashed_password)
+def verify_password(
+    plain_password: str,
+    hashed_password: str,
+):
+    return pwd_context.verify(
+        plain_password,
+        hashed_password,
+    )
 
+# =====================================================
+# Create JWT Access Token
+# =====================================================
 
 def create_access_token(data: dict):
     to_encode = data.copy()
 
-    expire = datetime.utcnow() + timedelta(
-        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+    expire = (
+        datetime.utcnow()
+        + timedelta(
+            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+        )
     )
 
-    to_encode.update({"exp": expire})
+    to_encode.update(
+        {
+            "exp": expire
+        }
+    )
 
-    return jwt.encode(
+    encoded_jwt = jwt.encode(
         to_encode,
         SECRET_KEY,
-        algorithm=ALGORITHM
+        algorithm=ALGORITHM,
     )
+
+    return encoded_jwt

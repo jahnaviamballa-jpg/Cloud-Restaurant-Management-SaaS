@@ -1,14 +1,13 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
 
 
 class UserRegister(BaseModel):
+    restaurant_id: int
     name: str
     email: EmailStr
     password: str
     role: str
-    restaurant_id: int
-    phone: Optional[str] = None
+    phone: str
 
 
 class UserLogin(BaseModel):
@@ -16,13 +15,7 @@ class UserLogin(BaseModel):
     password: str
 
 
-class UserResponse(BaseModel):
-    id: int
-    name: str
+class ChangePassword(BaseModel):
     email: EmailStr
-    role: str
-    restaurant_id: int
-    phone: Optional[str] = None
-
-    class Config:
-        from_attributes = True
+    old_password: str
+    new_password: str

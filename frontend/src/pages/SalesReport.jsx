@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-
+import Layout from "../components/Layout";
 function SalesReport() {
   const salesData = [
     {
@@ -64,6 +64,7 @@ function SalesReport() {
   };
 
   return (
+    <Layout>
     <div className="sales-report-page">
       <h1>📈 Sales Report</h1>
 
@@ -165,6 +166,7 @@ function SalesReport() {
         }
       `}</style>
     </div>
+    </Layout>
   );
 }
 

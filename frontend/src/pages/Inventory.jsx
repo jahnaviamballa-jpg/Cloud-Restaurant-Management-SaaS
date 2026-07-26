@@ -5,7 +5,7 @@ import {
 } from "../api/inventoryApi";
 import InventoryTable from "../components/InventoryTable";
 import LowStockAlert from "../components/LowStockAlert";
-
+import Layout from "../components/Layout";
 function Inventory() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -101,18 +101,13 @@ function Inventory() {
       Number(item.quantity) <= Number(item.minimum_stock)
   );
 
-  return (
-  <div
-    style={{
-      minHeight: "100vh",
-      padding: "40px",
-      background:
-        "linear-gradient(rgba(0,0,0,.20),rgba(0,0,0,.25)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      backgroundAttachment: "fixed",
-    }}
-  >
+ return (
+  <Layout>
+    <div
+  style={{
+    padding: "20px",
+  }}
+>
     <div
       style={{
         background: "rgba(18,18,24,.75)",
@@ -273,6 +268,7 @@ function Inventory() {
       <InventoryTable items={items} />
     </div>
   </div>
+  </Layout>
   );
 }
 const cardStyle = {

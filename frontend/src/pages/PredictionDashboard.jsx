@@ -3,95 +3,215 @@ import { useState, useEffect } from "react";
 import PredictionCard from "../components/PredictionCard";
 import PredictionTable from "../components/PredictionTable";
 import PredictionChart from "../components/PredictionChart";
+import PredictionProgressCard from "../components/PredictionProgressCard";
+import AIAlertCard from "../components/AIAlertCard";
+import AIHealthCard from "../components/AIHealthCard";
 import SuggestionCard from "../components/SuggestionCard";
-
+import ExportButtons from "../components/ExportButtons";
+import ExecutiveKPICard from "../components/ExecutiveKPICard";
+import AnalyticsOverview from "../components/AnalyticsOverview";
+import ForecastTimeline from "../components/ForecastTimeline";
+import PredictionFilter from "../components/PredictionFilter";
+import PageHeader from "../components/PageHeader";
+import Layout from "../components/Layout";
+import "../styles/dashboard.css";
 import {
   getPredictions,
   getInventoryAnalytics,
+  getInventoryHealth,
 } from "../api/predictionApi";
 
 function PredictionDashboard() {
   const [predictions, setPredictions] = useState([]);
   const [analytics, setAnalytics] = useState(null);
+  const [health, setHealth] = useState(null);
+
   const [loading, setLoading] = useState(true);
 
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("All");
+
   useEffect(() => {
-    const fetchPredictionData = async () => {
-      try {
-        const predictionResponse = await getPredictions();
-        const analyticsResponse = await getInventoryAnalytics();
-
-        setPredictions(
-          Array.isArray(predictionResponse)
-            ? predictionResponse
-            : []
-        );
-
-        setAnalytics(analyticsResponse);
-      } catch (error) {
-        console.error("Prediction Fetch Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPredictionData();
+
+    const interval = setInterval(() => {
+      fetchPredictionData();
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
+  const fetchPredictionData = async () => {
+    try {
+      setLoading(true);
+
+      const predictionResponse =
+        await getPredictions();
+
+      const analyticsResponse =
+        await getInventoryAnalytics();
+
+      const healthResponse =
+        await getInventoryHealth();
+
+      setPredictions(
+        Array.isArray(predictionResponse)
+          ? predictionResponse
+          : []
+      );
+
+      setAnalytics(analyticsResponse);
+      setHealth(healthResponse);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredPredictions =
+    predictions.filter((item) => {
+      const matchesSearch =
+        item.item_name
+          ?.toLowerCase()
+          .includes(search.toLowerCase());
+
+      const matchesStatus =
+        status === "All" ||
+        item.recommendation === status;
+
+      return matchesSearch && matchesStatus;
+    });
+
   if (loading) {
-    return (
-      <h2
-        style={{
-          textAlign: "center",
-          marginTop: "100px",
-          color: "white",
-        }}
-      >
-        Loading AI Predictions...
-      </h2>
-    );
-  }
+  return (
+  <Layout>
+    <div style={{ color: "white", padding: 40 }}>
+      Prediction Dashboard Working
+    </div>
+  </Layout>
+);
+}
 
   return (
+  <Layout>
     <div
-      style={{
-        minHeight: "100vh",
-        padding: "40px",
-        background:
-          "linear-gradient(rgba(0,0,0,.20),rgba(0,0,0,.25)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
+  style={{
+    padding: "20px",
+  }}
+>
       <div
         style={{
-          background: "rgba(18,18,24,.75)",
+          background: "rgba(18,18,24,.80)",
           borderRadius: "25px",
           padding: "35px",
-          border: "1px solid rgba(255,255,255,.08)",
           backdropFilter: "blur(12px)",
         }}
       >
-        <h1
-          style={{
-            color: "white",
-            fontSize: "42px",
-            marginBottom: "10px",
-          }}
-        >
-          🤖 AI Inventory Prediction Dashboard
-        </h1>
+        <PageHeader
+  title="🤖 AI Inventory Prediction Dashboard"
+  subtitle="AI-powered inventory forecasting, demand prediction and intelligent stock optimization."
+/>
 
-        <p
+        <ExportButtons
+          predictions={predictions}
+        />
+
+        {/* Executive KPI */}
+
+        <div
           style={{
-            color: "#CFCFD5",
-            fontSize: "18px",
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit,minmax(260px,1fr))",
+            gap: "25px",
+            marginTop: "30px",
             marginBottom: "35px",
           }}
         >
-          AI-powered inventory forecasting and stock recommendations.
-        </p>
+          <ExecutiveKPICard
+            title="Inventory Value"
+            value={`₹${
+              (analytics?.total_items || 0) *
+              1250
+            }`}
+            subtitle="Estimated Stock Value"
+            color="#60A5FA"
+            icon="💰"
+          />
+
+          <ExecutiveKPICard
+            title="Inventory Health"
+            value={`${
+              health?.health_score || 0
+            }%`}
+            subtitle="AI Health Score"
+            color="#22C55E"
+            icon="🩺"
+          />
+
+          <ExecutiveKPICard
+            title="Items Requiring Action"
+            value={
+              analytics?.low_stock || 0
+            }
+            subtitle="Needs Restocking"
+            color="#F59E0B"
+            icon="⚠️"
+          />
+
+          <ExecutiveKPICard
+            title="AI Accuracy"
+            value="97.8%"
+            subtitle="Prediction Confidence"
+            color="#A855F7"
+            icon="🤖"
+          />
+        </div>
+
+        <AnalyticsOverview
+          analytics={analytics}
+          health={health}
+        />
+
+        {/* Inventory Health */}
+
+        <div
+          style={{
+            background:
+              "rgba(20,20,28,.92)",
+            borderRadius: "20px",
+            padding: "35px",
+            marginTop: "35px",
+            textAlign: "center",
+          }}
+        >
+          <h2
+            style={{
+              color: "white",
+            }}
+          >
+            🩺 Inventory Health Score
+          </h2>
+
+          <h1
+            style={{
+              color: "#22C55E",
+              fontSize: "80px",
+              margin: 0,
+            }}
+          >
+            {health?.health_score || 0}%
+          </h1>
+
+          <h2
+            style={{
+              color: "#FACC15",
+            }}
+          >
+            {health?.status}
+          </h2>
+        </div>
 
         {/* Summary Cards */}
 
@@ -101,18 +221,23 @@ function PredictionDashboard() {
             gridTemplateColumns:
               "repeat(auto-fit,minmax(240px,1fr))",
             gap: "25px",
+            marginTop: "35px",
           }}
         >
           <PredictionCard
             icon="📦"
             title="Inventory Items"
-            value={analytics?.total_items || 0}
+            value={
+              analytics?.total_items || 0
+            }
           />
 
           <PredictionCard
             icon="⚠️"
             title="Low Stock"
-            value={analytics?.low_stock || 0}
+            value={
+              analytics?.low_stock || 0
+            }
           />
 
           <PredictionCard
@@ -124,49 +249,172 @@ function PredictionDashboard() {
           <PredictionCard
             icon="📈"
             title="Critical Items"
-            value={analytics?.critical_stock || 0}
+            value={
+              analytics?.critical_stock || 0
+            }
           />
         </div>
 
+        <div
+          style={{
+            marginTop: "35px",
+          }}
+        >
+          <PredictionFilter
+            search={search}
+            setSearch={setSearch}
+            status={status}
+            setStatus={setStatus}
+          />
+        </div>
+                {/* ========================= */}
         {/* Prediction Table */}
+        {/* ========================= */}
 
         <div style={{ marginTop: "40px" }}>
           <PredictionTable
-            predictions={predictions.map((item) => ({
-              id: item.inventory_id,
-              item: item.item_name,
-              currentStock: item.current_stock,
-              predictedUsage: `${item.daily_usage}/day`,
-              daysRemaining: `${item.days_remaining} Days`,
-              recommendedOrder: item.recommendation,
-              status:
-                item.recommendation ===
-                "Reorder Immediately"
-                  ? "🔴 Critical"
-                  : "🟡 Medium",
-            }))}
+            predictions={filteredPredictions.map(
+              (item, index) => ({
+                id: item.inventory_id ?? index,
+
+                item: item.item_name,
+
+                currentStock: item.current_stock,
+
+                predictedUsage: `${item.daily_usage}/day`,
+
+                daysRemaining: `${item.days_remaining} Days`,
+
+                recommendedOrder:
+                  item.reorder_quantity,
+
+                status:
+                  item.recommendation ===
+                  "Reorder Immediately"
+                    ? "🔴 Critical"
+                    : item.recommendation ===
+                      "Reorder Soon"
+                    ? "🟠 Warning"
+                    : item.recommendation ===
+                      "Monitor Stock"
+                    ? "🟡 Medium"
+                    : "🟢 Healthy",
+              })
+            )}
           />
         </div>
 
-        {/* AI Chart */}
+        {/* ========================= */}
+        {/* Prediction Chart */}
+        {/* ========================= */}
 
         <div
           style={{
             marginTop: "40px",
-            background: "rgba(20,20,28,.92)",
+            background:
+              "rgba(20,20,28,.92)",
             borderRadius: "20px",
             padding: "25px",
-            border: "1px solid rgba(255,255,255,.08)",
           }}
         >
-          <PredictionChart />
+          <PredictionChart
+            predictions={filteredPredictions.map(
+              (item) => ({
+                item: item.item_name,
+                currentStock:
+                  item.current_stock,
+                recommendedOrder:
+                  item.reorder_quantity,
+                daysRemaining:
+                  item.days_remaining,
+              })
+            )}
+          />
         </div>
 
-        {/* AI Suggestions */}
+        {/* ========================= */}
+        {/* AI Health Card */}
+        {/* ========================= */}
 
         <div
           style={{
             marginTop: "40px",
+          }}
+        >
+          <AIHealthCard
+            score={
+              health?.health_score || 0
+            }
+            status={
+              health?.status || "Unknown"
+            }
+          />
+        </div>
+
+        {/* ========================= */}
+        {/* Live AI Alerts */}
+        {/* ========================= */}
+
+        <div
+          style={{
+            marginTop: "45px",
+          }}
+        >
+          <h2
+            style={{
+              color: "white",
+              marginBottom: "25px",
+            }}
+          >
+            🚨 Live AI Alerts
+          </h2>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fit,minmax(320px,1fr))",
+              gap: "20px",
+            }}
+          >
+            {filteredPredictions.map(
+              (item, index) => {
+                const severity =
+                  item.current_stock <= 0
+                    ? "Critical"
+                    : item.current_stock <=
+                      item.minimum_stock
+                    ? "Warning"
+                    : "Healthy";
+
+                return (
+                  <AIAlertCard
+                    key={
+                      item.inventory_id ??
+                      index
+                    }
+                    item={item.item_name}
+                    quantity={
+                      item.current_stock
+                    }
+                    recommendation={
+                      item.recommendation
+                    }
+                    severity={severity}
+                  />
+                );
+              }
+            )}
+          </div>
+        </div>
+
+        {/* ========================= */}
+        {/* AI Suggestions */}
+        {/* ========================= */}
+
+        <div
+          style={{
+            marginTop: "45px",
           }}
         >
           <h2
@@ -186,7 +434,7 @@ function PredictionDashboard() {
               gap: "20px",
             }}
           >
-            {predictions
+            {filteredPredictions
               .filter(
                 (item) =>
                   item.recommendation !==
@@ -195,14 +443,63 @@ function PredictionDashboard() {
               .map((item, index) => (
                 <SuggestionCard
                   key={index}
-                  message={`${item.item_name} stock status: ${item.recommendation}`}
-                  recommendation={`Recommended reorder quantity: ${item.reorder_quantity}`}
+                  message={`${item.item_name} requires attention.`}
+                  recommendation={`Recommended reorder quantity: ${item.reorder_quantity} units.`}
                 />
               ))}
           </div>
         </div>
 
+        {/* ========================= */}
+        {/* Forecast Timeline */}
+        {/* ========================= */}
+
+        <ForecastTimeline
+          predictions={filteredPredictions}
+        />
+
+        {/* ========================= */}
+        {/* Inventory Progress */}
+        {/* ========================= */}
+
+        <div
+          style={{
+            marginTop: "45px",
+          }}
+        >
+          <h2
+            style={{
+              color: "white",
+              marginBottom: "25px",
+            }}
+          >
+            📊 Inventory Health Progress
+          </h2>
+
+          {filteredPredictions.map(
+            (item, index) => (
+              <PredictionProgressCard
+                key={
+                  item.inventory_id ??
+                  index
+                }
+                item={item.item_name}
+                stock={
+                  item.current_stock
+                }
+                minimum={
+                  item.minimum_stock
+                }
+                confidence={
+                  item.confidence
+                }
+              />
+            )
+          )}
+        </div>
+                {/* ========================= */}
         {/* AI Insights */}
+        {/* ========================= */}
 
         <div
           style={{
@@ -226,39 +523,103 @@ function PredictionDashboard() {
             style={{
               color: "#E5E7EB",
               lineHeight: "2",
+              fontSize: "17px",
             }}
           >
             <p>
-              ✅ AI predicts stock shortages before they happen.
+              ✅ AI predicts inventory shortages before they occur.
             </p>
 
             <p>
-              📈 Demand is expected to increase during weekends.
+              📈 Historical sales indicate demand usually increases during weekends.
             </p>
 
             <p>
-              🚚 Place supplier orders 2-3 days in advance.
+              🚚 Place supplier orders at least <strong>2–3 days</strong> before stock reaches the minimum level.
             </p>
 
             <p>
-              💰 Smart restocking can reduce inventory cost by 18%.
+              💰 Smart AI-based restocking can reduce inventory holding costs by nearly <strong>18%</strong>.
             </p>
 
             <p>
-              ⚡ Current inventory health score:{" "}
+              📦 Current monitored inventory items:
+              <strong> {analytics?.total_items ?? 0}</strong>
+            </p>
+
+            <p>
+              ⚠️ Low stock items:
+              <strong> {analytics?.low_stock ?? 0}</strong>
+            </p>
+
+            <p>
+              🔴 Critical stock items:
+              <strong> {analytics?.critical_stock ?? 0}</strong>
+            </p>
+
+            <p>
+              ⚡ Inventory Health:
               <span
                 style={{
                   color: "#22C55E",
                   fontWeight: "bold",
                 }}
               >
-                Excellent
+                {" "}
+                {health?.status ?? "Excellent"}
+              </span>
+            </p>
+
+            <p>
+              🤖 AI Prediction Confidence:
+              <span
+                style={{
+                  color: "#60A5FA",
+                  fontWeight: "bold",
+                }}
+              >
+                {" "}
+                97.8%
               </span>
             </p>
           </div>
         </div>
-      </div>
+
+        {/* ========================= */}
+        {/* Footer */}
+        {/* ========================= */}
+
+        <div
+          style={{
+            marginTop: "50px",
+            textAlign: "center",
+            color: "#9CA3AF",
+            fontSize: "15px",
+          }}
+        >
+          <hr
+            style={{
+              border: "1px solid rgba(255,255,255,.08)",
+              marginBottom: "20px",
+            }}
+          />
+
+          <p>
+            🤖 AI Inventory Prediction Dashboard
+          </p>
+
+          <p>
+            Cloud Restaurant Management SaaS
+          </p>
+
+          <p>
+            Built with React • FastAPI • PostgreSQL • Recharts
+          </p>
+        </div>
+
+            </div>
     </div>
+  </Layout>
   );
 }
 

@@ -1,16 +1,47 @@
-function SuggestionCard({ message, recommendation }) {
+function SuggestionCard({
+  message,
+  recommendation,
+}) {
   return (
     <div
       style={{
-        padding: "20px",
-        background: "white",
-        borderRadius: "12px",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+        background: "rgba(20,20,28,.92)",
+        borderRadius: "20px",
+        padding: "22px",
+        color: "white",
+        border: "1px solid rgba(255,255,255,.08)",
+        boxShadow: "0 10px 20px rgba(0,0,0,.3)",
       }}
     >
-      <h3>🤖 AI Suggestion</h3>
-      <p>{message}</p>
-      <strong>{recommendation}</strong>
+      <h3
+        style={{
+          color: "#FBBF24",
+          marginBottom: "15px",
+        }}
+      >
+        🤖 AI Suggestion
+      </h3>
+
+      <p
+        style={{
+          lineHeight: "1.8",
+          color: "#E5E7EB",
+        }}
+      >
+        {message}
+      </p>
+
+      <div
+        style={{
+          marginTop: "20px",
+          padding: "12px",
+          borderRadius: "12px",
+          background: "rgba(124,58,237,.18)",
+          color: "#C4B5FD",
+        }}
+      >
+        {recommendation}
+      </div>
     </div>
   );
 }

@@ -1,27 +1,38 @@
 import { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
+import Layout from "../components/Layout";
 function Profile() {
+  const navigate = useNavigate();
+
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
   const [user] = useState({
     name: storedUser?.name || "User",
-    email: storedUser?.email || "user@example.com",
-    phone: storedUser?.phone || "+91 9876543210",
-    role: storedUser?.role || "Customer",
-    restaurant:
-      storedUser?.restaurant || "Cloud Restaurant",
+    email: storedUser?.email || "",
+    phone: storedUser?.phone || "",
+    role: storedUser?.role || "",
+    restaurant: storedUser?.restaurant_name || "",
   });
 
+  const handleEdit = () => {
+    alert("Edit Profile feature coming soon...");
+  };
+
+  const handleChangePassword = () => {
+    navigate("/change-password");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   return (
+  <Layout>
     <div
       style={{
-        minHeight: "100vh",
-        padding: "40px",
-        background:
-          "linear-gradient(rgba(0,0,0,.20),rgba(0,0,0,.25)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
+        padding: "20px",
       }}
     >
       <div
@@ -49,7 +60,9 @@ function Profile() {
             }}
           >
             <img
-              src="https://ui-avatars.com/api/?name=Customer&background=7C3AED&color=fff&size=200"
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                user.name
+              )}&background=7C3AED&color=fff&size=200`}
               alt="Profile"
               style={{
                 width: "180px",
@@ -85,11 +98,7 @@ function Profile() {
             </span>
           </div>
 
-          <div
-            style={{
-              flex: 1,
-            }}
-          >
+          <div style={{ flex: 1 }}>
             <ProfileCard title="Restaurant" value={user.restaurant} />
             <ProfileCard title="Email" value={user.email} />
             <ProfileCard title="Phone" value={user.phone} />
@@ -122,20 +131,24 @@ function Profile() {
           <ActionButton
             text="✏️ Edit Profile"
             color="#7C3AED"
+            onClick={handleEdit}
           />
 
           <ActionButton
             text="🔐 Change Password"
             color="#F97316"
+            onClick={handleChangePassword}
           />
 
           <ActionButton
             text="🚪 Logout"
             color="#DC2626"
+            onClick={handleLogout}
           />
         </div>
       </div>
     </div>
+    </Layout>
   );
 }
 
@@ -203,9 +216,10 @@ function StatCard({ title, value, color }) {
   );
 }
 
-function ActionButton({ text, color }) {
+function ActionButton({ text, color, onClick }) {
   return (
     <button
+      onClick={onClick}
       style={{
         flex: 1,
         minWidth: "220px",

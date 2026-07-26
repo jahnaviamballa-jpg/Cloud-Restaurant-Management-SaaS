@@ -67,7 +67,7 @@ def get_top_selling_items(db: Session):
         )
 
         revenue = sum(
-            item.subtotal
+            item.subtotal or 0
             for item in order_items
         )
 
@@ -104,12 +104,11 @@ def get_order_statistics(db: Session):
 
     for order in orders:
 
-        status = (
-            order.order_status or ""
-        ).lower()
+        # FIXED HERE
+        order_status = (order.status or "").strip().lower()
 
-        if status in stats:
-            stats[status] += 1
+        if order_status in stats:
+            stats[order_status] += 1
 
     return stats
 

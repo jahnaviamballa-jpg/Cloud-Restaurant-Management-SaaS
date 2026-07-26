@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import Layout from "../components/Layout";
 import DashboardCard from "../components/DashboardCard";
 
 import { getRestaurants } from "../api/restaurantApi";
@@ -41,16 +41,18 @@ function OwnerDashboard() {
       );
 
       setSales(
-        salesData.total_sales ||
-          salesData.sales ||
-          0
-      );
+  salesData.today_orders ??
+  salesData.weekly_orders ??
+  salesData.monthly_orders ??
+  0
+);
 
       setRevenue(
-        revenueData.total_revenue ||
-          revenueData.revenue ||
-          0
-      );
+  revenueData.today_revenue ??
+  revenueData.weekly_revenue ??
+  revenueData.monthly_revenue ??
+  0
+);
 
       setOrders(
         (orderData.pending || 0) +
@@ -64,6 +66,7 @@ function OwnerDashboard() {
   };
 
   return (
+    <Layout>
     <div
       style={{
         minHeight: "100vh",
@@ -338,6 +341,7 @@ function OwnerDashboard() {
         </div>
       </div>
     </div>
+    </Layout>
   );
 }
 

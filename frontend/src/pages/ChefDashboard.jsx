@@ -1,62 +1,48 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DashboardCard from "../components/DashboardCard";
-import {
-  getOrders,
-  getOrderStats,
-  updateOrderStatus,
-} from "../api/orderApi";
+import Layout from "../components/Layout";
+
+import { getOrderStatistics } from "../api/analyticsApi";
+import { getMenuByRestaurant } from "../api/menuApi";
 
 function ChefDashboard() {
-  const [orders, setOrders] = useState({
-    pending: 0,
-    preparing: 0,
-    ready: 0,
-    served: 0,
-    cancelled: 0,
-  });
+  const navigate = useNavigate();
 
-  const [orderList, setOrderList] = useState([]);
+  const [orders, setOrders] = useState(0);
+  const [preparing, setPreparing] = useState(0);
+  const [ready, setReady] = useState(0);
+  const [menuItems, setMenuItems] = useState(0);
 
   useEffect(() => {
-    loadOrders();
+    loadDashboard();
   }, []);
 
-  const loadOrders = async () => {
+  const loadDashboard = async () => {
     try {
-      const [stats, orderData] = await Promise.all([
-        getOrderStats(),
-        getOrders(),
-      ]);
+      const orderData = await getOrderStatistics();
+      const menuData = await getMenuByRestaurant();
 
-      setOrders(stats);
-      setOrderList(orderData);
+      setPreparing(orderData.preparing || 0);
+      setReady(orderData.ready || 0);
+
+      setOrders(
+        (orderData.pending || 0) +
+          (orderData.preparing || 0) +
+          (orderData.ready || 0) +
+          (orderData.served || 0)
+      );
+
+      setMenuItems(
+        Array.isArray(menuData) ? menuData.length : 0
+      );
     } catch (error) {
       console.error(error);
-    }
-  };
-
-  const changeStatus = async (id, status) => {
-    try {
-      await updateOrderStatus(id, status);
-      loadOrders();
-    } catch (error) {
-      console.error(error);
-      alert("Failed to update order");
     }
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        padding: "40px",
-        background:
-          "linear-gradient(rgba(0,0,0,.20),rgba(0,0,0,.25)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
+    <Layout>
       <div
         style={{
           background: "rgba(18,18,24,.75)",
@@ -83,210 +69,143 @@ function ChefDashboard() {
             marginBottom: "35px",
           }}
         >
-          Monitor kitchen activities and manage every order efficiently.
+          Welcome Chef! Manage kitchen operations and monitor orders.
         </p>
 
         <div
           style={{
             display: "grid",
             gridTemplateColumns:
-              "repeat(auto-fit,minmax(220px,1fr))",
+              "repeat(auto-fit,minmax(250px,1fr))",
             gap: "25px",
           }}
         >
           <DashboardCard
-            title="Pending"
-            value={orders.pending}
+            title="Total Orders"
+            value={orders}
             icon="🛒"
           />
 
           <DashboardCard
             title="Preparing"
-            value={orders.preparing}
-            icon="🔥"
+            value={preparing}
+            icon="👨‍🍳"
           />
 
           <DashboardCard
             title="Ready"
-            value={orders.ready}
+            value={ready}
             icon="✅"
           />
 
           <DashboardCard
-            title="Served"
-            value={orders.served}
+            title="Menu Items"
+            value={menuItems}
             icon="🍽️"
-          />
-
-          <DashboardCard
-            title="Cancelled"
-            value={orders.cancelled || 0}
-            icon="❌"
           />
         </div>
 
         <div
           style={{
             marginTop: "45px",
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit,minmax(320px,1fr))",
-            gap: "25px",
           }}
         >
-          <div
+          <h2
             style={{
-              background: "rgba(20,20,28,.92)",
-              borderRadius: "20px",
-              padding: "30px",
-              border: "1px solid rgba(255,255,255,.08)",
+              color: "white",
+              marginBottom: "20px",
             }}
           >
-            <h2
-              style={{
-                color: "white",
-                marginBottom: "20px",
-              }}
-            >
-              ⏱ Average Preparation Time
-            </h2>
-
-            <h1
-              style={{
-                color: "#F97316",
-                fontSize: "48px",
-              }}
-            >
-              18 min
-            </h1>
-
-            <p style={{ color: "#BDBDBD" }}>
-              Average preparation time today.
-            </p>
-          </div>
+            ⚡ Quick Actions
+          </h2>
 
           <div
             style={{
-              background: "rgba(20,20,28,.92)",
-              borderRadius: "20px",
-              padding: "30px",
-              border: "1px solid rgba(255,255,255,.08)",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "20px",
             }}
           >
-            <h2
-              style={{
-                color: "white",
-                marginBottom: "20px",
-              }}
+            <button
+              style={buttonStyle}
+              onClick={() => navigate("/orders")}
             >
-              ⭐ Kitchen Rating
-            </h2>
+              🛒 View Orders
+            </button>
 
-            <h1
-              style={{
-                color: "#22C55E",
-                fontSize: "48px",
-              }}
+            <button
+              style={buttonStyle}
+              onClick={() => navigate("/menu")}
             >
-              4.8★
-            </h1>
+              🍽️ View Menu
+            </button>
 
-            <p style={{ color: "#BDBDBD" }}>
-              Customer satisfaction score.
-            </p>
+            <button
+              style={buttonStyle}
+              onClick={() => navigate("/profile")}
+            >
+              👤 Profile
+            </button>
           </div>
         </div>
 
-        {/* Live Kitchen Queue */}
-        {/* Chef Actions */}
+        <div
+          style={{
+            marginTop: "45px",
+            background: "rgba(20,20,28,.92)",
+            borderRadius: "20px",
+            padding: "30px",
+            border: "1px solid rgba(255,255,255,.08)",
+          }}
+        >
+          <h2
+            style={{
+              color: "white",
+              marginBottom: "20px",
+            }}
+          >
+            🕒 Kitchen Activity
+          </h2>
 
-<div
-  style={{
-    marginTop: "45px",
-  }}
->
-  <h2
-    style={{
-      color: "white",
-      marginBottom: "20px",
-    }}
-  >
-    ⚡ Quick Actions
-  </h2>
-
-  <div
-    style={{
-      display: "flex",
-      flexWrap: "wrap",
-      gap: "20px",
-    }}
-  >
-    <button
-      onClick={loadOrders}
-      style={{
-        padding: "15px 28px",
-        border: "none",
-        borderRadius: "14px",
-        background:
-          "linear-gradient(90deg,#7C3AED,#F97316)",
-        color: "white",
-        fontWeight: "600",
-        cursor: "pointer",
-      }}
-    >
-      🔄 Refresh Orders
-    </button>
-
-    <button
-      onClick={() => window.location.href = "/orders"}
-      style={{
-        padding: "15px 28px",
-        border: "none",
-        borderRadius: "14px",
-        background: "#22C55E",
-        color: "white",
-        fontWeight: "600",
-        cursor: "pointer",
-      }}
-    >
-      📋 View Orders
-    </button>
-
-    <button
-      onClick={() => window.location.href = "/inventory"}
-      style={{
-        padding: "15px 28px",
-        border: "none",
-        borderRadius: "14px",
-        background: "#3B82F6",
-        color: "white",
-        fontWeight: "600",
-        cursor: "pointer",
-      }}
-    >
-      📦 Inventory
-    </button>
-
-    <button
-      onClick={() => window.location.href = "/manager-dashboard"}
-      style={{
-        padding: "15px 28px",
-        border: "none",
-        borderRadius: "14px",
-        background: "#EF4444",
-        color: "white",
-        fontWeight: "600",
-        cursor: "pointer",
-      }}
-    >
-      🏠 Manager Dashboard
-    </button>
-  </div>
-</div>
-
-</div>
-</div>
-);
+          {[
+            "👨‍🍳 Kitchen is running smoothly",
+            "🍽️ New orders received",
+            "🔥 Food preparation in progress",
+            "✅ Orders ready for serving",
+            "📦 Ingredients available",
+          ].map((item, index) => (
+            <div
+              key={index}
+              style={{
+                color: "#E5E7EB",
+                padding: "15px 0",
+                borderBottom:
+                  index !== 4
+                    ? "1px solid rgba(255,255,255,.06)"
+                    : "none",
+              }}
+            >
+              {item}
+            </div>
+          ))}
+        </div>
+      </div>
+    </Layout>
+  );
 }
+
+const buttonStyle = {
+  padding: "15px 28px",
+  border: "none",
+  borderRadius: "14px",
+  background:
+    "linear-gradient(90deg,#7C3AED,#F97316)",
+  color: "white",
+  fontWeight: "600",
+  fontSize: "15px",
+  cursor: "pointer",
+  transition: "0.3s ease",
+  boxShadow: "0 8px 20px rgba(0,0,0,.25)",
+};
 
 export default ChefDashboard;

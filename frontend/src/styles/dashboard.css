@@ -1,0 +1,49 @@
+.dashboard-input {
+  width: 100%;
+  padding: 15px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(17,24,39,.90);
+  color: #F9FAFB;
+  font-size: 15px;
+  outline: none;
+  transition: all .3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-sizing: border-box;
+}
+
+.dashboard-input::placeholder {
+  color: #9CA3AF;
+}
+
+.dashboard-input:focus {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 4px rgba(59,130,246,.18);
+}
+
+.dashboard-select {
+  width: 100%;
+  padding: 15px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(17,24,39,.90);
+  color: #F9FAFB;
+  font-size: 15px;
+  outline: none;
+  transition: all .3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.dashboard-select:focus {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 4px rgba(59,130,246,.18);
+}
+
+.dashboard-select option {
+  background: #111827;
+  color: white;
+}

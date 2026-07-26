@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CartItem from "../components/CartItem";
 import api from "../api/api";
-
+import Layout from "../components/Layout";
 function Cart() {
   const navigate = useNavigate();
 
@@ -21,6 +21,7 @@ function Cart() {
 
   const updateCart = (updatedCart) => {
     setCartItems(updatedCart);
+
     localStorage.setItem(
       "cart",
       JSON.stringify(updatedCart)
@@ -41,18 +42,17 @@ function Cart() {
   };
 
   const decreaseQuantity = (id) => {
-    const updatedCart = cartItems
-      .map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              quantity: Math.max(
-                1,
-                item.quantity - 1
-              ),
-            }
-          : item
-      );
+    const updatedCart = cartItems.map((item) =>
+      item.id === id
+        ? {
+            ...item,
+            quantity: Math.max(
+              1,
+              item.quantity - 1
+            ),
+          }
+        : item
+    );
 
     updateCart(updatedCart);
   };
@@ -79,6 +79,9 @@ function Cart() {
   const total =
     subtotal + gst + delivery;
 
+  // =====================================
+  // Checkout
+  // =====================================
   const checkout = async () => {
     if (cartItems.length === 0) {
       alert("Cart is empty");
@@ -86,28 +89,40 @@ function Cart() {
     }
 
     try {
+      const user = JSON.parse(
+        localStorage.getItem("user")
+      );
+
       const order = {
         restaurant_id:
           cartItems[0].restaurant_id,
 
-        customer_id: 1,
+        customer_name:
+          user?.name ||
+          user?.username ||
+          "Customer",
 
-        payment_method: "Cash",
+        customer_phone:
+          user?.phone ||
+          "9999999999",
 
-        items: cartItems.map((item) => ({
-          menu_id: item.id,
-          quantity: item.quantity,
-        })),
+        total_amount: Number(
+          total.toFixed(2)
+        ),
+
+        status: "Pending",
       };
 
+      console.log("Sending Order:", order);
+
       const response = await api.post(
-        "/orders",
+        "/orders/",
         order
       );
 
       console.log(response.data);
 
-      alert("Order placed successfully");
+      alert("Order placed successfully!");
 
       localStorage.removeItem("cart");
 
@@ -117,6 +132,11 @@ function Cart() {
     } catch (err) {
       console.error(err);
 
+      console.log(
+        "Backend Error:",
+        err.response?.data
+      );
+
       alert(
         err.response?.data?.detail ||
           "Failed to place order"
@@ -125,6 +145,7 @@ function Cart() {
   };
 
   return (
+    <Layout>
     <div
       style={{
         minHeight: "100vh",
@@ -223,7 +244,6 @@ function Cart() {
                 }}
               >
                 <span>Subtotal</span>
-
                 <span>
                   ₹{subtotal.toFixed(2)}
                 </span>
@@ -239,7 +259,6 @@ function Cart() {
                 }}
               >
                 <span>GST (5%)</span>
-
                 <span>
                   ₹{gst.toFixed(2)}
                 </span>
@@ -255,7 +274,6 @@ function Cart() {
                 }}
               >
                 <span>Delivery</span>
-
                 <span>₹{delivery}</span>
               </div>
 
@@ -277,7 +295,6 @@ function Cart() {
                 }}
               >
                 <span>Total</span>
-
                 <span>
                   ₹{total.toFixed(2)}
                 </span>
@@ -306,6 +323,7 @@ function Cart() {
         )}
       </div>
     </div>
+    </Layout>
   );
 }
 

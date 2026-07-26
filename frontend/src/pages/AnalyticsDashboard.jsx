@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import AnalyticsCard from "../components/AnalyticsCard";
 import TopItemsTable from "../components/TopItemsTable";
 import OrderStatsCard from "../components/OrderStatsCard";
-
+import Layout from "../components/Layout";
 import {
   getSalesAnalytics,
   getRevenueAnalytics,
@@ -105,6 +105,7 @@ function AnalyticsDashboard() {
   }
 
   return (
+    <Layout>
     <div
       style={{
         minHeight: "100vh",
@@ -292,6 +293,7 @@ function AnalyticsDashboard() {
         </div>
       </div>
     </div>
+    </Layout>
   );
 }
 

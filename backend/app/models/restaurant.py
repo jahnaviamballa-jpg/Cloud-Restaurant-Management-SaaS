@@ -128,3 +128,13 @@ class Restaurant(Base):
     back_populates="restaurant",
     cascade="all, delete-orphan",
     )
+
+
+    users = relationship(
+    "User",
+    back_populates="restaurant",
+    cascade="all, delete-orphan",
+)
+    
+
+    

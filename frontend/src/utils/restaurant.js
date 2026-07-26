@@ -1,13 +1,45 @@
-export const getSelectedRestaurant = () => {
-  const restaurant = localStorage.getItem("restaurant");
+// ==========================================
+// Get Logged In User
+// ==========================================
+export const getLoggedInUser = () => {
+  const user = localStorage.getItem("user");
 
-  if (!restaurant) return null;
+  if (!user) {
+    return null;
+  }
 
-  return JSON.parse(restaurant);
+  return JSON.parse(user);
 };
 
+// ==========================================
+// Get Restaurant ID
+// ==========================================
 export const getRestaurantId = () => {
-  const restaurant = getSelectedRestaurant();
+  const user = getLoggedInUser();
 
-  return restaurant?.restaurant_id;
+  return user?.restaurant_id ?? null;
+};
+
+// ==========================================
+// Get Restaurant Name
+// ==========================================
+export const getRestaurantName = () => {
+  const user = getLoggedInUser();
+
+  return user?.restaurant_name ?? "";
+};
+
+// ==========================================
+// Get User
+// ==========================================
+export const getUser = () => {
+  return getLoggedInUser();
+};
+
+// ==========================================
+// Logout
+// ==========================================
+export const clearRestaurant = () => {
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
 };

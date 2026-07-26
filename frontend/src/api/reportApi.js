@@ -1,29 +1,10 @@
 import api from "./api";
-import { getRestaurantId } from "../utils/restaurant";
 
 // ===================================
 // Sales Report
 // ===================================
 export const getSalesReport = async () => {
-  const restaurantId = getRestaurantId();
-
-  const response = await api.get(
-    `/reports/restaurants/${restaurantId}/sales`
-  );
-
-  return response.data;
-};
-
-// ===================================
-// Revenue Report
-// ===================================
-export const getRevenueReport = async () => {
-  const restaurantId = getRestaurantId();
-
-  const response = await api.get(
-    `/reports/restaurants/${restaurantId}/revenue`
-  );
-
+  const response = await api.get("/reports/sales");
   return response.data;
 };
 
@@ -31,12 +12,7 @@ export const getRevenueReport = async () => {
 // Inventory Report
 // ===================================
 export const getInventoryReport = async () => {
-  const restaurantId = getRestaurantId();
-
-  const response = await api.get(
-    `/reports/restaurants/${restaurantId}/inventory`
-  );
-
+  const response = await api.get("/reports/inventory");
   return response.data;
 };
 
@@ -44,40 +20,14 @@ export const getInventoryReport = async () => {
 // Order Report
 // ===================================
 export const getOrderReport = async () => {
-  const restaurantId = getRestaurantId();
-
-  const response = await api.get(
-    `/reports/restaurants/${restaurantId}/orders`
-  );
-
+  const response = await api.get("/reports/orders");
   return response.data;
 };
 
 // ===================================
-// Customer Report
+// Summary
 // ===================================
-export const getCustomerReport = async () => {
-  const restaurantId = getRestaurantId();
-
-  const response = await api.get(
-    `/reports/restaurants/${restaurantId}/customers`
-  );
-
-  return response.data;
-};
-
-// ===================================
-// Download Report
-// ===================================
-export const downloadReport = async (type) => {
-  const restaurantId = getRestaurantId();
-
-  const response = await api.get(
-    `/reports/restaurants/${restaurantId}/download/${type}`,
-    {
-      responseType: "blob",
-    }
-  );
-
+export const getSummaryReport = async () => {
+  const response = await api.get("/reports/summary");
   return response.data;
 };

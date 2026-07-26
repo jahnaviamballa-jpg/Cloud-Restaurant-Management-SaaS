@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import DashboardCard from "../components/DashboardCard";
-
+import Layout from "../components/Layout";
 import { getInventoryStats } from "../api/inventoryApi";
 import { getOrderStats } from "../api/orderApi";
 import { getLowStockNotifications } from "../api/notificationApi";
 import { getSalesReport } from "../api/reportApi";
+
+import { getRestaurantId } from "../utils/restaurant";
 
 function ManagerDashboard() {
   const navigate = useNavigate();
@@ -39,6 +41,14 @@ function ManagerDashboard() {
   const loadDashboard = async () => {
     try {
       setLoading(true);
+
+      const restaurantId = getRestaurantId();
+
+      if (!restaurantId) {
+        alert("Please login again.");
+        navigate("/login");
+        return;
+      }
 
       const [
         inventoryData,
@@ -75,8 +85,13 @@ function ManagerDashboard() {
       </h2>
     );
   }
+  console.log("Inventory:", inventory);
+console.log("Orders:", orders);
+console.log("Alerts:", alerts);
+console.log("Sales:", sales);
 
-  return (
+ return (
+  <Layout>
     <div
       style={{
         minHeight: "100vh",
@@ -88,219 +103,115 @@ function ManagerDashboard() {
         backgroundAttachment: "fixed",
       }}
     >
-      <div
+      <h1
         style={{
-          background: "rgba(18,18,24,.75)",
-          borderRadius: "25px",
-          padding: "35px",
-          border: "1px solid rgba(255,255,255,.08)",
+          color: "white",
+          marginBottom: "30px",
         }}
       >
-        <h1
-          style={{
-            color: "white",
-            fontSize: "42px",
-            marginBottom: "10px",
-          }}
-        >
-          👨‍💼 Restaurant Manager Dashboard
-        </h1>
+        🍽 Manager Dashboard
+      </h1>
 
-        <p
-          style={{
-            color: "#CFCFD5",
-            fontSize: "18px",
-            marginBottom: "35px",
-          }}
-        >
-          Monitor your restaurant performance in real time.
-        </p>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))",
+          gap: "20px",
+          marginBottom: "30px",
+        }}
+      >
+        <DashboardCard
+          title="Inventory Items"
+          value={inventory.total_items}
+          color="#3B82F6"
+        />
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit,minmax(220px,1fr))",
-            gap: "25px",
-          }}
-        >
-          <DashboardCard
-            title="Inventory Items"
-            value={inventory.total_items}
-            icon="📦"
-          />
+        <DashboardCard
+          title="Low Stock"
+          value={inventory.low_stock}
+          color="#F59E0B"
+        />
 
-          <DashboardCard
-            title="Low Stock"
-            value={inventory.low_stock}
-            icon="⚠️"
-          />
+        <DashboardCard
+          title="Critical Stock"
+          value={inventory.critical_stock}
+          color="#EF4444"
+        />
 
-          <DashboardCard
-            title="Critical Stock"
-            value={inventory.critical_stock}
-            icon="🚨"
-          />
-
-          <DashboardCard
-            title="Pending Orders"
-            value={orders.pending}
-            icon="🛒"
-          />
-
-          <DashboardCard
-            title="Preparing Orders"
-            value={orders.preparing}
-            icon="👨‍🍳"
-          />
-
-          <DashboardCard
-            title="Ready Orders"
-            value={orders.ready}
-            icon="✅"
-          />
-
-          <DashboardCard
-            title="Served Orders"
-            value={orders.served}
-            icon="🍽️"
-          />
-
-          <DashboardCard
-            title="Revenue"
-            value={`₹${sales.total_revenue}`}
-            icon="💰"
-          />
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit,minmax(420px,1fr))",
-            gap: "25px",
-            marginTop: "40px",
-          }}
-        >
-          <div
-            style={{
-              background: "rgba(20,20,28,.92)",
-              borderRadius: "20px",
-              padding: "25px",
-            }}
-          >
-            <h2 style={{ color: "white" }}>
-              📦 Inventory Alerts
-            </h2>
-
-            <ul
-              style={{
-                color: "#ddd",
-                marginTop: "20px",
-                lineHeight: "35px",
-              }}
-            >
-              {alerts.length === 0 ? (
-                <li>No Low Stock Items</li>
-              ) : (
-                alerts.map((item, index) => (
-                  <li key={index}>
-                    {item.status === "Critical"
-                      ? "🚨"
-                      : "⚠️"}{" "}
-                    {item.item} ({item.quantity})
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
-
-          <div
-            style={{
-              background: "rgba(20,20,28,.92)",
-              borderRadius: "20px",
-              padding: "25px",
-            }}
-          >
-            <h2 style={{ color: "white" }}>
-              📊 Dashboard Summary
-            </h2>
-
-            <ul
-              style={{
-                color: "#ddd",
-                marginTop: "20px",
-                lineHeight: "35px",
-              }}
-            >
-              <li>Total Inventory : {inventory.total_items}</li>
-              <li>Pending Orders : {orders.pending}</li>
-              <li>Preparing : {orders.preparing}</li>
-              <li>Ready : {orders.ready}</li>
-              <li>Served : {orders.served}</li>
-              <li>
-                Revenue : ₹{sales.total_revenue}
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div
-          style={{
-            marginTop: "40px",
-            display: "flex",
-            gap: "20px",
-            flexWrap: "wrap",
-          }}
-        >
-          <button
-            onClick={() => navigate("/inventory")}
-            style={{
-              padding: "16px 30px",
-              border: "none",
-              borderRadius: "15px",
-              background:
-                "linear-gradient(90deg,#7C3AED,#F97316)",
-              color: "white",
-              cursor: "pointer",
-              fontWeight: "700",
-            }}
-          >
-            📦 Manage Inventory
-          </button>
-
-          <button
-            onClick={() => navigate("/reports")}
-            style={{
-              padding: "16px 30px",
-              border: "none",
-              borderRadius: "15px",
-              background: "#22C55E",
-              color: "white",
-              cursor: "pointer",
-              fontWeight: "700",
-            }}
-          >
-            📊 View Reports
-          </button>
-
-          <button
-            onClick={() => navigate("/analytics")}
-            style={{
-              padding: "16px 30px",
-              border: "none",
-              borderRadius: "15px",
-              background: "#3B82F6",
-              color: "white",
-              cursor: "pointer",
-              fontWeight: "700",
-            }}
-          >
-            📈 Analytics
-          </button>
-        </div>
+        <DashboardCard
+          title="Revenue"
+          value={`₹${sales.total_revenue}`}
+          color="#22C55E"
+        />
       </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))",
+          gap: "20px",
+          marginBottom: "40px",
+        }}
+      >
+        <DashboardCard
+          title="Pending Orders"
+          value={orders.pending}
+          color="#F59E0B"
+        />
+
+        <DashboardCard
+          title="Preparing"
+          value={orders.preparing}
+          color="#3B82F6"
+        />
+
+        <DashboardCard
+          title="Ready"
+          value={orders.ready}
+          color="#10B981"
+        />
+
+        <DashboardCard
+          title="Served"
+          value={orders.served}
+          color="#8B5CF6"
+        />
+      </div>
+
+      <div
+        style={{
+          background: "rgba(20,20,28,.90)",
+          padding: "25px",
+          borderRadius: "18px",
+          color: "white",
+        }}
+      >
+        <h2>⚠ Low Stock Alerts</h2>
+
+        {alerts.length === 0 ? (
+  <p>No Low Stock Alerts</p>
+) : (
+  alerts.map((item, index) => (
+    <div
+      key={`${item.item}-${index}`}
+      style={{
+        padding: "12px",
+        borderBottom: "1px solid #333",
+      }}
+    >
+      <strong>{item.item}</strong>
+
+      <p>
+        Remaining Stock : {item.quantity}
+      </p>
+
+      <p>Status : {item.status}</p>
     </div>
+  ))
+)}
+      </div>
+        </div>
+  </Layout>
   );
 }
 

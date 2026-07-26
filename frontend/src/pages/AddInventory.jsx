@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createInventory } from "../api/inventoryApi";
+import Layout from "../components/Layout";
 
 function AddInventory() {
   const [form, setForm] = useState({
@@ -40,6 +41,7 @@ function AddInventory() {
   };
 
   return (
+    <Layout>
     <div style={{ padding: "30px" }}>
       <h1>Add Inventory</h1>
 
@@ -101,6 +103,7 @@ function AddInventory() {
         </button>
       </form>
     </div>
+    </Layout>
   );
 }
 

@@ -7,6 +7,7 @@ from sqlalchemy import (
     ForeignKey,
 )
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 
 from app.database import Base
 
@@ -50,4 +51,19 @@ class Order(Base):
     created_at = Column(
         DateTime(timezone=True),
         server_default=func.now(),
+    )
+
+    # ============================
+    # Relationship
+    # ============================
+
+    restaurant = relationship(
+        "Restaurant",
+        back_populates="orders",
+    )
+
+    order_items = relationship(
+        "OrderItem",
+        back_populates="order",
+        cascade="all, delete-orphan",
     )

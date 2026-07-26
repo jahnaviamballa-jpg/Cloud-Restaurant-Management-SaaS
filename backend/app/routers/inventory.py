@@ -49,8 +49,81 @@ def add_inventory(
     db.refresh(inventory)
 
     return inventory
+# =====================================================
+# Inventory Statistics
+# =====================================================
+@router.get(
+    "/restaurants/{restaurant_id}/stats"
+)
+def get_inventory_stats(
+    restaurant_id: int,
+    db: Session = Depends(get_db),
+):
+    items = (
+        db.query(Inventory)
+        .filter(
+            Inventory.restaurant_id == restaurant_id
+        )
+        .all()
+    )
+
+    total_items = len(items)
+
+    low_stock = sum(
+        1
+        for item in items
+        if item.quantity <= item.minimum_stock
+    )
+
+    critical_stock = sum(
+        1
+        for item in items
+        if item.quantity <= max(
+            1,
+            item.minimum_stock // 2,
+        )
+    )
+
+    return {
+        "total_items": total_items,
+        "low_stock": low_stock,
+        "critical_stock": critical_stock,
+    }
 
 
+# =====================================================
+# Low Stock Items
+# =====================================================
+@router.get(
+    "/restaurants/{restaurant_id}/low-stock"
+)
+def get_low_stock_items(
+    restaurant_id: int,
+    db: Session = Depends(get_db),
+):
+    items = (
+        db.query(Inventory)
+        .filter(
+            Inventory.restaurant_id == restaurant_id
+        )
+        .all()
+    )
+
+    result = [
+        {
+            "id": item.id,
+            "item_name": item.item_name,
+            "quantity": item.quantity,
+            "minimum_stock": item.minimum_stock,
+        }
+        for item in items
+        if item.quantity <= item.minimum_stock
+    ]
+
+    return {
+        "count": len(result),
+        "items": result,
+    }
 # =====================================================
 # Get Inventory By Restaurant
 # =====================================================
@@ -179,78 +252,4 @@ def delete_inventory(
     }
 
 
-# =====================================================
-# Inventory Statistics
-# =====================================================
-@router.get(
-    "/restaurants/{restaurant_id}/stats"
-)
-def get_inventory_stats(
-    restaurant_id: int,
-    db: Session = Depends(get_db),
-):
-    items = (
-        db.query(Inventory)
-        .filter(
-            Inventory.restaurant_id == restaurant_id
-        )
-        .all()
-    )
 
-    total_items = len(items)
-
-    low_stock = sum(
-        1
-        for item in items
-        if item.quantity <= item.minimum_stock
-    )
-
-    critical_stock = sum(
-        1
-        for item in items
-        if item.quantity <= max(
-            1,
-            item.minimum_stock // 2,
-        )
-    )
-
-    return {
-        "total_items": total_items,
-        "low_stock": low_stock,
-        "critical_stock": critical_stock,
-    }
-
-
-# =====================================================
-# Low Stock Items
-# =====================================================
-@router.get(
-    "/restaurants/{restaurant_id}/low-stock"
-)
-def get_low_stock_items(
-    restaurant_id: int,
-    db: Session = Depends(get_db),
-):
-    items = (
-        db.query(Inventory)
-        .filter(
-            Inventory.restaurant_id == restaurant_id
-        )
-        .all()
-    )
-
-    result = [
-        {
-            "id": item.id,
-            "item_name": item.item_name,
-            "quantity": item.quantity,
-            "minimum_stock": item.minimum_stock,
-        }
-        for item in items
-        if item.quantity <= item.minimum_stock
-    ]
-
-    return {
-        "count": len(result),
-        "items": result,
-    }

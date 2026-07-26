@@ -1,84 +1,113 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { deleteRestaurant } from "../api/restaurantApi";
+import Layout from "../components/Layout";
+
+import {
+  getRestaurants,
+  deleteRestaurant,
+} from "../api/restaurantApi";
 
 function RestaurantList() {
   const navigate = useNavigate();
 
-  const [restaurants, setRestaurants] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
+
+  const role = user?.role || "";
+
+  const [restaurants, setRestaurants] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
 
   useEffect(() => {
-    fetchRestaurants();
+    loadRestaurants();
   }, []);
 
-  const fetchRestaurants = async () => {
+  const loadRestaurants = async () => {
     try {
       setLoading(true);
 
-      const response = await axios.get(
-        "http://127.0.0.1:8000/restaurants"
-      );
+      const data =
+        await getRestaurants();
 
       setRestaurants(
-        Array.isArray(response.data)
-          ? response.data
-          : []
+        Array.isArray(data) ? data : []
       );
 
       setError("");
     } catch (err) {
       console.error(err);
-      setError("Failed to load restaurants");
+
+      setError(
+        "Failed to load restaurants."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (restaurantId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this restaurant?"
-    );
-
-    if (!confirmDelete) return;
-
-    try {
-      await deleteRestaurant(restaurantId);
-
-      alert("Restaurant deleted successfully!");
-
-      fetchRestaurants();
-    } catch (error) {
-      console.error(error);
-      alert("Failed to delete restaurant.");
-    }
-  };
-
-  const handleViewRestaurant = (restaurant) => {
+  const handleSelectRestaurant = (
+    restaurant
+  ) => {
     localStorage.setItem(
       "restaurant",
       JSON.stringify(restaurant)
     );
 
-    navigate(
-      `/menu/${restaurant.restaurant_id}`
-    );
+    navigate("/menu");
+  };
+
+  const handleDelete = async (
+    restaurantId
+  ) => {
+    const confirmDelete =
+      window.confirm(
+        "Delete this restaurant?"
+      );
+
+    if (!confirmDelete) return;
+
+    try {
+      await deleteRestaurant(
+        restaurantId
+      );
+
+      alert(
+        "Restaurant deleted successfully."
+      );
+
+      loadRestaurants();
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        "Failed to delete restaurant."
+      );
+    }
   };
 
   if (loading) {
     return (
       <div
         style={{
+          minHeight: "100vh",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh",
           background: "#111827",
         }}
       >
-        <h2 style={{ color: "white" }}>
+        <h2
+          style={{
+            color: "white",
+          }}
+        >
           Loading Restaurants...
         </h2>
       </div>
@@ -89,14 +118,18 @@ function RestaurantList() {
     return (
       <div
         style={{
+          minHeight: "100vh",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh",
           background: "#111827",
         }}
       >
-        <h2 style={{ color: "red" }}>
+        <h2
+          style={{
+            color: "red",
+          }}
+        >
           {error}
         </h2>
       </div>
@@ -104,12 +137,13 @@ function RestaurantList() {
   }
 
   return (
+    <Layout>
     <div
       style={{
         minHeight: "100vh",
         padding: "40px",
         background:
-          "linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.35)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
+          "linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.35)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",
@@ -117,11 +151,13 @@ function RestaurantList() {
     >
       <div
         style={{
-          background: "rgba(18,18,24,.78)",
+          background:
+            "rgba(18,18,24,.80)",
           borderRadius: "25px",
           padding: "35px",
-          border: "1px solid rgba(255,255,255,.08)",
-          backdropFilter: "blur(10px)",
+          border:
+            "1px solid rgba(255,255,255,.08)",
+          backdropFilter: "blur(12px)",
         }}
       >
         <h1
@@ -131,17 +167,16 @@ function RestaurantList() {
             marginBottom: "10px",
           }}
         >
-          🍽️ Restaurants
+          🍽 Restaurants
         </h1>
 
         <p
           style={{
-            color: "#CFCFD5",
+            color: "#D1D5DB",
             marginBottom: "35px",
           }}
         >
-          Discover and manage restaurants on your
-          cloud platform.
+          Select a restaurant to continue.
         </p>
 
         <div
@@ -149,12 +184,21 @@ function RestaurantList() {
             display: "grid",
             gridTemplateColumns:
               "repeat(auto-fit,minmax(320px,1fr))",
-            gap: "30px",
+            gap: "25px",
           }}
         >
                     {restaurants.map((restaurant) => (
             <div
               key={restaurant.restaurant_id}
+              style={{
+                background: "rgba(20,20,28,.95)",
+                borderRadius: "20px",
+                overflow: "hidden",
+                border: "1px solid rgba(255,255,255,.08)",
+                transition: "0.3s",
+                boxShadow:
+                  "0 10px 25px rgba(0,0,0,.25)",
+              }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform =
                   "translateY(-8px)";
@@ -162,17 +206,6 @@ function RestaurantList() {
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform =
                   "translateY(0)";
-              }}
-              style={{
-                background: "rgba(20,20,28,.92)",
-                borderRadius: "20px",
-                overflow: "hidden",
-                border:
-                  "1px solid rgba(255,255,255,.08)",
-                transition: ".3s",
-                cursor: "pointer",
-                boxShadow:
-                  "0 10px 25px rgba(0,0,0,.25)",
               }}
             >
               <img
@@ -196,38 +229,34 @@ function RestaurantList() {
                 <h2
                   style={{
                     color: "white",
-                    marginBottom: "10px",
+                    marginBottom: "12px",
                   }}
                 >
                   {restaurant.restaurant_name}
                 </h2>
 
-                <p style={{ color: "#BDBDBD" }}>
-                  👨 Owner: {restaurant.owner_name}
+                <p style={{ color: "#CFCFD5" }}>
+                  👨 Owner : {restaurant.owner_name}
                 </p>
 
-                <p style={{ color: "#BDBDBD" }}>
+                <p style={{ color: "#CFCFD5" }}>
                   📍 {restaurant.city},{" "}
                   {restaurant.state}
                 </p>
 
-                <p style={{ color: "#BDBDBD" }}>
+                <p style={{ color: "#CFCFD5" }}>
                   📞 {restaurant.phone}
                 </p>
 
-                <p style={{ color: "#BDBDBD" }}>
+                <p style={{ color: "#CFCFD5" }}>
                   📧 {restaurant.email}
-                </p>
-
-                <p style={{ color: "#BDBDBD" }}>
-                  ⭐ 4.8 • 25-30 mins
                 </p>
 
                 <p
                   style={{
-                    color: "#BDBDBD",
+                    color: "#CFCFD5",
                     marginTop: "15px",
-                    minHeight: "55px",
+                    minHeight: "60px",
                   }}
                 >
                   {restaurant.description ||
@@ -236,7 +265,7 @@ function RestaurantList() {
 
                 <button
                   onClick={() =>
-                    handleViewRestaurant(
+                    handleSelectRestaurant(
                       restaurant
                     )
                   }
@@ -250,65 +279,67 @@ function RestaurantList() {
                       "linear-gradient(90deg,#7C3AED,#F97316)",
                     color: "white",
                     fontWeight: "700",
-                    fontSize: "15px",
                     cursor: "pointer",
+                    fontSize: "15px",
                   }}
                 >
                   🍽 View Restaurant
                 </button>
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "12px",
-                    marginTop: "15px",
-                  }}
-                >
-                  <button
-                    onClick={() =>
-                      navigate(
-                        `/edit-restaurant/${restaurant.restaurant_id}`
-                      )
-                    }
+                                {(role === "Owner" || role === "owner") && (
+                  <div
                     style={{
-                      flex: 1,
-                      padding: "12px",
-                      border: "none",
-                      borderRadius: "10px",
-                      background: "#2563EB",
-                      color: "white",
-                      fontWeight: "600",
-                      cursor: "pointer",
+                      display: "flex",
+                      gap: "12px",
+                      marginTop: "15px",
                     }}
                   >
-                    ✏️ Edit
-                  </button>
+                    <button
+                      onClick={() =>
+                        navigate(
+                          `/edit-restaurant/${restaurant.restaurant_id}`
+                        )
+                      }
+                      style={{
+                        flex: 1,
+                        padding: "12px",
+                        border: "none",
+                        borderRadius: "10px",
+                        background: "#2563EB",
+                        color: "white",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ✏️ Edit
+                    </button>
 
-                  <button
-                    onClick={() =>
-                      handleDelete(
-                        restaurant.restaurant_id
-                      )
-                    }
-                    style={{
-                      flex: 1,
-                      padding: "12px",
-                      border: "none",
-                      borderRadius: "10px",
-                      background: "#DC2626",
-                      color: "white",
-                      fontWeight: "600",
-                      cursor: "pointer",
-                    }}
-                  >
-                    🗑 Delete
-                  </button>
-                </div>
+                    <button
+                      onClick={() =>
+                        handleDelete(
+                          restaurant.restaurant_id
+                        )
+                      }
+                      style={{
+                        flex: 1,
+                        padding: "12px",
+                        border: "none",
+                        borderRadius: "10px",
+                        background: "#DC2626",
+                        color: "white",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                      }}
+                    >
+                      🗑 Delete
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
-                {restaurants.length === 0 && (
+
+        {restaurants.length === 0 && (
           <div
             style={{
               textAlign: "center",
@@ -316,14 +347,14 @@ function RestaurantList() {
               color: "white",
               padding: "40px",
               background: "rgba(20,20,28,.92)",
+              borderRadius: "20px",
               border:
                 "1px solid rgba(255,255,255,.08)",
-              borderRadius: "20px",
             }}
           >
             <h2
               style={{
-                marginBottom: "10px",
+                marginBottom: "15px",
               }}
             >
               🍽 No Restaurants Available
@@ -331,36 +362,41 @@ function RestaurantList() {
 
             <p
               style={{
-                color: "#CFCFD5",
+                color: "#D1D5DB",
                 marginBottom: "25px",
               }}
             >
-              Click the button below to add your
-              first restaurant.
+              There are currently no restaurants
+              available.
             </p>
-
-            <button
-              onClick={() =>
-                navigate("/add-restaurant")
-              }
-              style={{
-                padding: "15px 30px",
-                border: "none",
-                borderRadius: "12px",
-                background:
-                  "linear-gradient(90deg,#7C3AED,#F97316)",
-                color: "white",
-                fontWeight: "700",
-                fontSize: "16px",
-                cursor: "pointer",
-              }}
-            >
-              ➕ Add Restaurant
-            </button>
+                        {(role === "Owner" ||
+              role === "owner") && (
+              <button
+                onClick={() =>
+                  navigate(
+                    "/add-restaurant"
+                  )
+                }
+                style={{
+                  padding: "15px 30px",
+                  border: "none",
+                  borderRadius: "12px",
+                  background:
+                    "linear-gradient(90deg,#7C3AED,#F97316)",
+                  color: "white",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  fontSize: "16px",
+                }}
+              >
+                ➕ Add Restaurant
+              </button>
+            )}
           </div>
         )}
       </div>
     </div>
+    </Layout>
   );
 }
 
