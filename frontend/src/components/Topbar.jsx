@@ -178,9 +178,15 @@ function Topbar() {
               to={item.path}
               style={{
                 textDecoration: "none",
-                const isActive = item.activePaths
-  ? item.activePaths.includes(location.pathname)
-  : location.pathname === item.path;
+                color:
+                  location.pathname === item.path
+                    ? "#fff"
+                    : "#B5B5C3",
+
+                background:
+                  location.pathname === item.path
+                    ? "#7C3AED"
+                    : "transparent",
 
                 padding: "10px 16px",
                 borderRadius: "8px",
