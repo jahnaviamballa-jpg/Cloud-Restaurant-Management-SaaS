@@ -1,148 +1,306 @@
-# Cloud Restaurant Management SaaS
+# 🍽️ Cloud Restaurant Management SaaS
 
-## Project Overview
+A cloud-based Restaurant Management Software as a Service (SaaS) platform developed using **React**, **FastAPI**, and **PostgreSQL**. The application enables restaurants to efficiently manage orders, menus, inventory, reservations, employees, analytics, and customer authentication through a modern web interface.
 
-Cloud Restaurant Management SaaS is a web application for managing restaurants using cloud technologies. It provides restaurant management, menu management, order processing, and inventory management.
+---
 
-## Technology Stack
+# 📖 Project Overview
 
-- React
+Cloud Restaurant Management SaaS is a full-stack web application designed to simplify restaurant operations using cloud technologies. It supports restaurant management, order processing, menu management, inventory tracking, employee management, customer reservations, authentication, analytics, and AI-based prediction modules.
+
+---
+
+# ✨ Features
+
+- 🔐 User Authentication (Register/Login)
+- 🍽️ Restaurant Management
+- 📋 Menu Management
+- 🛒 Order Management
+- 📦 Inventory Management
+- 📅 Reservation Management
+- 👨‍🍳 Employee Management
+- 📊 Analytics Dashboard
+- 🤖 AI Prediction Module
+- 🔔 Notification Module
+- ☁️ Cloud Deployment
+- 📱 Responsive User Interface
+
+---
+
+# 🛠 Technology Stack
+
+## Frontend
+- React.js
+- Vite
+- Axios
+- React Router DOM
+
+## Backend
 - FastAPI
-- PostgreSQL
+- SQLAlchemy
+- Pydantic
+- JWT Authentication
+- Passlib (Password Hashing)
+
+## Database
+- PostgreSQL (Neon)
+
+## Cloud & Deployment
+- Render (Backend)
+- Vercel (Frontend)
+- GitHub
 - Docker
-- Render
 
-## Live Demo
+---
 
-### Frontend
+# 🏗 Project Architecture
 
-https://cloud-restaurant-management-saas.onrender.com
+```
+React Frontend
+       │
+       ▼
+ FastAPI REST APIs
+       │
+       ▼
+ PostgreSQL Database
+       │
+       ▼
+ Cloud Deployment
+(Render + Vercel)
+```
+
+---
+
+# 📂 Folder Structure
+
+```
+Cloud-Restaurant-Management-SaaS/
+│
+├── backend/
+│   ├── app/
+│   ├── requirements.txt
+│   └── main.py
+│
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   └── package.json
+│
+├── README.md
+└── .gitignore
+```
+
+---
+
+# 🚀 Live Demo
+
+## 🌐 Frontend
+
+https://cloud-restaurant-management-saa-s.vercel.app
+
+## ⚙ Backend
+
+https://cloud-restaurant-management-saas-aom7.onrender.com
+
+## 📘 Swagger API Documentation
+
+https://cloud-restaurant-management-saas-aom7.onrender.com/docs
+
+---
+
+# ⚙ Installation
+
+## Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/Cloud-Restaurant-Management-SaaS.git
+```
+
+```bash
+cd Cloud-Restaurant-Management-SaaS
+```
+
+---
+
+## Backend Setup
+
+```bash
+cd backend
+```
+
+Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+Run server
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Backend URL
+
+```
+http://127.0.0.1:8000
+```
+
+Swagger
+
+```
+http://127.0.0.1:8000/docs
+```
+
+---
+
+## Frontend Setup
+
+```bash
+cd frontend
+```
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Run application
+
+```bash
+npm run dev
+```
+
+Frontend URL
+
+```
+http://localhost:5173
+```
+
+---
+
+# 🌐 Environment Variables
+
+Frontend
+
+```
+VITE_API_BASE_URL=https://cloud-restaurant-management-saas-aom7.onrender.com
+```
+
+Backend
+
+```
+DATABASE_URL=YOUR_POSTGRES_DATABASE_URL
+SECRET_KEY=YOUR_SECRET_KEY
+```
+
+---
+
+# ☁️ Deployment
 
 ### Backend
 
-https://restaurant-backend-wcoz.onrender.com
-
-### Swagger
-
-https://restaurant-backend-wcoz.onrender.com/docs
-
-## Deployment Instructions
-
-1. Deploy the backend on Render.
-2. Deploy the frontend on Render.
-3. Configure environment variables.
-4. Enable Auto Deploy.
-
-# Project Architecture
-
-Explain frontend, backend, database, and cloud.
-
-# Technology Stack
-
-- React
-- FastAPI
-- PostgreSQL
-- Docker
 - Render
-- GitHub Actions
 
-# Deployment Links
+### Frontend
 
-Frontend:
-https://cloud-restaurant-management-saas.onrender.com
+- Vercel
 
-Backend:
-https://restaurant-backend-wcoz.onrender.com
+### Database
 
-# Setup Instructions
+- Neon PostgreSQL
 
-1. Clone repository
-2. Install dependencies
-3. Configure environment variables
-4. Run backend
-5. Run frontend
+---
 
-# Team Members
+# 📡 API Documentation
 
-- Member 1 – Backend
-- Member 2 – Frontend
-- Member 3 – Cloud & DevOps
+Swagger UI
 
-# Features
+https://cloud-restaurant-management-saas-aom7.onrender.com/docs
 
-- Restaurant Management
-- Menu Management
-- Orders
-- Inventory
-- Authentication
+---
 
-# Future Enhancements
+# 👥 Team Members
 
-- Notifications
-- Analytics
-- AI Recommendations
+### Member 1
+Backend Development
 
-# Project Architecture
+### Member 2
+Frontend Development
 
-React → FastAPI → PostgreSQL → Cloud
+### Member 3
+Cloud Deployment & DevOps
 
-# Cloud Deployment
+---
 
-Deployed using Render.
+# 🔮 Future Enhancements
 
-# Technology Stack
+- AI-based Food Recommendations
+- Online Payment Integration
+- Email Notifications
+- SMS Notifications
+- Real-time Order Tracking
+- Customer Feedback System
+- Advanced Analytics Dashboard
+- Multi-Restaurant SaaS Support
 
-- React
-- FastAPI
-- PostgreSQL
-- Docker
-- Render
-- GitHub Actions
+---
 
-# API Documentation
+# 📸 Screenshots
 
-Swagger:
-https://your-backend.onrender.com/docs
+> Add screenshots of Login, Dashboard, Orders, Menu, Inventory, Analytics, Reservations, and Employee Management pages.
 
-# Deployment URLs
+---
 
-Frontend:
-https://your-frontend.onrender.com
+# 📄 License
 
-Backend:
-https://your-backend.onrender.com
+This project is developed for educational and academic purposes.
 
-# Future Scope
+---
 
-- AI recommendations
-- Advanced analytics
-- Notifications
+# 🔗 Related Links
 
-# Contributors
+## GitHub Repository
 
-Member 1 - Backend
+https://github.com/YOUR_USERNAME/Cloud-Restaurant-Management-SaaS
 
-Member 2 - Frontend
+## Frontend
 
-Member 3 - Cloud & DevOps
-## Project Overview
+https://cloud-restaurant-management-saa-s.vercel.app
 
-## Features
+## Backend
 
-## Technology Stack
+https://cloud-restaurant-management-saas-aom7.onrender.com
 
-## Installation
+## Swagger API
 
-## Deployment
+https://cloud-restaurant-management-saas-aom7.onrender.com/docs
 
-## API Documentation
+## Vercel
 
-## Team Members
+https://vercel.com/
 
-## Folder Structure
+## Render
 
-## Screenshots
+https://render.com/
 
-## Future Scope
+## Neon PostgreSQL
 
-## License
+https://neon.tech/
+
+## React
+
+https://react.dev/
+
+## FastAPI
+
+https://fastapi.tiangolo.com/
+
+## PostgreSQL
+
+https://www.postgresql.org/
+
+## Docker
+
+https://www.docker.com/
