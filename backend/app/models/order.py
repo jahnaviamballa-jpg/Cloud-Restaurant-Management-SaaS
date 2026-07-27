@@ -15,11 +15,19 @@ from app.database import Base
 class Order(Base):
     __tablename__ = "orders"
 
+    # =====================================================
+    # Primary Key
+    # =====================================================
+
     id = Column(
         Integer,
         primary_key=True,
         index=True,
     )
+
+    # =====================================================
+    # Foreign Keys
+    # =====================================================
 
     restaurant_id = Column(
         Integer,
@@ -27,15 +35,34 @@ class Order(Base):
         nullable=False,
     )
 
+    customer_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True,
+    )
+
+    # =====================================================
+    # Customer Details
+    # =====================================================
+
     customer_name = Column(
-        String,
+        String(100),
+        nullable=False,
+    )
+
+    customer_email = Column(
+        String(100),
         nullable=False,
     )
 
     customer_phone = Column(
-        String,
+        String(20),
         nullable=False,
     )
+
+    # =====================================================
+    # Order Details
+    # =====================================================
 
     total_amount = Column(
         Float,
@@ -43,7 +70,7 @@ class Order(Base):
     )
 
     status = Column(
-        String,
+        String(50),
         default="Pending",
         nullable=False,
     )
@@ -53,12 +80,17 @@ class Order(Base):
         server_default=func.now(),
     )
 
-    # ============================
-    # Relationship
-    # ============================
+    # =====================================================
+    # Relationships
+    # =====================================================
 
     restaurant = relationship(
         "Restaurant",
+        back_populates="orders",
+    )
+
+    customer = relationship(
+        "User",
         back_populates="orders",
     )
 

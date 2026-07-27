@@ -22,8 +22,8 @@ router = APIRouter(
 
 # =====================================================
 # Create Order
-# POST /orders
 # =====================================================
+
 @router.post(
     "/",
     response_model=OrderResponse,
@@ -56,7 +56,9 @@ def create_order(
 
     new_order = Order(
         restaurant_id=order.restaurant_id,
+        customer_id=order.customer_id,
         customer_name=order.customer_name,
+        customer_email=order.customer_email,
         customer_phone=order.customer_phone,
         total_amount=order.total_amount,
         status=order.status,
@@ -71,8 +73,8 @@ def create_order(
 
 # =====================================================
 # Get All Orders
-# GET /orders
 # =====================================================
+
 @router.get(
     "/",
     response_model=list[OrderResponse],
@@ -90,9 +92,9 @@ def get_orders(
 
 
 # =====================================================
-# Order Statistics
-# GET /orders/restaurants/{restaurant_id}/stats
+# Get Restaurant Statistics
 # =====================================================
+
 @router.get("/restaurants/{restaurant_id}/stats")
 def get_order_stats(
     restaurant_id: int,
@@ -159,8 +161,8 @@ def get_order_stats(
 
 # =====================================================
 # Get Single Order
-# GET /orders/{order_id}
 # =====================================================
+
 @router.get(
     "/{order_id}",
     response_model=OrderResponse,
@@ -171,7 +173,9 @@ def get_order(
 ):
     order = (
         db.query(Order)
-        .filter(Order.id == order_id)
+        .filter(
+            Order.id == order_id
+        )
         .first()
     )
 
@@ -186,8 +190,8 @@ def get_order(
 
 # =====================================================
 # Update Order
-# PUT /orders/{order_id}
 # =====================================================
+
 @router.put(
     "/{order_id}",
     response_model=OrderResponse,
@@ -199,7 +203,9 @@ def update_order(
 ):
     db_order = (
         db.query(Order)
-        .filter(Order.id == order_id)
+        .filter(
+            Order.id == order_id
+        )
         .first()
     )
 
@@ -250,8 +256,8 @@ def update_order(
 
 # =====================================================
 # Delete Order
-# DELETE /orders/{order_id}
 # =====================================================
+
 @router.delete(
     "/{order_id}",
     status_code=status.HTTP_200_OK,
@@ -262,7 +268,9 @@ def delete_order(
 ):
     order = (
         db.query(Order)
-        .filter(Order.id == order_id)
+        .filter(
+            Order.id == order_id
+        )
         .first()
     )
 

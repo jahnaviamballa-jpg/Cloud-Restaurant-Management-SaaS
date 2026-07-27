@@ -18,6 +18,7 @@ class User(Base):
     # =====================================================
     # Primary Key
     # =====================================================
+
     id = Column(
         Integer,
         primary_key=True,
@@ -27,6 +28,7 @@ class User(Base):
     # =====================================================
     # Foreign Key
     # =====================================================
+
     restaurant_id = Column(
         Integer,
         ForeignKey("restaurants.restaurant_id"),
@@ -36,6 +38,7 @@ class User(Base):
     # =====================================================
     # User Details
     # =====================================================
+
     name = Column(
         String(100),
         nullable=False,
@@ -70,6 +73,7 @@ class User(Base):
     # =====================================================
     # Relationships
     # =====================================================
+
     restaurant = relationship(
         "Restaurant",
         back_populates="users",

@@ -1,12 +1,17 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from app.schemas.profile_schema import ProfileUpdate
-from app.database import SessionLocal
 
+from app.database import SessionLocal
 from app.models.user import User
 from app.models.restaurant import Restaurant
 
-from app.schemas.user_schema import (UserRegister, UserLogin, ChangePassword,)
+from app.schemas.user_schema import (
+    UserRegister,
+    UserLogin,
+    ChangePassword,
+)
+
+from app.schemas.profile_schema import ProfileUpdate
 
 from app.utils.security import (
     hash_password,
@@ -22,6 +27,7 @@ router = APIRouter(
 # ============================================
 # Database Dependency
 # ============================================
+
 def get_db():
     db = SessionLocal()
     try:
@@ -33,10 +39,12 @@ def get_db():
 # ============================================
 # Register
 # ============================================
-@router.post("/register")
-def register(user: UserRegister):
 
-    db = SessionLocal()
+@router.post("/register")
+def register(
+    user: UserRegister,
+    db: Session = Depends(get_db),
+):
 
     existing_user = (
         db.query(User)
@@ -45,10 +53,9 @@ def register(user: UserRegister):
     )
 
     if existing_user:
-        db.close()
         raise HTTPException(
             status_code=400,
-            detail="Email already registered"
+            detail="Email already registered",
         )
 
     restaurant = (
@@ -60,10 +67,9 @@ def register(user: UserRegister):
     )
 
     if not restaurant:
-        db.close()
         raise HTTPException(
             status_code=404,
-            detail="Restaurant not found"
+            detail="Restaurant not found",
         )
 
     new_user = User(
@@ -79,8 +85,6 @@ def register(user: UserRegister):
     db.commit()
     db.refresh(new_user)
 
-    db.close()
-
     return {
         "message": "User registered successfully"
     }
@@ -89,10 +93,12 @@ def register(user: UserRegister):
 # ============================================
 # Login
 # ============================================
-@router.post("/login")
-def login(user: UserLogin):
 
-    db = SessionLocal()
+@router.post("/login")
+def login(
+    user: UserLogin,
+    db: Session = Depends(get_db),
+):
 
     db_user = (
         db.query(User)
@@ -101,26 +107,25 @@ def login(user: UserLogin):
     )
 
     if not db_user:
-        db.close()
         raise HTTPException(
             status_code=401,
-            detail="Invalid Email or Password"
+            detail="Invalid Email or Password",
         )
 
     if not verify_password(
         user.password,
-        db_user.hashed_password
+        db_user.hashed_password,
     ):
-        db.close()
         raise HTTPException(
             status_code=401,
-            detail="Invalid Email or Password"
+            detail="Invalid Email or Password",
         )
 
     restaurant = (
         db.query(Restaurant)
         .filter(
-            Restaurant.restaurant_id == db_user.restaurant_id
+            Restaurant.restaurant_id
+            == db_user.restaurant_id
         )
         .first()
     )
@@ -132,7 +137,7 @@ def login(user: UserLogin):
         }
     )
 
-    response = {
+    return {
         "access_token": token,
         "token_type": "bearer",
         "user": {
@@ -142,41 +147,44 @@ def login(user: UserLogin):
             "phone": db_user.phone,
             "role": db_user.role,
             "restaurant_id": db_user.restaurant_id,
-            "restaurant_name": restaurant.restaurant_name if restaurant else ""
-        }
+            "restaurant_name": (
+                restaurant.restaurant_name
+                if restaurant
+                else ""
+            ),
+        },
     }
 
-    db.close()
 
-    return response
+# ============================================
+# Change Password
+# ============================================
 
-# ==========================================
-
-# ===========================================
 @router.put("/change-password")
-def change_password(data: ChangePassword):
+def change_password(
+    data: ChangePassword,
+    db: Session = Depends(get_db),
+):
 
-    db = SessionLocal()
-
-    user = db.query(User).filter(
-        User.email == data.email
-    ).first()
+    user = (
+        db.query(User)
+        .filter(User.email == data.email)
+        .first()
+    )
 
     if not user:
-        db.close()
         raise HTTPException(
             status_code=404,
-            detail="User not found"
+            detail="User not found",
         )
 
     if not verify_password(
         data.old_password,
-        user.hashed_password
+        user.hashed_password,
     ):
-        db.close()
         raise HTTPException(
             status_code=400,
-            detail="Old password is incorrect"
+            detail="Old password is incorrect",
         )
 
     user.hashed_password = hash_password(
@@ -185,70 +193,69 @@ def change_password(data: ChangePassword):
 
     db.commit()
 
-    db.close()
-
     return {
         "message": "Password changed successfully"
     }
-# ==========================================
+
+
+# ============================================
 # Get Profile
-# ==========================================
+# ============================================
+
 @router.get("/profile/{user_id}")
-def get_profile(user_id: int):
+def get_profile(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
 
-    db = SessionLocal()
-
-    user = db.query(User).filter(
-        User.id == user_id
-    ).first()
+    user = (
+        db.query(User)
+        .filter(User.id == user_id)
+        .first()
+    )
 
     if not user:
-        db.close()
         raise HTTPException(
             status_code=404,
-            detail="User not found"
+            detail="User not found",
         )
 
-    restaurant_name = ""
-
-    if user.restaurant:
-        restaurant_name = user.restaurant.restaurant_name
-
-    data = {
+    return {
         "id": user.id,
         "name": user.name,
         "email": user.email,
         "phone": user.phone,
         "role": user.role,
         "restaurant_id": user.restaurant_id,
-        "restaurant_name": restaurant_name
+        "restaurant_name": (
+            user.restaurant.restaurant_name
+            if user.restaurant
+            else ""
+        ),
     }
 
-    db.close()
 
-    return data
-
-
-# ==========================================
+# ============================================
 # Update Profile
-# ==========================================
+# ============================================
+
 @router.put("/profile/{user_id}")
 def update_profile(
     user_id: int,
-    profile: ProfileUpdate
+    profile: ProfileUpdate,
+    db: Session = Depends(get_db),
 ):
 
-    db = SessionLocal()
-
-    user = db.query(User).filter(
-        User.id == user_id
-    ).first()
+    user = (
+        db.query(User)
+        .filter(User.id == user_id)
+        .first()
+    )
 
     if not user:
-        db.close()
         raise HTTPException(
             status_code=404,
-            detail="User not found"
+            detail="User not found",
         )
 
     user.name = profile.name
@@ -257,24 +264,19 @@ def update_profile(
     db.commit()
     db.refresh(user)
 
-    restaurant_name = ""
-
-    if user.restaurant:
-        restaurant_name = user.restaurant.restaurant_name
-
-    data = {
-        "id": user.id,
-        "name": user.name,
-        "email": user.email,
-        "phone": user.phone,
-        "role": user.role,
-        "restaurant_id": user.restaurant_id,
-        "restaurant_name": restaurant_name
-    }
-
-    db.close()
-
     return {
         "message": "Profile Updated Successfully",
-        "user": data
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "phone": user.phone,
+            "role": user.role,
+            "restaurant_id": user.restaurant_id,
+            "restaurant_name": (
+                user.restaurant.restaurant_name
+                if user.restaurant
+                else ""
+            ),
+        },
     }

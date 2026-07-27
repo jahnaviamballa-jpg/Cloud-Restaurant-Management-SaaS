@@ -1,14 +1,17 @@
-from pydantic import BaseModel
 from datetime import datetime
+from pydantic import BaseModel
 
 
 # ==========================================
 # Base Schema
 # ==========================================
+
 class OrderBase(BaseModel):
     restaurant_id: int
-    customer_name: str
-    customer_phone: str
+    customer_id: int | None = None
+    customer_name: str | None = None
+    customer_email: str | None = None
+    customer_phone: str | None = None
     total_amount: float
     status: str = "Pending"
 
@@ -16,6 +19,7 @@ class OrderBase(BaseModel):
 # ==========================================
 # Create Order
 # ==========================================
+
 class OrderCreate(OrderBase):
     pass
 
@@ -23,8 +27,10 @@ class OrderCreate(OrderBase):
 # ==========================================
 # Update Order
 # ==========================================
+
 class OrderUpdate(BaseModel):
     customer_name: str | None = None
+    customer_email: str | None = None
     customer_phone: str | None = None
     total_amount: float | None = None
     status: str | None = None
@@ -33,6 +39,7 @@ class OrderUpdate(BaseModel):
 # ==========================================
 # Response Schema
 # ==========================================
+
 class OrderResponse(OrderBase):
     id: int
     created_at: datetime
