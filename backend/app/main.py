@@ -36,6 +36,12 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+
+        # Vercel Production
+        "https://cloud-restaurant-management-saas-s.vercel.app",
+
+        # Vercel Preview
+        "https://cloud-restaurant-management-saa-7m17st94r-jahnavi11.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
