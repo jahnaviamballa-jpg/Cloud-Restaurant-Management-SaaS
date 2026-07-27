@@ -113,7 +113,7 @@ https://cloud-restaurant-management-saas-aom7.onrender.com/docs
 ## Clone Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Cloud-Restaurant-Management-SaaS.git
+git clone https://github.com/jahnaviamballa-jpg/Cloud-Restaurant-Management-SaaS.git
 ```
 
 ```bash
