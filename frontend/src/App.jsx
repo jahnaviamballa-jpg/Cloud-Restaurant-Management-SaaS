@@ -2,7 +2,6 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  useLocation,
   Navigate,
 } from "react-router-dom";
 
@@ -11,7 +10,10 @@ import "react-toastify/dist/ReactToastify.css";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// ==========================
 // Pages
+// ==========================
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import RestaurantSelection from "./pages/RestaurantSelection";
@@ -60,7 +62,6 @@ import ServerError from "./pages/ServerError";
 import NotFound from "./pages/NotFound";
 
 function AppContent() {
-  const location = useLocation();
 
   const token = localStorage.getItem("token");
   const restaurant = localStorage.getItem("restaurant");
@@ -79,43 +80,38 @@ function AppContent() {
 
       <Routes>
 
-        {/* Default */}
+        {/* ==========================
+            Default
+        ========================== */}
 
         <Route
           path="/"
           element={<Navigate to="/login" replace />}
         />
 
-        {/* Login */}
+        {/* ==========================
+            Login
+        ========================== */}
 
         <Route
           path="/login"
           element={
             token ? (
               (() => {
+
                 const user = JSON.parse(
                   localStorage.getItem("user")
                 );
 
-                if (!user) {
-                  return <Login />;
-                }
+                if (!user) return <Login />;
 
                 const role =
                   (user.role || "").toLowerCase();
 
                 if (role === "customer") {
-                  return restaurant ? (
-                    <Navigate
-                      to="/dashboard"
-                      replace
-                    />
-                  ) : (
-                    <Navigate
-                      to="/select-restaurant"
-                      replace
-                    />
-                  );
+                  return restaurant
+                    ? <Navigate to="/dashboard" replace />
+                    : <Navigate to="/select-restaurant" replace />;
                 }
 
                 if (role === "manager") {
@@ -146,6 +142,7 @@ function AppContent() {
                 }
 
                 return <Login />;
+
               })()
             ) : (
               <Login />
@@ -153,20 +150,18 @@ function AppContent() {
           }
         />
 
-        {/* Register */}
+        {/* ==========================
+            Register
+        ========================== */}
 
         <Route
           path="/register"
           element={<Register />}
         />
 
-        {/* Employees */}
-
-        <Route
-          path="/employees"
-          element={<Employees />}
-        />
-                {/* Restaurant Selection */}
+        {/* ==========================
+            Restaurant Selection
+        ========================== */}
 
         <Route
           path="/select-restaurant"
@@ -184,27 +179,36 @@ function AppContent() {
           }
         />
 
-        {/* Change Password */}
+        {/* ==========================
+            Employees
+        ========================== */}
+
+        <Route
+          path="/employees"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Owner",
+                "Manager",
+              ]}
+            >
+              <Employees />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ==========================
+            Change Password
+        ========================== */}
 
         <Route
           path="/change-password"
           element={<ChangePassword />}
         />
 
-        {/* Edit Restaurant */}
-
-        <Route
-          path="/edit-restaurant/:restaurantId"
-          element={
-            <ProtectedRoute
-              allowedRoles={["Owner"]}
-            >
-              <EditRestaurant />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Customer Dashboard */}
+        {/* ==========================
+            Customer Dashboard
+        ========================== */}
 
         <Route
           path="/dashboard"
@@ -217,7 +221,9 @@ function AppContent() {
           }
         />
 
-        {/* Manager Dashboard */}
+        {/* ==========================
+            Manager Dashboard
+        ========================== */}
 
         <Route
           path="/manager-dashboard"
@@ -230,7 +236,9 @@ function AppContent() {
           }
         />
 
-        {/* Owner Dashboard */}
+        {/* ==========================
+            Owner Dashboard
+        ========================== */}
 
         <Route
           path="/owner-dashboard"
@@ -243,7 +251,9 @@ function AppContent() {
           }
         />
 
-        {/* Chef Dashboard */}
+        {/* ==========================
+            Chef Dashboard
+        ========================== */}
 
         <Route
           path="/chef-dashboard"
@@ -256,7 +266,9 @@ function AppContent() {
           }
         />
 
-        {/* Restaurants */}
+        {/* ==========================
+            Restaurants
+        ========================== */}
 
         <Route
           path="/restaurants"
@@ -273,7 +285,31 @@ function AppContent() {
           }
         />
 
-        {/* Menu */}
+        <Route
+          path="/add-restaurant"
+          element={
+            <ProtectedRoute
+              allowedRoles={["Owner"]}
+            >
+              <AddRestaurant />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/edit-restaurant/:restaurantId"
+          element={
+            <ProtectedRoute
+              allowedRoles={["Owner"]}
+            >
+              <EditRestaurant />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ==========================
+            Menu
+        ========================== */}
 
         <Route
           path="/menu"
@@ -282,6 +318,7 @@ function AppContent() {
               allowedRoles={[
                 "Customer",
                 "Manager",
+                "Owner",
                 "Chef",
               ]}
             >
@@ -291,7 +328,7 @@ function AppContent() {
         />
 
         <Route
-          path="/add-menu-item"
+          path="/add-menu"
           element={
             <ProtectedRoute
               allowedRoles={[
@@ -305,7 +342,7 @@ function AppContent() {
         />
 
         <Route
-          path="/edit-menu/:menuId"
+          path="/edit-menu-item/:menuId"
           element={
             <ProtectedRoute
               allowedRoles={[
@@ -317,8 +354,9 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-
-        {/* Cart */}
+                {/* ==========================
+            Cart
+        ========================== */}
 
         <Route
           path="/cart"
@@ -330,23 +368,26 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-                {/* Orders */}
+
+        {/* ==========================
+            Orders
+        ========================== */}
 
         <Route
-  path="/orders"
-  element={
-    <ProtectedRoute
-      allowedRoles={[
-        "Customer",
-        "Manager",
-        "Owner",
-        "Chef",
-      ]}
-    >
-      <Orders />
-    </ProtectedRoute>
-  }
-/>
+          path="/orders"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Customer",
+                "Manager",
+                "Owner",
+                "Chef",
+              ]}
+            >
+              <Orders />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/add-order"
@@ -391,13 +432,19 @@ function AppContent() {
           }
         />
 
-        {/* Reservations */}
+        {/* ==========================
+            Reservations
+        ========================== */}
 
         <Route
           path="/reservations"
           element={
             <ProtectedRoute
-              allowedRoles={["Customer"]}
+              allowedRoles={[
+                "Customer",
+                "Manager",
+                "Owner",
+              ]}
             >
               <Reservations />
             </ProtectedRoute>
@@ -448,7 +495,9 @@ function AppContent() {
           }
         />
 
-        {/* Profile */}
+        {/* ==========================
+            Profile
+        ========================== */}
 
         <Route
           path="/profile"
@@ -466,7 +515,9 @@ function AppContent() {
           }
         />
 
-        {/* Inventory */}
+        {/* ==========================
+            Inventory
+        ========================== */}
 
         <Route
           path="/inventory"
@@ -475,6 +526,7 @@ function AppContent() {
               allowedRoles={[
                 "Manager",
                 "Owner",
+                "Chef",
               ]}
             >
               <Inventory />
@@ -496,19 +548,9 @@ function AppContent() {
           }
         />
 
-        {/* Restaurant Management */}
-
-        <Route
-          path="/add-restaurant"
-          element={
-            <ProtectedRoute
-              allowedRoles={["Owner"]}
-            >
-              <AddRestaurant />
-            </ProtectedRoute>
-          }
-        />
-                {/* Predictions */}
+        {/* ==========================
+            Predictions
+        ========================== */}
 
         <Route
           path="/predictions"
@@ -538,21 +580,23 @@ function AppContent() {
           }
         />
 
-        {/* Analytics */}
+        {/* ==========================
+            Analytics
+        ========================== */}
 
         <Route
-  path="/analytics-dashboard"
-  element={
-    <ProtectedRoute
-      allowedRoles={[
-        "Manager",
-        "Owner",
-      ]}
-    >
-      <AnalyticsDashboard />
-    </ProtectedRoute>
-  }
-/>
+          path="/analytics-dashboard"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Manager",
+                "Owner",
+              ]}
+            >
+              <AnalyticsDashboard />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/sales-report"
@@ -576,7 +620,9 @@ function AppContent() {
           }
         />
 
-        {/* Error Pages */}
+        {/* ==========================
+            Error Pages
+        ========================== */}
 
         <Route
           path="/server-error"
@@ -587,6 +633,7 @@ function AppContent() {
           path="*"
           element={<NotFound />}
         />
+
       </Routes>
     </>
   );

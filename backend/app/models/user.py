@@ -68,9 +68,15 @@ class User(Base):
     )
 
     # =====================================================
-    # Relationship
+    # Relationships
     # =====================================================
     restaurant = relationship(
         "Restaurant",
         back_populates="users",
+    )
+
+    orders = relationship(
+        "Order",
+        back_populates="customer",
+        cascade="all, delete-orphan",
     )
