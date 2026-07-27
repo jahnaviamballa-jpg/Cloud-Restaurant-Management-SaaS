@@ -9,11 +9,12 @@ function AddOrder() {
   const [saving, setSaving] = useState(false);
 
   const [order, setOrder] = useState({
-    customer_name: "",
-    customer_phone: "",
-    total_amount: "",
-    status: "Pending",
-  });
+  customer_name: "",
+  customer_email: "",
+  customer_phone: "",
+  total_amount: "",
+  status: "Pending",
+});
 
   const handleChange = (e) => {
     setOrder({
@@ -112,7 +113,15 @@ function AddOrder() {
               style={inputStyle}
               required
             />
-
+            <input
+  type="email"
+  name="customer_email"
+  placeholder="Customer Email"
+  value={order.customer_email}
+  onChange={handleChange}
+  style={inputStyle}
+  required
+/>
             <input
               type="text"
               name="customer_phone"
