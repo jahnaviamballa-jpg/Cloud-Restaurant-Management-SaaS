@@ -1,45 +1,39 @@
-// ==========================================
-// Get Logged In User
-// ==========================================
-export const getLoggedInUser = () => {
-  const user = localStorage.getItem("user");
+// =========================================
+// Restaurant Utility Functions
+// =========================================
 
-  if (!user) {
-    return null;
-  }
-
-  return JSON.parse(user);
+// Save Selected Restaurant
+export const setRestaurant = (restaurant) => {
+  localStorage.setItem(
+    "restaurant",
+    JSON.stringify(restaurant)
+  );
 };
 
-// ==========================================
+// Get Selected Restaurant Object
+export const getRestaurant = () => {
+  const restaurant = localStorage.getItem("restaurant");
+
+  if (!restaurant) return null;
+
+  return JSON.parse(restaurant);
+};
+
 // Get Restaurant ID
-// ==========================================
 export const getRestaurantId = () => {
-  const user = getLoggedInUser();
+  const restaurant = getRestaurant();
 
-  return user?.restaurant_id ?? null;
+  return restaurant?.restaurant_id || null;
 };
 
-// ==========================================
 // Get Restaurant Name
-// ==========================================
 export const getRestaurantName = () => {
-  const user = getLoggedInUser();
+  const restaurant = getRestaurant();
 
-  return user?.restaurant_name ?? "";
+  return restaurant?.restaurant_name || "";
 };
 
-// ==========================================
-// Get User
-// ==========================================
-export const getUser = () => {
-  return getLoggedInUser();
-};
-
-// ==========================================
-// Logout
-// ==========================================
+// Clear Restaurant
 export const clearRestaurant = () => {
-  localStorage.removeItem("user");
-  localStorage.removeItem("token");
+  localStorage.removeItem("restaurant");
 };

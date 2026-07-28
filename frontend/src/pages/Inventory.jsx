@@ -12,7 +12,7 @@ function Inventory() {
   const [error, setError] = useState("");
 
   const [newItem, setNewItem] = useState({
-    restaurant_id: 1,
+  restaurant_id: "",
     item_name: "",
     category: "",
     quantity: "",
@@ -58,7 +58,7 @@ function Inventory() {
     try {
       const inventoryData = {
         ...newItem,
-        restaurant_id: Number(newItem.restaurant_id),
+        restaurant_id: undefined,
         quantity: Number(newItem.quantity),
         minimum_stock: Number(newItem.minimum_stock),
       };
@@ -68,7 +68,7 @@ function Inventory() {
       await loadInventory();
 
       setNewItem({
-        restaurant_id: 1,
+  restaurant_id: "",
         item_name: "",
         category: "",
         quantity: "",

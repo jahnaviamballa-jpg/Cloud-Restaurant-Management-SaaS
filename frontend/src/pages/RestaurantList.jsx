@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
-
+import { setRestaurant } from "../utils/restaurant";
 import {
   getRestaurants,
   deleteRestaurant,
@@ -52,16 +52,11 @@ function RestaurantList() {
     }
   };
 
-  const handleSelectRestaurant = (
-    restaurant
-  ) => {
-    localStorage.setItem(
-      "restaurant",
-      JSON.stringify(restaurant)
-    );
+  const handleSelectRestaurant = (restaurant) => {
+  setRestaurant(restaurant);
 
-    navigate("/menu");
-  };
+  navigate("/menu");
+};
 
   const handleDelete = async (
     restaurantId

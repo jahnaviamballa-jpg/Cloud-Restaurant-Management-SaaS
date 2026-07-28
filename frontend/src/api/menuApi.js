@@ -7,18 +7,15 @@ import { getRestaurantId } from "../utils/restaurant";
 export const getMenuByRestaurant = async () => {
   const restaurantId = getRestaurantId();
 
+  if (!restaurantId) {
+    return [];
+  }
+
   const response = await api.get(
     `/restaurants/${restaurantId}/menu`
   );
 
   return response.data;
-};
-
-// ========================================
-// Get All Menu Items (Alias)
-// ========================================
-export const getMenu = async () => {
-  return getMenuByRestaurant();
 };
 
 // ========================================
@@ -37,7 +34,10 @@ export const createMenuItem = async (data) => {
 
   const response = await api.post(
     `/restaurants/${restaurantId}/menu`,
-    data
+    {
+      ...data,
+      restaurant_id: restaurantId,
+    }
   );
 
   return response.data;
@@ -46,7 +46,10 @@ export const createMenuItem = async (data) => {
 // ========================================
 // Update Menu Item
 // ========================================
-export const updateMenuItem = async (id, data) => {
+export const updateMenuItem = async (
+  id,
+  data
+) => {
   const response = await api.put(
     `/menu/${id}`,
     data
@@ -58,7 +61,9 @@ export const updateMenuItem = async (id, data) => {
 // ========================================
 // Delete Menu Item
 // ========================================
-export const deleteMenuItem = async (id) => {
+export const deleteMenuItem = async (
+  id
+) => {
   const response = await api.delete(
     `/menu/${id}`
   );

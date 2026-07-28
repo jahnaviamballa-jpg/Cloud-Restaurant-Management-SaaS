@@ -27,26 +27,35 @@ function AddMenuItem() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      await createMenuItem({
-        ...menuItem,
-        price: Number(menuItem.price),
-      });
+    const restaurantId = getRestaurantId();
 
-      alert("Menu Item Added Successfully");
-
-      navigate("/menu");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to add menu item.");
-    } finally {
-      setLoading(false);
+    if (!restaurantId) {
+      alert("Please select a restaurant first.");
+      navigate("/restaurants");
+      return;
     }
-  };
+
+    await createMenuItem({
+      ...menuItem,
+      restaurant_id: restaurantId,
+      price: Number(menuItem.price),
+    });
+
+    alert("Menu Item Added Successfully");
+
+    navigate("/menu");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to add menu item.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const inputStyle = {
     width: "100%",
