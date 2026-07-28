@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import CartItem from "../components/CartItem";
 import api from "../api/api";
 import Layout from "../components/Layout";
+
 function Cart() {
   const navigate = useNavigate();
 
@@ -90,35 +91,45 @@ function Cart() {
 
     try {
       const user = JSON.parse(
-        localStorage.getItem("user")
+        localStorage.getItem("user") || "null"
       );
 
+      const restaurant = JSON.parse(
+        localStorage.getItem("restaurant") || "null"
+      );
+
+      if (!user) {
+        alert("Please login again.");
+        navigate("/login");
+        return;
+      }
+
+      if (!restaurant) {
+        alert("Please select a restaurant.");
+        navigate("/select-restaurant");
+        return;
+      }
+       console.log("USER =", user);
+       
       const order = {
-        restaurant_id:
-          cartItems[0].restaurant_id,
+  restaurant_id: restaurant.restaurant_id,
 
-        customer_name:
-          user?.name ||
-          user?.username ||
-          "Customer",
+  customer_id: Number(user.id),
 
-        customer_phone:
-          user?.phone ||
-          "9999999999",
+  customer_name: user.name,
 
-        total_amount: Number(
-          total.toFixed(2)
-        ),
+  customer_email: user.email,
 
-        status: "Pending",
-      };
+  customer_phone: user.phone,
 
-      console.log("Sending Order:", order);
+  total_amount: Number(total.toFixed(2)),
 
-      const response = await api.post(
-        "/orders/",
-        order
-      );
+  status: "Pending",
+};
+
+console.log("ORDER =", order);
+
+      const response = await api.post("/orders/", order);
 
       console.log(response.data);
 
@@ -146,183 +157,177 @@ function Cart() {
 
   return (
     <Layout>
-    <div
-      style={{
-        minHeight: "100vh",
-        padding: "40px",
-        background:
-          "linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.22)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
       <div
         style={{
-          background: "rgba(18,18,24,.75)",
-          borderRadius: "25px",
-          padding: "35px",
-          border:
-            "1px solid rgba(255,255,255,.08)",
+          minHeight: "100vh",
+          padding: "40px",
+          background:
+            "linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.22)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed",
         }}
       >
-        <h1
+        <div
           style={{
-            color: "white",
-            fontSize: "42px",
+            background: "rgba(18,18,24,.75)",
+            borderRadius: "25px",
+            padding: "35px",
+            border:
+              "1px solid rgba(255,255,255,.08)",
           }}
         >
-          🛒 Your Cart
-        </h1>
-
-        <p
-          style={{
-            color: "#ccc",
-            marginBottom: "35px",
-          }}
-        >
-          Review your delicious order.
-        </p>
-
-        {cartItems.length === 0 ? (
-          <h2
+          <h1
             style={{
               color: "white",
-              textAlign: "center",
+              fontSize: "42px",
             }}
           >
-            Your cart is empty
-          </h2>
-        ) : (
-          <>
-            <div
+            🛒 Your Cart
+          </h1>
+
+          <p
+            style={{
+              color: "#ccc",
+              marginBottom: "35px",
+            }}
+          >
+            Review your delicious order.
+          </p>
+
+          {cartItems.length === 0 ? (
+            <h2
               style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "20px",
+                color: "white",
+                textAlign: "center",
               }}
             >
-              {cartItems.map((item) => (
-                <CartItem
-                  key={item.id}
-                  item={item}
-                  increaseQuantity={
-                    increaseQuantity
-                  }
-                  decreaseQuantity={
-                    decreaseQuantity
-                  }
-                  removeItem={removeItem}
-                />
-              ))}
-            </div>
-
-            <div
-              style={{
-                marginTop: "40px",
-                background:
-                  "rgba(20,20,28,.92)",
-                borderRadius: "20px",
-                padding: "30px",
-              }}
-            >
-              <h2
-                style={{
-                  color: "white",
-                }}
-              >
-                Order Summary
-              </h2>
-
+              Your cart is empty
+            </h2>
+          ) : (
+            <>
               <div
                 style={{
                   display: "flex",
-                  justifyContent:
-                    "space-between",
-                  marginTop: "20px",
-                  color: "#ddd",
+                  flexDirection: "column",
+                  gap: "20px",
                 }}
               >
-                <span>Subtotal</span>
-                <span>
-                  ₹{subtotal.toFixed(2)}
-                </span>
+                {cartItems.map((item) => (
+                  <CartItem
+                    key={item.id}
+                    item={item}
+                    increaseQuantity={
+                      increaseQuantity
+                    }
+                    decreaseQuantity={
+                      decreaseQuantity
+                    }
+                    removeItem={removeItem}
+                  />
+                ))}
               </div>
 
               <div
                 style={{
-                  display: "flex",
-                  justifyContent:
-                    "space-between",
-                  marginTop: "15px",
-                  color: "#ddd",
-                }}
-              >
-                <span>GST (5%)</span>
-                <span>
-                  ₹{gst.toFixed(2)}
-                </span>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent:
-                    "space-between",
-                  marginTop: "15px",
-                  color: "#ddd",
-                }}
-              >
-                <span>Delivery</span>
-                <span>₹{delivery}</span>
-              </div>
-
-              <hr
-                style={{
-                  marginTop: "20px",
-                  marginBottom: "20px",
-                }}
-              />
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent:
-                    "space-between",
-                  color: "white",
-                  fontSize: "24px",
-                  fontWeight: "bold",
-                }}
-              >
-                <span>Total</span>
-                <span>
-                  ₹{total.toFixed(2)}
-                </span>
-              </div>
-
-              <button
-                onClick={checkout}
-                style={{
-                  width: "100%",
-                  marginTop: "30px",
-                  padding: "15px",
-                  border: "none",
-                  borderRadius: "12px",
+                  marginTop: "40px",
                   background:
-                    "linear-gradient(90deg,#7C3AED,#F97316)",
-                  color: "white",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  fontSize: "16px",
+                    "rgba(20,20,28,.92)",
+                  borderRadius: "20px",
+                  padding: "30px",
                 }}
               >
-                Proceed to Checkout
-              </button>
-            </div>
-          </>
-        )}
+                <h2
+                  style={{
+                    color: "white",
+                  }}
+                >
+                  Order Summary
+                </h2>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent:
+                      "space-between",
+                    marginTop: "20px",
+                    color: "#ddd",
+                  }}
+                >
+                  <span>Subtotal</span>
+                  <span>₹{subtotal.toFixed(2)}</span>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent:
+                      "space-between",
+                    marginTop: "15px",
+                    color: "#ddd",
+                  }}
+                >
+                  <span>GST (5%)</span>
+                  <span>₹{gst.toFixed(2)}</span>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent:
+                      "space-between",
+                    marginTop: "15px",
+                    color: "#ddd",
+                  }}
+                >
+                  <span>Delivery</span>
+                  <span>₹{delivery}</span>
+                </div>
+
+                <hr
+                  style={{
+                    marginTop: "20px",
+                    marginBottom: "20px",
+                  }}
+                />
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent:
+                      "space-between",
+                    color: "white",
+                    fontSize: "24px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  <span>Total</span>
+                  <span>₹{total.toFixed(2)}</span>
+                </div>
+
+                <button
+                  onClick={checkout}
+                  style={{
+                    width: "100%",
+                    marginTop: "30px",
+                    padding: "15px",
+                    border: "none",
+                    borderRadius: "12px",
+                    background:
+                      "linear-gradient(90deg,#7C3AED,#F97316)",
+                    color: "white",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                  }}
+                >
+                  Proceed to Checkout
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
-    </div>
     </Layout>
   );
 }
