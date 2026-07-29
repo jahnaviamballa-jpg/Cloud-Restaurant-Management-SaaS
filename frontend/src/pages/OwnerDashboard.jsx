@@ -11,6 +11,16 @@ import {
 } from "../api/analyticsApi";
 
 function OwnerDashboard() {
+  useEffect(() => {
+  const restaurant = getRestaurant();
+
+  if (!restaurant) {
+    navigate("/select-restaurant");
+    return;
+  }
+
+  loadDashboard();
+}, []);
   const navigate = useNavigate();
 
   const [restaurantCount, setRestaurantCount] = useState(0);

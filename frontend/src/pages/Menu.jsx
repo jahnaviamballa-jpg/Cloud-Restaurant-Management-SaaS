@@ -110,16 +110,14 @@ function Menu() {
       const data =
         await getMenuByRestaurant();
 
-      setMenuItems(
-        Array.isArray(data) ? data : []
-      );
+      const menu = Array.isArray(data)
+        ? data
+        : [];
 
-      setFilteredItems(
-        Array.isArray(data) ? data : []
-      );
+      setMenuItems(menu);
+      setFilteredItems(menu);
     } catch (error) {
       console.error(error);
-
       alert("Failed to load menu.");
     } finally {
       setLoading(false);
@@ -140,15 +138,18 @@ function Menu() {
     try {
       await deleteMenuItem(id);
 
-      await loadMenu();
-
       alert(
         "Menu item deleted successfully."
       );
+
+      loadMenu();
     } catch (error) {
       console.error(error);
 
-      alert("Delete failed.");
+      alert(
+        error.response?.data?.detail ||
+          "Delete failed."
+      );
     }
   };
 
@@ -192,7 +193,7 @@ function Menu() {
   };
 
   // =====================================
-  // Check Cart
+  // Cart Helper
   // =====================================
 
   const getCartItem = (id) => {
@@ -216,13 +217,14 @@ function Menu() {
 
     return ["All", ...unique];
   }, [menuItems]);
-    // =====================================
+
+  // =====================================
   // Initial Load
   // =====================================
 
   useEffect(() => {
     if (!restaurantId) {
-      alert("Please select a restaurant first.");
+      alert("Please select a restaurant.");
 
       navigate("/restaurant-selection");
 
@@ -233,7 +235,7 @@ function Menu() {
   }, []);
 
   // =====================================
-  // Global Search (Top Bar)
+  // Global Search (TopBar)
   // =====================================
 
   useEffect(() => {
@@ -302,7 +304,7 @@ function Menu() {
   }, [category, menuItems]);
 
   // =====================================
-  // Refresh Cart Automatically
+  // Refresh Cart
   // =====================================
 
   useEffect(() => {
@@ -440,7 +442,7 @@ function Menu() {
           </div>
 
           {/* ===================================== */}
-          {/* Dashboard Cards */}
+          {/* Statistics */}
           {/* ===================================== */}
 
           <div
@@ -549,9 +551,7 @@ function Menu() {
             }}
           >
                         {filteredItems.map((item) => {
-              const cartItem = cart.find(
-                (food) => food.id === item.id
-              );
+              const cartItem = getCartItem(item.id);
 
               return (
                 <div
@@ -714,8 +714,7 @@ function Menu() {
                               cursor: "pointer",
                             }}
                           >
-                            ✅ View Cart (
-                            {cartItem.quantity})
+                            ✅ View Cart ({cartItem.quantity})
                           </button>
                         )}
                       </>

@@ -7,6 +7,16 @@ import { getOrderStatistics } from "../api/analyticsApi";
 import { getMenuByRestaurant } from "../api/menuApi";
 
 function ChefDashboard() {
+  useEffect(() => {
+  const restaurant = getRestaurant();
+
+  if (!restaurant) {
+    navigate("/select-restaurant");
+    return;
+  }
+
+  loadDashboard();
+}, []);
   const navigate = useNavigate();
 
   const [orders, setOrders] = useState(0);

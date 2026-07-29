@@ -11,6 +11,17 @@ function RestaurantSelection() {
   const navigate = useNavigate();
 
   // =====================================
+  // Logged In User
+  // =====================================
+
+  const user =
+    JSON.parse(localStorage.getItem("user")) || {};
+
+  const role = (
+    user.role || ""
+  ).toLowerCase();
+
+  // =====================================
   // States
   // =====================================
 
@@ -34,7 +45,8 @@ function RestaurantSelection() {
     try {
       setLoading(true);
 
-      const data = await getRestaurants();
+      const data =
+        await getRestaurants();
 
       setRestaurants(
         Array.isArray(data) ? data : []
@@ -45,22 +57,63 @@ function RestaurantSelection() {
         error
       );
 
-      alert("Failed to load restaurants.");
+      alert(
+        "Failed to load restaurants."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   // =====================================
-  // Search
+  // Search Restaurants
   // =====================================
 
   const filteredRestaurants =
     restaurants.filter((restaurant) =>
       (restaurant.restaurant_name || "")
         .toLowerCase()
-        .includes(search.toLowerCase())
+        .includes(
+          search.toLowerCase()
+        )
     );
+
+  // =====================================
+  // Navigate Based On Role
+  // =====================================
+
+  const goToDashboard = () => {
+    switch (role) {
+      case "customer":
+        navigate("/dashboard", {
+          replace: true,
+        });
+        break;
+
+      case "manager":
+        navigate("/manager-dashboard", {
+          replace: true,
+        });
+        break;
+
+      case "chef":
+        navigate("/chef-dashboard", {
+          replace: true,
+        });
+        break;
+
+      case "owner":
+        navigate("/owner-dashboard", {
+          replace: true,
+        });
+        break;
+
+      default:
+        navigate("/", {
+          replace: true,
+        });
+    }
+  };
 
   // =====================================
   // Save Selected Restaurant
@@ -90,10 +143,10 @@ function RestaurantSelection() {
         restaurant.logo_url,
     };
 
-    // Save Selected Restaurant
-    setRestaurant(selectedRestaurant);
+    setRestaurant(
+      selectedRestaurant
+    );
 
-    // Clear previous cart
     localStorage.removeItem("cart");
 
     console.log(
@@ -101,13 +154,11 @@ function RestaurantSelection() {
       selectedRestaurant
     );
 
-    navigate("/dashboard", {
-      replace: true,
-    });
+    goToDashboard();
   };
 
   // =====================================
-  // Distance Calculation
+  // Distance Formula
   // =====================================
 
   const calculateDistance = (
@@ -119,16 +170,22 @@ function RestaurantSelection() {
     const R = 6371;
 
     const dLat =
-      ((lat2 - lat1) * Math.PI) / 180;
+      ((lat2 - lat1) * Math.PI) /
+      180;
 
     const dLon =
-      ((lon2 - lon1) * Math.PI) / 180;
+      ((lon2 - lon1) * Math.PI) /
+      180;
 
     const a =
       Math.sin(dLat / 2) *
         Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
+      Math.cos(
+        (lat1 * Math.PI) / 180
+      ) *
+        Math.cos(
+          (lat2 * Math.PI) / 180
+        ) *
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
 
@@ -141,8 +198,7 @@ function RestaurantSelection() {
 
     return R * c;
   };
-
-  // =====================================
+    // =====================================
   // Find Nearest Restaurant
   // =====================================
 
@@ -239,17 +295,13 @@ function RestaurantSelection() {
           selectedRestaurant
         );
 
-        localStorage.removeItem(
-          "cart"
-        );
+        localStorage.removeItem("cart");
 
         alert(
           `Nearest Restaurant: ${nearest.restaurant_name}`
         );
 
-        navigate("/dashboard", {
-          replace: true,
-        });
+        goToDashboard();
       },
       () => {
         alert(
@@ -259,22 +311,33 @@ function RestaurantSelection() {
     );
   };
 
-   return (
+  // =====================================
+  // UI
+  // =====================================
+
+  return (
     <div className="auth-page">
       <div
         style={{
           width: "95%",
           maxWidth: "1500px",
           display: "grid",
-          gridTemplateColumns: "1fr 1.4fr",
+          gridTemplateColumns:
+            "1fr 1.4fr",
           gap: "50px",
           alignItems: "center",
         }}
       >
         {/* LEFT PANEL */}
 
-        <div style={{ color: "white" }}>
-          <div className="logo">🍽</div>
+        <div
+          style={{
+            color: "white",
+          }}
+        >
+          <div className="logo">
+            🍽
+          </div>
 
           <h1
             style={{
@@ -297,10 +360,13 @@ function RestaurantSelection() {
               maxWidth: "500px",
             }}
           >
-            Select your preferred restaurant to
-            continue. Browse menus, place orders,
-            reserve tables and enjoy a seamless
-            cloud restaurant experience.
+            Select your preferred
+            restaurant to continue.
+            Browse menus, place
+            orders, reserve tables
+            and enjoy a seamless
+            cloud restaurant
+            experience.
           </p>
 
           <button
@@ -329,7 +395,8 @@ function RestaurantSelection() {
           </h2>
 
           <p className="auth-subtitle">
-            Search and choose your restaurant
+            Search and choose your
+            restaurant
           </p>
 
           <div className="input-box">
@@ -338,7 +405,9 @@ function RestaurantSelection() {
               placeholder="Search Restaurant..."
               value={search}
               onChange={(e) =>
-                setSearch(e.target.value)
+                setSearch(
+                  e.target.value
+                )
               }
             />
           </div>
@@ -365,7 +434,7 @@ function RestaurantSelection() {
                 paddingRight: "8px",
               }}
             >
-              {filteredRestaurants.map(
+                            {filteredRestaurants.map(
                 (restaurant) => {
                   const selected =
                     JSON.parse(
@@ -530,7 +599,7 @@ function RestaurantSelection() {
           )}
         </div>
       </div>
-    </div>
+          </div>
   );
 }
 

@@ -48,24 +48,44 @@ console.log(response);
       const role =
         response.user.role.toLowerCase();
 
-      if (role === "customer") {
-        const restaurant =
-          localStorage.getItem("restaurant");
+      const restaurant =
+  localStorage.getItem("restaurant");
 
-        if (restaurant) {
-          navigate("/dashboard");
-        } else {
-          navigate("/select-restaurant");
-        }
-      } else if (role === "manager") {
-        navigate("/manager-dashboard");
-      } else if (role === "owner") {
-        navigate("/owner-dashboard");
-      } else if (role === "chef") {
-        navigate("/chef-dashboard");
-      } else {
-        navigate("/");
-      }
+if (role === "customer") {
+  if (restaurant) {
+    navigate("/dashboard");
+  } else {
+    navigate("/select-restaurant");
+  }
+}
+
+else if (role === "manager") {
+  if (restaurant) {
+    navigate("/manager-dashboard");
+  } else {
+    navigate("/select-restaurant");
+  }
+}
+
+else if (role === "chef") {
+  if (restaurant) {
+    navigate("/chef-dashboard");
+  } else {
+    navigate("/select-restaurant");
+  }
+}
+
+else if (role === "owner") {
+  if (restaurant) {
+    navigate("/owner-dashboard");
+  } else {
+    navigate("/select-restaurant");
+  }
+}
+
+else {
+  navigate("/");
+}
     } catch (error) {
       toast.error(
         error.response?.data?.detail ||

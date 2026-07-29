@@ -11,6 +11,16 @@ import { getSalesReport } from "../api/reportApi";
 import { getRestaurantId } from "../utils/restaurant";
 
 function ManagerDashboard() {
+  useEffect(() => {
+  const restaurant = getRestaurant();
+
+  if (!restaurant) {
+    navigate("/select-restaurant");
+    return;
+  }
+
+  loadDashboard();
+}, []);
   const navigate = useNavigate();
 
   const [inventory, setInventory] = useState({

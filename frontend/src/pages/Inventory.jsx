@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   getInventory,
   createInventory,
+  deleteInventory,
 } from "../api/inventoryApi";
 import InventoryTable from "../components/InventoryTable";
 import LowStockAlert from "../components/LowStockAlert";
@@ -54,35 +55,25 @@ function Inventory() {
     loadInventory();
   }, []);
 
-  const handleAddInventory = async () => {
-    try {
-      const inventoryData = {
-        ...newItem,
-        restaurant_id: undefined,
-        quantity: Number(newItem.quantity),
-        minimum_stock: Number(newItem.minimum_stock),
-      };
+  const handleDeleteInventory = async (id) => {
+  const ok = window.confirm(
+    "Are you sure you want to delete this inventory item?"
+  );
 
-      await createInventory(inventoryData);
+  if (!ok) return;
 
-      await loadInventory();
+  try {
+    await deleteInventory(id);
 
-      setNewItem({
-  restaurant_id: "",
-        item_name: "",
-        category: "",
-        quantity: "",
-        unit: "",
-        minimum_stock: "",
-        supplier_name: "",
-      });
+    alert("Inventory deleted successfully.");
 
-      alert("Inventory Added Successfully!");
-    } catch (error) {
-      console.error("Add Inventory Error:", error);
-      alert("Failed to Add Inventory");
-    }
-  };
+    await loadInventory();
+  } catch (error) {
+    console.error(error);
+
+    alert("Delete failed.");
+  }
+};
 
   if (loading) {
     return <h2 style={{ textAlign: "center" }}>Loading...</h2>;

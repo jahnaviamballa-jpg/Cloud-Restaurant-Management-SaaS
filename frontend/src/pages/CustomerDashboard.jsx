@@ -8,6 +8,16 @@ import {
 } from "../api/orderApi";
 
 function CustomerDashboard() {
+  useEffect(() => {
+  const restaurant = getRestaurant();
+
+  if (!restaurant) {
+    navigate("/select-restaurant");
+    return;
+  }
+
+  loadDashboard();
+}, []);
   const [stats, setStats] = useState({
     total_orders: 0,
     pending_orders: 0,

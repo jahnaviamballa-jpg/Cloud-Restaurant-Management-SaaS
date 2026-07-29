@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createMenuItem } from "../api/menuApi";
-
+import Layout from "../components/Layout";
 function AddMenuItem() {
   const navigate = useNavigate();
 
@@ -69,6 +69,7 @@ function AddMenuItem() {
   };
 
   return (
+    <Layout>
     <div
       style={{
         minHeight: "100vh",
@@ -228,6 +229,7 @@ function AddMenuItem() {
                   </form>
       </div>
     </div>
+    </Layout>
   );
 }
 

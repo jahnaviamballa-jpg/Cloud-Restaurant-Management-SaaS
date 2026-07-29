@@ -1,4 +1,4 @@
-function InventoryTable({ items }) {
+function InventoryTable({ items, onDelete }) {
   if (!items || items.length === 0) {
     return (
       <h3
@@ -54,7 +54,7 @@ function InventoryTable({ items }) {
 
         <tbody>
           {items.map((item) => (
-            <tr key={item.id ?? item.inventory_id}>
+            <tr key={item.id}>
               <td style={styles.td}>
                 <img
                   src={
@@ -71,29 +71,17 @@ function InventoryTable({ items }) {
                 />
               </td>
 
-              <td style={styles.td}>
-                {item.item_name}
-              </td>
+              <td style={styles.td}>{item.item_name}</td>
 
-              <td style={styles.td}>
-                {item.category}
-              </td>
+              <td style={styles.td}>{item.category}</td>
 
-              <td style={styles.td}>
-                {item.quantity}
-              </td>
+              <td style={styles.td}>{item.quantity}</td>
 
-              <td style={styles.td}>
-                {item.unit}
-              </td>
+              <td style={styles.td}>{item.unit}</td>
 
-              <td style={styles.td}>
-                {item.minimum_stock}
-              </td>
+              <td style={styles.td}>{item.minimum_stock}</td>
 
-              <td style={styles.td}>
-                {item.supplier_name}
-              </td>
+              <td style={styles.td}>{item.supplier_name}</td>
 
               <td style={styles.td}>
                 <span
@@ -120,7 +108,7 @@ function InventoryTable({ items }) {
                 <button
                   onClick={() =>
                     alert(
-                      `Edit ${item.item_name} (Backend coming next)`
+                      `Edit ${item.item_name} (Coming Soon)`
                     )
                   }
                   style={{
@@ -137,11 +125,7 @@ function InventoryTable({ items }) {
                 </button>
 
                 <button
-                  onClick={() =>
-                    alert(
-                      `Delete ${item.item_name} (Backend coming next)`
-                    )
-                  }
+                  onClick={() => onDelete(item.id)}
                   style={{
                     padding: "8px 14px",
                     border: "none",

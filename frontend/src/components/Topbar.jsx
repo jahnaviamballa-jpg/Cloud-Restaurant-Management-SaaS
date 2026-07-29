@@ -7,7 +7,6 @@ import {
 
 import {
   FaBell,
-  FaSearch,
   FaUserCircle,
 } from "react-icons/fa";
 
@@ -16,7 +15,7 @@ function Topbar() {
   const location = useLocation();
 
   const [time, setTime] = useState(new Date());
-  const [search, setSearch] = useState("");
+  
 
   const user =
     JSON.parse(localStorage.getItem("user")) || {};
@@ -214,42 +213,7 @@ function Topbar() {
           gap: "16px",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            background: "#232332",
-            padding: "0 14px",
-            borderRadius: "8px",
-            height: "42px",
-            width: "180px",
-          }}
-        >
-          <FaSearch color="#9CA3AF" size={14} />
-
-          <input
-            type="text"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-
-              window.dispatchEvent(
-                new CustomEvent("globalSearch", {
-                  detail: e.target.value,
-                })
-              );
-            }}
-            style={{
-              flex: 1,
-              marginLeft: "10px",
-              background: "transparent",
-              border: "none",
-              outline: "none",
-              color: "white",
-            }}
-          />
-        </div>
+        
 
         <FaBell
           size={18}
