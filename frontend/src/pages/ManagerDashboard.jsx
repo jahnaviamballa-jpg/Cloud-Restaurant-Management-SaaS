@@ -11,7 +11,7 @@ import { getOrderStats } from "../api/orderApi";
 import { getLowStockNotifications } from "../api/notificationApi";
 import { getSalesReport } from "../api/reportApi";
 
-import { getRestaurantId } from "../utils/restaurant";
+
 
 function ManagerDashboard() {
   useEffect(() => {
