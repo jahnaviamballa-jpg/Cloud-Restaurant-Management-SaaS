@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import {
+  getRestaurant,
+  getRestaurantId,
+} from "../utils/restaurant";
 import DashboardCard from "../components/DashboardCard";
 import Layout from "../components/Layout";
 import { getInventoryStats } from "../api/inventoryApi";
