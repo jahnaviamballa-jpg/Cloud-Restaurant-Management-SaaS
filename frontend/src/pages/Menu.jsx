@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/dashboard.css";
-import Layout from "../components/Layout";
 
-import { getRestaurantId } from "../utils/restaurant";
+import Layout from "../components/Layout";
+import "../styles/dashboard.css";
+
+import {
+  getRestaurant,
+  getRestaurantId,
+} from "../utils/restaurant";
 
 import {
   getMenuByRestaurant,
@@ -25,13 +29,22 @@ function Menu() {
   const isCustomer = role === "customer";
 
   const canManageMenu =
-    role === "manager" || role === "owner";
+    role === "owner" || role === "manager";
+
+  // =====================================
+  // Current Restaurant
+  // =====================================
+
+  const restaurant = getRestaurant();
+
+  const restaurantId = getRestaurantId();
 
   // =====================================
   // States
   // =====================================
 
-  const [menuItems, setMenuItems] = useState([]);
+  const [menuItems, setMenuItems] =
+    useState([]);
 
   const [filteredItems, setFilteredItems] =
     useState([]);
@@ -41,6 +54,18 @@ function Menu() {
 
   const [category, setCategory] =
     useState("All");
+
+  const [cart, setCart] = useState(() => {
+    if (!restaurantId) return [];
+
+    return (
+      JSON.parse(
+        localStorage.getItem(
+          `cart_${restaurantId}`
+        )
+      ) || []
+    );
+  });
 
   // =====================================
   // Statistics
@@ -64,15 +89,15 @@ function Menu() {
     ).length;
 
   const averagePrice =
-    totalItems > 0
-      ? (
+    totalItems === 0
+      ? 0
+      : (
           menuItems.reduce(
             (sum, item) =>
               sum + Number(item.price),
             0
           ) / totalItems
-        ).toFixed(0)
-      : 0;
+        ).toFixed(0);
 
   // =====================================
   // Load Menu
@@ -85,10 +110,16 @@ function Menu() {
       const data =
         await getMenuByRestaurant();
 
-      setMenuItems(data || []);
-      setFilteredItems(data || []);
+      setMenuItems(
+        Array.isArray(data) ? data : []
+      );
+
+      setFilteredItems(
+        Array.isArray(data) ? data : []
+      );
     } catch (error) {
       console.error(error);
+
       alert("Failed to load menu.");
     } finally {
       setLoading(false);
@@ -96,44 +127,27 @@ function Menu() {
   };
 
   // =====================================
-  // Initial Load
-  // =====================================
-
-  useEffect(() => {
-    const restaurantId =
-      getRestaurantId();
-
-    if (!restaurantId) {
-      alert(
-        "Please select a restaurant first."
-      );
-      navigate("/restaurants");
-      return;
-    }
-
-    loadMenu();
-  }, []);
-
-  // =====================================
-  // Delete Menu Item
+  // Delete Menu
   // =====================================
 
   const handleDelete = async (id) => {
-    if (
-      !window.confirm(
-        "Delete this menu item?"
-      )
-    )
-      return;
+    const ok = window.confirm(
+      "Delete this menu item?"
+    );
+
+    if (!ok) return;
 
     try {
       await deleteMenuItem(id);
 
-      alert("Menu Item Deleted");
+      await loadMenu();
 
-      loadMenu();
+      alert(
+        "Menu item deleted successfully."
+      );
     } catch (error) {
       console.error(error);
+
       alert("Delete failed.");
     }
   };
@@ -143,30 +157,48 @@ function Menu() {
   // =====================================
 
   const handleAddToCart = (item) => {
-    let cart =
+    const key = `cart_${restaurantId}`;
+
+    let currentCart =
       JSON.parse(
-        localStorage.getItem("cart")
+        localStorage.getItem(key)
       ) || [];
 
-    const existing = cart.find(
-      (food) => food.id === item.id
-    );
+    const existing =
+      currentCart.find(
+        (food) => food.id === item.id
+      );
 
     if (existing) {
       existing.quantity += 1;
     } else {
-      cart.push({
+      currentCart.push({
         ...item,
         quantity: 1,
+        restaurant_id: restaurantId,
       });
     }
 
     localStorage.setItem(
-      "cart",
-      JSON.stringify(cart)
+      key,
+      JSON.stringify(currentCart)
     );
 
-    alert(`${item.name} added to cart.`);
+    setCart([...currentCart]);
+
+    window.dispatchEvent(
+      new Event("cartUpdated")
+    );
+  };
+
+  // =====================================
+  // Check Cart
+  // =====================================
+
+  const getCartItem = (id) => {
+    return cart.find(
+      (item) => item.id === id
+    );
   };
 
   // =====================================
@@ -184,15 +216,30 @@ function Menu() {
 
     return ["All", ...unique];
   }, [menuItems]);
-
-  // =====================================
-  // Topbar Global Search
+    // =====================================
+  // Initial Load
   // =====================================
 
   useEffect(() => {
-    const handleSearch = (e) => {
+    if (!restaurantId) {
+      alert("Please select a restaurant first.");
+
+      navigate("/restaurant-selection");
+
+      return;
+    }
+
+    loadMenu();
+  }, []);
+
+  // =====================================
+  // Global Search (Top Bar)
+  // =====================================
+
+  useEffect(() => {
+    const handleSearch = (event) => {
       const keyword = (
-        e.detail || ""
+        event.detail || ""
       )
         .trim()
         .toLowerCase();
@@ -255,7 +302,50 @@ function Menu() {
   }, [category, menuItems]);
 
   // =====================================
-  // Loading
+  // Refresh Cart Automatically
+  // =====================================
+
+  useEffect(() => {
+    const refreshCart = () => {
+      if (!restaurantId) return;
+
+      const latestCart =
+        JSON.parse(
+          localStorage.getItem(
+            `cart_${restaurantId}`
+          )
+        ) || [];
+
+      setCart(latestCart);
+    };
+
+    refreshCart();
+
+    window.addEventListener(
+      "cartUpdated",
+      refreshCart
+    );
+
+    window.addEventListener(
+      "storage",
+      refreshCart
+    );
+
+    return () => {
+      window.removeEventListener(
+        "cartUpdated",
+        refreshCart
+      );
+
+      window.removeEventListener(
+        "storage",
+        refreshCart
+      );
+    };
+  }, [restaurantId]);
+
+  // =====================================
+  // Loading Screen
   // =====================================
 
   if (loading) {
@@ -269,34 +359,36 @@ function Menu() {
           background: "#111827",
         }}
       >
-        <h2 style={{ color: "white" }}>
+        <h2
+          style={{
+            color: "white",
+          }}
+        >
           Loading Menu...
         </h2>
       </div>
     );
   }
-
-  return (
+    return (
     <Layout>
       <div style={{ padding: "20px" }}>
         <div
           style={{
-            background:
-              "rgba(18,18,24,.78)",
-            borderRadius: "25px",
+            background: "rgba(18,18,24,.80)",
+            borderRadius: "24px",
             padding: "35px",
-            border:
-              "1px solid rgba(255,255,255,.08)",
+            border: "1px solid rgba(255,255,255,.08)",
             backdropFilter: "blur(12px)",
           }}
         >
-          {/* HEADER */}
+          {/* ===================================== */}
+          {/* Header */}
+          {/* ===================================== */}
 
           <div
             style={{
               display: "flex",
-              justifyContent:
-                "space-between",
+              justifyContent: "space-between",
               alignItems: "center",
               flexWrap: "wrap",
               gap: "20px",
@@ -307,47 +399,47 @@ function Menu() {
               <h1
                 style={{
                   color: "white",
-                  fontSize: "40px",
                   marginBottom: "8px",
+                  fontSize: "38px",
                 }}
               >
-                🍽️ Restaurant Menu
+                🍽 Restaurant Menu
               </h1>
 
               <p
                 style={{
-                  color: "#CFCFD5",
+                  color: "#D1D5DB",
+                  fontSize: "16px",
                 }}
               >
-                {isCustomer
-                  ? "Browse delicious food and add items to your cart."
-                  : "Manage all menu items from one place."}
+                {restaurant?.restaurant_name ||
+                  "Selected Restaurant"}
               </p>
             </div>
 
             {canManageMenu && (
               <button
                 onClick={() =>
-                  navigate(
-                    "/add-menu-item"
-                  )
+                  navigate("/add-menu")
                 }
                 style={{
-                  padding: "15px 28px",
+                  padding: "14px 28px",
                   border: "none",
-                  borderRadius: "14px",
+                  borderRadius: "12px",
                   background:
                     "linear-gradient(90deg,#7C3AED,#F97316)",
                   color: "white",
                   fontWeight: "700",
                   cursor: "pointer",
+                  fontSize: "15px",
                 }}
               >
                 ➕ Add Menu Item
               </button>
             )}
           </div>
-                    {/* ===================================== */}
+
+          {/* ===================================== */}
           {/* Dashboard Cards */}
           {/* ===================================== */}
 
@@ -355,9 +447,9 @@ function Menu() {
             style={{
               display: "grid",
               gridTemplateColumns:
-                "repeat(auto-fit,minmax(220px,1fr))",
-              gap: "20px",
-              marginBottom: "35px",
+                "repeat(auto-fit,minmax(180px,1fr))",
+              gap: "18px",
+              marginBottom: "30px",
             }}
           >
             <div style={cardStyle}>
@@ -371,17 +463,17 @@ function Menu() {
             </div>
 
             <div style={cardStyle}>
-              <h3>🥗 Veg Items</h3>
+              <h3>🥗 Veg</h3>
               <h1>{vegItems}</h1>
             </div>
 
             <div style={cardStyle}>
-              <h3>🍗 Non-Veg Items</h3>
+              <h3>🍗 Non-Veg</h3>
               <h1>{nonVegItems}</h1>
             </div>
 
             <div style={cardStyle}>
-              <h3>💰 Average Price</h3>
+              <h3>💰 Avg Price</h3>
               <h1>₹{averagePrice}</h1>
             </div>
           </div>
@@ -407,13 +499,12 @@ function Menu() {
               style={{
                 padding: "14px",
                 borderRadius: "12px",
-                border:
-                  "1px solid rgba(255,255,255,.08)",
                 background:
                   "rgba(255,255,255,.08)",
                 color: "white",
+                border:
+                  "1px solid rgba(255,255,255,.08)",
                 outline: "none",
-                fontSize: "15px",
               }}
             >
               {categories.map((cat) => (
@@ -433,13 +524,12 @@ function Menu() {
               style={{
                 background:
                   "linear-gradient(90deg,#7C3AED,#F97316)",
-                borderRadius: "14px",
+                borderRadius: "12px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 color: "white",
                 fontWeight: "700",
-                fontSize: "18px",
               }}
             >
               {filteredItems.length} Items
@@ -458,154 +548,184 @@ function Menu() {
               gap: "25px",
             }}
           >
-            {filteredItems.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  background: "rgba(20,20,28,.92)",
-                  borderRadius: "20px",
-                  overflow: "hidden",
-                  border:
-                    "1px solid rgba(255,255,255,.08)",
-                  boxShadow:
-                    "0 10px 25px rgba(0,0,0,.25)",
-                  transition: "0.3s",
-                }}
-              >
-                <img
-                  src={
-                    item.image_url ||
-                    "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
-                  }
-                  alt={item.name}
-                  style={{
-                    width: "100%",
-                    height: "220px",
-                    objectFit: "cover",
-                  }}
-                />
+                        {filteredItems.map((item) => {
+              const cartItem = cart.find(
+                (food) => food.id === item.id
+              );
 
+              return (
                 <div
+                  key={item.id}
                   style={{
-                    padding: "20px",
+                    background: "rgba(20,20,28,.92)",
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                    border:
+                      "1px solid rgba(255,255,255,.08)",
+                    boxShadow:
+                      "0 10px 25px rgba(0,0,0,.25)",
+                    transition: ".3s",
                   }}
                 >
+                  <img
+                    src={
+                      item.image_url ||
+                      "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
+                    }
+                    alt={item.name}
+                    style={{
+                      width: "100%",
+                      height: "220px",
+                      objectFit: "cover",
+                    }}
+                  />
+
                   <div
                     style={{
-                      display: "flex",
-                      justifyContent:
-                        "space-between",
-                      alignItems: "center",
+                      padding: "20px",
                     }}
                   >
-                    <h2
+                    <div
                       style={{
-                        color: "white",
-                        margin: 0,
+                        display: "flex",
+                        justifyContent:
+                          "space-between",
+                        alignItems: "center",
                       }}
                     >
-                      {item.name}
-                    </h2>
-
-                    <span
-                      style={{
-                        color: "#FACC15",
-                        fontWeight: "700",
-                        fontSize: "20px",
-                      }}
-                    >
-                      ₹{item.price}
-                    </span>
-                  </div>
-
-                  <p
-                    style={{
-                      color: "#BDBDBD",
-                      marginTop: "10px",
-                      minHeight: "45px",
-                    }}
-                  >
-                    {item.description ||
-                      "Delicious food prepared with fresh ingredients."}
-                  </p>
-
-                  <p
-                    style={{
-                      color: "#9CA3AF",
-                      marginTop: "10px",
-                    }}
-                  >
-                    📂 {item.category}
-                  </p>
-
-                  <div
-  style={{
-    display: "flex",
-    gap: "10px",
-    flexWrap: "wrap",
-    marginTop: "15px",
-  }}
->
-  <span
-    style={{
-      padding: "8px 14px",
-      borderRadius: "20px",
-      background: item.is_veg
-        ? "#16A34A"
-        : "#DC2626",
-      color: "white",
-      fontWeight: "600",
-    }}
-  >
-    {item.is_veg ? "🥗 Veg" : "🍗 Non-Veg"}
-  </span>
-
-  <span
-    style={{
-      padding: "8px 14px",
-      borderRadius: "20px",
-      background: item.is_available
-        ? "#2563EB"
-        : "#6B7280",
-      color: "white",
-      fontWeight: "600",
-    }}
-  >
-    {item.is_available
-      ? "✅ Available"
-      : "❌ Unavailable"}
-  </span>
-</div>
-
-<div
-  style={{
-    display: "flex",
-    gap: "12px",
-    marginTop: "20px",
-  }}
->
-                    {isCustomer ? (
-                      <button
-                        onClick={() =>
-                          handleAddToCart(item)
-                        }
+                      <h2
                         style={{
-                          width: "100%",
-                          padding: "13px",
-                          border: "none",
-                          borderRadius: "12px",
-                          background:
-                            "linear-gradient(90deg,#7C3AED,#F97316)",
                           color: "white",
-                          fontWeight: "700",
-                          cursor: "pointer",
-                          fontSize: "15px",
+                          margin: 0,
+                          fontSize: "22px",
                         }}
                       >
-                        🛒 Add to Cart
-                      </button>
-                    ) : (
+                        {item.name}
+                      </h2>
+
+                      <h2
+                        style={{
+                          color: "#FACC15",
+                          margin: 0,
+                        }}
+                      >
+                        ₹{item.price}
+                      </h2>
+                    </div>
+
+                    <p
+                      style={{
+                        color: "#D1D5DB",
+                        marginTop: "12px",
+                        minHeight: "55px",
+                      }}
+                    >
+                      {item.description ||
+                        "Freshly prepared delicious food."}
+                    </p>
+
+                    <p
+                      style={{
+                        color: "#9CA3AF",
+                        marginBottom: "18px",
+                      }}
+                    >
+                      📂 {item.category}
+                    </p>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        flexWrap: "wrap",
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          background: item.is_veg
+                            ? "#16A34A"
+                            : "#DC2626",
+                          color: "white",
+                          padding: "6px 14px",
+                          borderRadius: "20px",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                        }}
+                      >
+                        {item.is_veg
+                          ? "🥗 Veg"
+                          : "🍗 Non-Veg"}
+                      </span>
+
+                      <span
+                        style={{
+                          background:
+                            item.is_available
+                              ? "#2563EB"
+                              : "#6B7280",
+                          color: "white",
+                          padding: "6px 14px",
+                          borderRadius: "20px",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                        }}
+                      >
+                        {item.is_available
+                          ? "✅ Available"
+                          : "❌ Unavailable"}
+                      </span>
+                    </div>
+
+                    {isCustomer ? (
                       <>
+                        {!cartItem ? (
+                          <button
+                            onClick={() =>
+                              handleAddToCart(item)
+                            }
+                            style={{
+                              width: "100%",
+                              padding: "14px",
+                              border: "none",
+                              borderRadius: "12px",
+                              background:
+                                "linear-gradient(90deg,#7C3AED,#F97316)",
+                              color: "white",
+                              fontWeight: "700",
+                              cursor: "pointer",
+                            }}
+                          >
+                            🛒 Add to Cart
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() =>
+                              navigate("/cart")
+                            }
+                            style={{
+                              width: "100%",
+                              padding: "14px",
+                              border: "none",
+                              borderRadius: "12px",
+                              background: "#16A34A",
+                              color: "white",
+                              fontWeight: "700",
+                              cursor: "pointer",
+                            }}
+                          >
+                            ✅ View Cart (
+                            {cartItem.quantity})
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "12px",
+                        }}
+                      >
                         <button
                           onClick={() =>
                             navigate(
@@ -643,72 +763,67 @@ function Menu() {
                         >
                           🗑 Delete
                         </button>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>
-              </div>
-            ))}
-
-            {/* ===================================== */}
-            {/* Empty State */}
-            {/* ===================================== */}
-
-            {filteredItems.length === 0 && (
-              <div
+              );
+            })}
+                      {filteredItems.length === 0 && (
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                padding: "70px 20px",
+                background: "rgba(20,20,28,.92)",
+                borderRadius: "20px",
+                border:
+                  "1px solid rgba(255,255,255,.08)",
+              }}
+            >
+              <h2
                 style={{
-                  gridColumn: "1 / -1",
-                  textAlign: "center",
-                  padding: "60px 20px",
-                  background: "rgba(20,20,28,.92)",
-                  borderRadius: "20px",
-                  border:
-                    "1px solid rgba(255,255,255,.08)",
+                  color: "white",
+                  marginBottom: "15px",
                 }}
               >
-                <h2
+                🍽 No Menu Items Found
+              </h2>
+
+              <p
+                style={{
+                  color: "#BDBDBD",
+                  marginBottom: "30px",
+                }}
+              >
+                {isCustomer
+                  ? "No menu items available for this restaurant."
+                  : "No menu items have been added yet."}
+              </p>
+
+              {canManageMenu && (
+                <button
+                  onClick={() =>
+                    navigate("/add-menu")
+                  }
                   style={{
+                    padding: "14px 28px",
+                    border: "none",
+                    borderRadius: "12px",
+                    background:
+                      "linear-gradient(90deg,#7C3AED,#F97316)",
                     color: "white",
-                    marginBottom: "15px",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                    fontSize: "15px",
                   }}
                 >
-                  🍽️ No Menu Items Found
-                </h2>
-
-                <p
-                  style={{
-                    color: "#BDBDBD",
-                    marginBottom: "25px",
-                  }}
-                >
-                  {isCustomer
-                    ? "No menu items match your search."
-                    : "No menu items found. Try another search or add a new menu item."}
-                </p>
-
-                {canManageMenu && (
-                  <button
-                    onClick={() =>
-                      navigate("/add-menu-item")
-                    }
-                    style={{
-                      padding: "14px 28px",
-                      border: "none",
-                      borderRadius: "12px",
-                      background:
-                        "linear-gradient(90deg,#7C3AED,#F97316)",
-                      color: "white",
-                      fontWeight: "700",
-                      cursor: "pointer",
-                    }}
-                  >
-                    ➕ Add First Menu Item
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-                  </div>
+                  ➕ Add First Menu Item
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </Layout>
   );

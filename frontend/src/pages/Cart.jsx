@@ -1,33 +1,83 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CartItem from "../components/CartItem";
-import api from "../api/api";
+
 import Layout from "../components/Layout";
+import CartItem from "../components/CartItem";
+
+import api from "../api/api";
+
+import {
+  getRestaurant,
+  getRestaurantId,
+} from "../utils/restaurant";
 
 function Cart() {
   const navigate = useNavigate();
 
+  // =====================================
+  // Restaurant
+  // =====================================
+
+  const restaurant = getRestaurant();
+
+  const restaurantId = getRestaurantId();
+
+  const cartKey = `cart_${restaurantId}`;
+
+  // =====================================
+  // States
+  // =====================================
+
   const [cartItems, setCartItems] = useState([]);
+
+  // =====================================
+  // Load Cart
+  // =====================================
 
   useEffect(() => {
     loadCart();
+
+    window.addEventListener(
+      "cartUpdated",
+      loadCart
+    );
+
+    return () =>
+      window.removeEventListener(
+        "cartUpdated",
+        loadCart
+      );
   }, []);
 
   const loadCart = () => {
     const cart =
-      JSON.parse(localStorage.getItem("cart")) || [];
+      JSON.parse(
+        localStorage.getItem(cartKey)
+      ) || [];
 
     setCartItems(cart);
   };
+
+  // =====================================
+  // Update Cart
+  // =====================================
 
   const updateCart = (updatedCart) => {
     setCartItems(updatedCart);
 
     localStorage.setItem(
-      "cart",
+      cartKey,
       JSON.stringify(updatedCart)
     );
+
+    window.dispatchEvent(
+      new Event("cartUpdated")
+    );
   };
+
+  // =====================================
+  // Increase Quantity
+  // =====================================
 
   const increaseQuantity = (id) => {
     const updatedCart = cartItems.map((item) =>
@@ -41,6 +91,10 @@ function Cart() {
 
     updateCart(updatedCart);
   };
+
+  // =====================================
+  // Decrease Quantity
+  // =====================================
 
   const decreaseQuantity = (id) => {
     const updatedCart = cartItems.map((item) =>
@@ -58,6 +112,10 @@ function Cart() {
     updateCart(updatedCart);
   };
 
+  // =====================================
+  // Remove Item
+  // =====================================
+
   const removeItem = (id) => {
     const updatedCart = cartItems.filter(
       (item) => item.id !== id
@@ -65,6 +123,10 @@ function Cart() {
 
     updateCart(updatedCart);
   };
+
+  // =====================================
+  // Price Calculation
+  // =====================================
 
   const subtotal = cartItems.reduce(
     (sum, item) =>
@@ -79,10 +141,10 @@ function Cart() {
 
   const total =
     subtotal + gst + delivery;
-
-  // =====================================
+      // =====================================
   // Checkout
   // =====================================
+
   const checkout = async () => {
     if (cartItems.length === 0) {
       alert("Cart is empty");
@@ -94,10 +156,6 @@ function Cart() {
         localStorage.getItem("user") || "null"
       );
 
-      const restaurant = JSON.parse(
-        localStorage.getItem("restaurant") || "null"
-      );
-
       if (!user) {
         alert("Please login again.");
         navigate("/login");
@@ -106,38 +164,50 @@ function Cart() {
 
       if (!restaurant) {
         alert("Please select a restaurant.");
-        navigate("/select-restaurant");
+        navigate("/restaurant-selection");
         return;
       }
-       console.log("USER =", user);
-       
+
       const order = {
-  restaurant_id: restaurant.restaurant_id,
+        restaurant_id: restaurant.restaurant_id,
 
-  customer_id: Number(user.id),
+        customer_id: Number(user.id),
 
-  customer_name: user.name,
+        customer_name: user.name,
 
-  customer_email: user.email,
+        customer_email: user.email,
 
-  customer_phone: user.phone,
+        customer_phone: user.phone,
 
-  total_amount: Number(total.toFixed(2)),
+        total_amount: Number(
+          total.toFixed(2)
+        ),
 
-  status: "Pending",
-};
+        status: "Pending",
+      };
 
-console.log("ORDER =", order);
+      console.log("ORDER =", order);
 
-      const response = await api.post("/orders/", order);
+      const response = await api.post(
+        "/orders/",
+        order
+      );
 
       console.log(response.data);
 
       alert("Order placed successfully!");
 
-      localStorage.removeItem("cart");
+      // =====================================
+      // Clear only current restaurant cart
+      // =====================================
+
+      localStorage.removeItem(cartKey);
 
       setCartItems([]);
+
+      window.dispatchEvent(
+        new Event("cartUpdated")
+      );
 
       navigate("/orders");
     } catch (err) {
@@ -154,182 +224,211 @@ console.log("ORDER =", order);
       );
     }
   };
-
   return (
-    <Layout>
+  <Layout>
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: "40px",
+        background:
+          "linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.22)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
       <div
         style={{
-          minHeight: "100vh",
-          padding: "40px",
-          background:
-            "linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.22)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
+          background: "rgba(18,18,24,.78)",
+          borderRadius: "25px",
+          padding: "35px",
+          border:
+            "1px solid rgba(255,255,255,.08)",
         }}
       >
-        <div
+        <h1
           style={{
-            background: "rgba(18,18,24,.75)",
-            borderRadius: "25px",
-            padding: "35px",
-            border:
-              "1px solid rgba(255,255,255,.08)",
+            color: "white",
+            fontSize: "42px",
+            marginBottom: "10px",
           }}
         >
-          <h1
+          🛒 Your Cart
+        </h1>
+
+        <p
+          style={{
+            color: "#CFCFD5",
+            marginBottom: "30px",
+          }}
+        >
+          {restaurant
+            ? `Restaurant : ${restaurant.restaurant_name}`
+            : "Review your order"}
+        </p>
+
+        {cartItems.length === 0 ? (
+          <div
             style={{
-              color: "white",
-              fontSize: "42px",
+              textAlign: "center",
+              padding: "80px 20px",
             }}
           >
-            🛒 Your Cart
-          </h1>
-
-          <p
-            style={{
-              color: "#ccc",
-              marginBottom: "35px",
-            }}
-          >
-            Review your delicious order.
-          </p>
-
-          {cartItems.length === 0 ? (
-            <h2
-              style={{
-                color: "white",
-                textAlign: "center",
-              }}
-            >
+            <h2 style={{ color: "white" }}>
               Your cart is empty
             </h2>
-          ) : (
-            <>
+
+            <button
+              onClick={() => navigate("/menu")}
+              style={{
+                marginTop: "30px",
+                padding: "14px 28px",
+                border: "none",
+                borderRadius: "12px",
+                background:
+                  "linear-gradient(90deg,#7C3AED,#F97316)",
+                color: "white",
+                fontWeight: "700",
+                cursor: "pointer",
+              }}
+            >
+              🍽 Browse Menu
+            </button>
+          </div>
+        ) : (
+          <>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+              }}
+            >
+              {cartItems.map((item) => (
+                <CartItem
+                  key={item.id}
+                  item={item}
+                  increaseQuantity={
+                    increaseQuantity
+                  }
+                  decreaseQuantity={
+                    decreaseQuantity
+                  }
+                  removeItem={removeItem}
+                />
+              ))}
+            </div>
+
+            <div
+              style={{
+                marginTop: "40px",
+                background:
+                  "rgba(20,20,28,.92)",
+                borderRadius: "20px",
+                padding: "30px",
+              }}
+            >
+              <h2
+                style={{
+                  color: "white",
+                  marginBottom: "25px",
+                }}
+              >
+                Order Summary
+              </h2>
+
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "column",
-                  gap: "20px",
+                  justifyContent:
+                    "space-between",
+                  color: "#D1D5DB",
+                  marginBottom: "15px",
                 }}
               >
-                {cartItems.map((item) => (
-                  <CartItem
-                    key={item.id}
-                    item={item}
-                    increaseQuantity={
-                      increaseQuantity
-                    }
-                    decreaseQuantity={
-                      decreaseQuantity
-                    }
-                    removeItem={removeItem}
-                  />
-                ))}
+                <span>Subtotal</span>
+                <span>
+                  ₹{subtotal.toFixed(2)}
+                </span>
               </div>
 
               <div
                 style={{
-                  marginTop: "40px",
-                  background:
-                    "rgba(20,20,28,.92)",
-                  borderRadius: "20px",
-                  padding: "30px",
+                  display: "flex",
+                  justifyContent:
+                    "space-between",
+                  color: "#D1D5DB",
+                  marginBottom: "15px",
                 }}
               >
-                <h2
-                  style={{
-                    color: "white",
-                  }}
-                >
-                  Order Summary
-                </h2>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent:
-                      "space-between",
-                    marginTop: "20px",
-                    color: "#ddd",
-                  }}
-                >
-                  <span>Subtotal</span>
-                  <span>₹{subtotal.toFixed(2)}</span>
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent:
-                      "space-between",
-                    marginTop: "15px",
-                    color: "#ddd",
-                  }}
-                >
-                  <span>GST (5%)</span>
-                  <span>₹{gst.toFixed(2)}</span>
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent:
-                      "space-between",
-                    marginTop: "15px",
-                    color: "#ddd",
-                  }}
-                >
-                  <span>Delivery</span>
-                  <span>₹{delivery}</span>
-                </div>
-
-                <hr
-                  style={{
-                    marginTop: "20px",
-                    marginBottom: "20px",
-                  }}
-                />
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent:
-                      "space-between",
-                    color: "white",
-                    fontSize: "24px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  <span>Total</span>
-                  <span>₹{total.toFixed(2)}</span>
-                </div>
-
-                <button
-                  onClick={checkout}
-                  style={{
-                    width: "100%",
-                    marginTop: "30px",
-                    padding: "15px",
-                    border: "none",
-                    borderRadius: "12px",
-                    background:
-                      "linear-gradient(90deg,#7C3AED,#F97316)",
-                    color: "white",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    fontSize: "16px",
-                  }}
-                >
-                  Proceed to Checkout
-                </button>
+                <span>GST (5%)</span>
+                <span>
+                  ₹{gst.toFixed(2)}
+                </span>
               </div>
-            </>
-          )}
-        </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent:
+                    "space-between",
+                  color: "#D1D5DB",
+                  marginBottom: "20px",
+                }}
+              >
+                <span>Delivery</span>
+                <span>₹{delivery}</span>
+              </div>
+
+              <hr
+                style={{
+                  borderColor:
+                    "rgba(255,255,255,.1)",
+                  marginBottom: "20px",
+                }}
+              />
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent:
+                    "space-between",
+                  color: "white",
+                  fontSize: "24px",
+                  fontWeight: "700",
+                }}
+              >
+                <span>Total</span>
+                <span>
+                  ₹{total.toFixed(2)}
+                </span>
+              </div>
+
+              <button
+                onClick={checkout}
+                style={{
+                  width: "100%",
+                  marginTop: "30px",
+                  padding: "16px",
+                  border: "none",
+                  borderRadius: "12px",
+                  background:
+                    "linear-gradient(90deg,#7C3AED,#F97316)",
+                  color: "white",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  fontSize: "16px",
+                }}
+              >
+                Proceed to Checkout
+              </button>
+            </div>
+          </>
+        )}
       </div>
-    </Layout>
-  );
+    </div>
+  </Layout>
+);
 }
 
 export default Cart;

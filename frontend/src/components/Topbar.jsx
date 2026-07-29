@@ -48,16 +48,14 @@ function Topbar() {
   // ==========================
 
   if (role === "customer") {
-    menu = [
-      { name: "Dashboard", path: "/dashboard" },
-      { name: "Restaurants", path: "/restaurants" },
-      { name: "Menu", path: "/menu" },
-      { name: "Cart", path: "/cart" },
-      { name: "My Orders", path: "/orders" },
-      { name: "Reservations", path: "/reservations" },
-      { name: "Profile", path: "/profile" },
-    ];
-  }
+  menu = [
+    { name: "Dashboard", path: "/dashboard" },
+    { name: "Menu", path: "/menu" },
+    { name: "My Orders", path: "/orders" },
+    { name: "Reservations", path: "/reservations" },
+    { name: "Profile", path: "/profile" },
+  ];
+}
 
   // ==========================
   // MANAGER
@@ -147,18 +145,20 @@ function Topbar() {
     >
       {/* LEFT */}
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "35px",
-        }}
-      >
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "18px",
+    minWidth: 0,
+    flex: 1,
+  }}
+>
         <h2
           style={{
             margin: 0,
             color: "#8B5CF6",
             fontWeight: "800",
-            fontSize: "26px",
+            fontSize: "22px",
             whiteSpace: "nowrap",
           }}
         >
@@ -166,12 +166,15 @@ function Topbar() {
         </h2>
 
         <div
-          style={{
-            display: "flex",
-            gap: "8px",
-            flexWrap: "wrap",
-          }}
-        >
+  style={{
+    display: "flex",
+    gap: "6px",
+    flexWrap: "nowrap",
+    overflowX: "auto",
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
+  }}
+>
           {menu.map((item) => (
             <Link
               key={item.path}
@@ -188,10 +191,12 @@ function Topbar() {
                     ? "#7C3AED"
                     : "transparent",
 
-                padding: "10px 16px",
+                padding: "9px 12px",
+                fontSize: "13px",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
                 borderRadius: "8px",
                 fontWeight: "600",
-                fontSize: "14px",
                 transition: ".25s",
               }}
             >
@@ -217,7 +222,7 @@ function Topbar() {
             padding: "0 14px",
             borderRadius: "8px",
             height: "42px",
-            width: "220px",
+            width: "180px",
           }}
         >
           <FaSearch color="#9CA3AF" size={14} />
