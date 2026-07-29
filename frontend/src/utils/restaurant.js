@@ -14,23 +14,35 @@ export const setRestaurant = (restaurant) => {
 export const getRestaurant = () => {
   const restaurant = localStorage.getItem("restaurant");
 
-  if (!restaurant) return null;
+  if (restaurant) {
+    return JSON.parse(restaurant);
+  }
 
-  return JSON.parse(restaurant);
+  // Fallback for Manager / Owner / Chef
+  const user = JSON.parse(
+    localStorage.getItem("user") || "null"
+  );
+
+  if (!user) return null;
+
+  return {
+    restaurant_id: user.restaurant_id,
+    restaurant_name: user.restaurant_name,
+  };
 };
 
 // Get Restaurant ID
 export const getRestaurantId = () => {
   const restaurant = getRestaurant();
 
-  return restaurant?.restaurant_id || null;
+  return restaurant?.restaurant_id ?? null;
 };
 
 // Get Restaurant Name
 export const getRestaurantName = () => {
   const restaurant = getRestaurant();
 
-  return restaurant?.restaurant_name || "";
+  return restaurant?.restaurant_name ?? "";
 };
 
 // Clear Restaurant
