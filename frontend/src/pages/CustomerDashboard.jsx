@@ -10,6 +10,7 @@ import {
   getRestaurant,
   getRestaurantId,
 } from "../utils/restaurant";
+import { useNavigate } from "react-router-dom";
 function CustomerDashboard() {
   const navigate = useNavigate();
   useEffect(() => {
