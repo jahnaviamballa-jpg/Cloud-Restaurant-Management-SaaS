@@ -60,7 +60,7 @@ import ChangePassword from "./pages/ChangePassword";
 
 import ServerError from "./pages/ServerError";
 import NotFound from "./pages/NotFound";
-
+import AddEmployee from "./pages/AddEmployee";
 function AppContent() {
 
   const token = localStorage.getItem("token");
@@ -158,7 +158,10 @@ function AppContent() {
           path="/register"
           element={<Register />}
         />
-
+        <Route
+          path="/add-employee"
+          element={<AddEmployee />}
+        />
         {/* ==========================
             Restaurant Selection
         ========================== */}

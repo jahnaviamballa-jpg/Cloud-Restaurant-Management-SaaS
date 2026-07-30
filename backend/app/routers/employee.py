@@ -124,3 +124,29 @@ def get_employees_by_restaurant(
     )
 
     return employees
+@router.delete("/{employee_id}")
+def delete_employee(
+    employee_id: int,
+    db: Session = Depends(get_db),
+):
+    employee = (
+        db.query(Employee)
+        .filter(
+            Employee.employee_id == employee_id
+        )
+        .first()
+    )
+
+    if not employee:
+        raise HTTPException(
+            status_code=404,
+            detail="Employee not found",
+        )
+
+    db.delete(employee)
+
+    db.commit()
+
+    return {
+        "message": "Employee deleted successfully."
+    }

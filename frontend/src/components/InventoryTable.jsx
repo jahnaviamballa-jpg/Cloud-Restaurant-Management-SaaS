@@ -28,6 +28,7 @@ function InventoryTable({ items, onDelete }) {
       <table
         style={{
           width: "100%",
+          minWidth: "1200px",
           borderCollapse: "collapse",
           color: "white",
         }}
@@ -54,7 +55,12 @@ function InventoryTable({ items, onDelete }) {
 
         <tbody>
           {items.map((item) => (
-            <tr key={item.id}>
+            <tr
+              key={item.id}
+              style={{
+                transition: ".3s",
+              }}
+            >
               <td style={styles.td}>
                 <img
                   src={
@@ -71,25 +77,45 @@ function InventoryTable({ items, onDelete }) {
                 />
               </td>
 
-              <td style={styles.td}>{item.item_name}</td>
-
-              <td style={styles.td}>{item.category}</td>
-
-              <td style={styles.td}>{item.quantity}</td>
-
-              <td style={styles.td}>{item.unit}</td>
-
-              <td style={styles.td}>{item.minimum_stock}</td>
-
-              <td style={styles.td}>{item.supplier_name}</td>
+              <td style={styles.td}>
+                {item.item_name}
+              </td>
 
               <td style={styles.td}>
+                {item.category}
+              </td>
+
+              <td style={styles.td}>
+                {item.quantity}
+              </td>
+
+              <td style={styles.td}>
+                {item.unit}
+              </td>
+
+              <td style={styles.td}>
+                {item.minimum_stock}
+              </td>
+
+              <td style={styles.td}>
+                {item.supplier_name}
+              </td>
+
+              {/* STATUS */}
+              <td
+                style={{
+                  ...styles.td,
+                  whiteSpace: "nowrap",
+                }}
+              >
                 <span
                   style={{
+                    display: "inline-block",
                     padding: "8px 16px",
                     borderRadius: "30px",
                     color: "white",
                     fontWeight: "600",
+                    whiteSpace: "nowrap",
                     background:
                       Number(item.quantity) <=
                       Number(item.minimum_stock)
@@ -99,12 +125,17 @@ function InventoryTable({ items, onDelete }) {
                 >
                   {Number(item.quantity) <=
                   Number(item.minimum_stock)
-                    ? "Low Stock"
-                    : "In Stock"}
+                    ? "🔴 Low Stock"
+                    : "🟢 In Stock"}
                 </span>
               </td>
 
-              <td style={styles.td}>
+              <td
+                style={{
+                  ...styles.td,
+                  whiteSpace: "nowrap",
+                }}
+              >
                 <button
                   onClick={() =>
                     alert(
@@ -115,13 +146,14 @@ function InventoryTable({ items, onDelete }) {
                     padding: "8px 14px",
                     border: "none",
                     borderRadius: "8px",
-                    background: "#7C3AED",
+                    background: "#2563EB",
                     color: "white",
                     marginRight: "10px",
                     cursor: "pointer",
+                    fontWeight: "600",
                   }}
                 >
-                  ✏️
+                  ✏️ Edit
                 </button>
 
                 <button
@@ -133,9 +165,10 @@ function InventoryTable({ items, onDelete }) {
                     background: "#DC2626",
                     color: "white",
                     cursor: "pointer",
+                    fontWeight: "600",
                   }}
                 >
-                  🗑
+                  🗑 Delete
                 </button>
               </td>
             </tr>
@@ -152,13 +185,16 @@ const styles = {
     textAlign: "center",
     fontWeight: "700",
     fontSize: "15px",
+    whiteSpace: "nowrap",
   },
 
   td: {
     padding: "18px",
     textAlign: "center",
-    borderBottom: "1px solid rgba(255,255,255,.08)",
+    borderBottom:
+      "1px solid rgba(255,255,255,.08)",
     color: "#E5E7EB",
+    whiteSpace: "nowrap",
   },
 };
 

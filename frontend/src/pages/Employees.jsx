@@ -32,18 +32,7 @@ function Employees() {
     setRoleFilter] =
     useState("All");
 
-  const [newEmployee,
-    setNewEmployee] =
-    useState({
-      restaurant_id: 1,
-      employee_name: "",
-      role: "",
-      phone: "",
-      email: "",
-      salary: "",
-      joining_date: "",
-      status: "Active",
-    });
+  
 
   // ===========================
   // Load Employees
@@ -102,32 +91,6 @@ function Employees() {
   // Add Employee
   // ===========================
 
-  const handleAddEmployee = async () => {
-    try {
-      await createEmployee({
-        ...newEmployee,
-        salary: Number(newEmployee.salary),
-      });
-
-      alert("Employee added successfully.");
-
-      setNewEmployee({
-        restaurant_id: 1,
-        employee_name: "",
-        role: "",
-        phone: "",
-        email: "",
-        salary: "",
-        joining_date: "",
-        status: "Active",
-      });
-
-      loadEmployees();
-    } catch (error) {
-      console.error(error);
-      alert("Failed to add employee.");
-    }
-  };
 
   // ===========================
   // Employee Roles
@@ -249,21 +212,21 @@ function Employees() {
             </div>
 
             <button
-              onClick={handleAddEmployee}
-              style={{
-                padding: "15px 28px",
-                border: "none",
-                borderRadius: "14px",
-                background:
-                  "linear-gradient(90deg,#7C3AED,#F97316)",
-                color: "white",
-                fontWeight: "700",
-                cursor: "pointer",
-                fontSize: "15px",
-              }}
-            >
-              ➕ Add Employee
-            </button>
+  onClick={() => navigate("/add-employee")}
+  style={{
+    padding: "15px 28px",
+    border: "none",
+    borderRadius: "14px",
+    background:
+      "linear-gradient(90deg,#7C3AED,#F97316)",
+    color: "white",
+    fontWeight: "700",
+    cursor: "pointer",
+    fontSize: "15px",
+  }}
+>
+  ➕ Add Employee
+</button>
           </div>
 
           {/* ========================= */}
@@ -560,7 +523,7 @@ function Employees() {
               </p>
 
               <button
-                onClick={handleAddEmployee}
+                onClick={() => navigate("/add-employee")}
                 style={{
                   padding: "14px 28px",
                   border: "none",
