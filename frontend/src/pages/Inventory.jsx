@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   getInventory,
-  createInventory,
+  
   deleteInventory,
 } from "../api/inventoryApi";
 import InventoryTable from "../components/InventoryTable";
@@ -12,15 +12,7 @@ function Inventory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [newItem, setNewItem] = useState({
-  restaurant_id: "",
-    item_name: "",
-    category: "",
-    quantity: "",
-    unit: "",
-    minimum_stock: "",
-    supplier_name: "",
-  });
+  
 
   const loadInventory = async () => {
     try {
@@ -202,83 +194,7 @@ const handleAddInventory = async () => {
   </div>
 </div>
 
-      <div className="inventory-form">
-        <input
-          type="text"
-          placeholder="Item Name"
-          value={newItem.item_name}
-          onChange={(e) =>
-            setNewItem({
-              ...newItem,
-              item_name: e.target.value,
-            })
-          }
-        />
-
-        <input
-          type="text"
-          placeholder="Category"
-          value={newItem.category}
-          onChange={(e) =>
-            setNewItem({
-              ...newItem,
-              category: e.target.value,
-            })
-          }
-        />
-
-        <input
-          type="number"
-          placeholder="Quantity"
-          value={newItem.quantity}
-          onChange={(e) =>
-            setNewItem({
-              ...newItem,
-              quantity: e.target.value,
-            })
-          }
-        />
-
-        <input
-          type="text"
-          placeholder="Unit"
-          value={newItem.unit}
-          onChange={(e) =>
-            setNewItem({
-              ...newItem,
-              unit: e.target.value,
-            })
-          }
-        />
-
-        <input
-          type="number"
-          placeholder="Minimum Stock"
-          value={newItem.minimum_stock}
-          onChange={(e) =>
-            setNewItem({
-              ...newItem,
-              minimum_stock: e.target.value,
-            })
-          }
-        />
-
-        <input
-          type="text"
-          placeholder="Supplier"
-          value={newItem.supplier_name}
-          onChange={(e) =>
-            setNewItem({
-              ...newItem,
-              supplier_name: e.target.value,
-            })
-          }
-        />
-
-        <button onClick={handleAddInventory}>
-          Add Inventory
-        </button>
-      </div>
+      
 
       <LowStockAlert
         item={lowStock ? lowStock.item_name : null}

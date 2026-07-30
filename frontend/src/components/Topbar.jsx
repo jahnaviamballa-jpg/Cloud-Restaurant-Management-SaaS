@@ -33,12 +33,22 @@ function Topbar() {
   }, []);
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("restaurant");
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  localStorage.removeItem("restaurant");
 
-    navigate("/login");
-  };
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith("cart_")) {
+      localStorage.removeItem(key);
+    }
+  });
+
+  navigate("/login", { replace: true });
+
+  setTimeout(() => {
+    window.location.reload();
+  }, 100);
+};
 
   let menu = [];
 
