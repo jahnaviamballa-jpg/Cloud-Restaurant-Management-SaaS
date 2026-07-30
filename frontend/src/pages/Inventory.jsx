@@ -74,7 +74,35 @@ function Inventory() {
     alert("Delete failed.");
   }
 };
+const handleAddInventory = async () => {
+  try {
+    const inventoryData = {
+      ...newItem,
+      restaurant_id: undefined,
+      quantity: Number(newItem.quantity),
+      minimum_stock: Number(newItem.minimum_stock),
+    };
 
+    await createInventory(inventoryData);
+
+    await loadInventory();
+
+    setNewItem({
+      restaurant_id: "",
+      item_name: "",
+      category: "",
+      quantity: "",
+      unit: "",
+      minimum_stock: "",
+      supplier_name: "",
+    });
+
+    alert("Inventory Added Successfully!");
+  } catch (error) {
+    console.error("Add Inventory Error:", error);
+    alert("Failed to Add Inventory");
+  }
+};
   if (loading) {
     return <h2 style={{ textAlign: "center" }}>Loading...</h2>;
   }
@@ -256,7 +284,10 @@ function Inventory() {
         item={lowStock ? lowStock.item_name : null}
       />
 
-      <InventoryTable items={items} />
+      <InventoryTable
+  items={items}
+  onDelete={handleDeleteInventory}
+/>
     </div>
   </div>
   </Layout>
