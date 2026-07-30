@@ -1,22 +1,21 @@
 from app.models.order import Order
-
-from app.services.analytics_service import (
-    get_order_statistics,
-    get_inventory_usage,
-)
+from app.models.inventory import Inventory
 
 
 # =====================================================
 # Sales Report
 # =====================================================
-def get_sales_report(db):
-    orders = db.query(Order).all()
+def get_sales_report(db, restaurant_id: int):
+    orders = (
+        db.query(Order)
+        .filter(Order.restaurant_id == restaurant_id)
+        .all()
+    )
 
     total_orders = len(orders)
 
     total_revenue = sum(
-        order.total_amount
-        for order in orders
+        order.total_amount for order in orders
     )
 
     average_order_value = (
@@ -36,32 +35,62 @@ def get_sales_report(db):
 # =====================================================
 # Inventory Report
 # =====================================================
-def get_inventory_report(db):
-    inventory = get_inventory_usage(db)
+def get_inventory_report(db, restaurant_id: int):
+    inventory = (
+        db.query(Inventory)
+        .filter(
+            Inventory.restaurant_id == restaurant_id
+        )
+        .all()
+    )
+
+    total_items = len(inventory)
+
+    low_stock = sum(
+        1
+        for item in inventory
+        if item.quantity <= item.minimum_stock
+    )
+
+    critical_stock = sum(
+        1
+        for item in inventory
+        if item.quantity <= max(1, item.minimum_stock // 2)
+    )
 
     return {
-        "total_items": inventory["total_items"],
-        "low_stock": inventory["low_stock"],
-        "critical_stock": inventory["critical_stock"],
-        "average_days_remaining": inventory[
-            "average_days_remaining"
-        ],
+        "total_items": total_items,
+        "low_stock": low_stock,
+        "critical_stock": critical_stock,
+        "average_days_remaining": 0,
     }
 
 
 # =====================================================
 # Order Report
 # =====================================================
-def get_order_report(db):
-    stats = get_order_statistics(db)
-
-    total_orders = sum(stats.values())
+def get_order_report(db, restaurant_id: int):
+    orders = (
+        db.query(Order)
+        .filter(Order.restaurant_id == restaurant_id)
+        .all()
+    )
 
     return {
-        "total_orders": total_orders,
-        "pending": stats.get("pending", 0),
-        "preparing": stats.get("preparing", 0),
-        "ready": stats.get("ready", 0),
-        "completed": stats.get("served", 0),
-        "cancelled": stats.get("cancelled", 0),
+        "total_orders": len(orders),
+        "pending": len(
+            [o for o in orders if o.status == "Pending"]
+        ),
+        "preparing": len(
+            [o for o in orders if o.status == "Preparing"]
+        ),
+        "ready": len(
+            [o for o in orders if o.status == "Ready"]
+        ),
+        "completed": len(
+            [o for o in orders if o.status == "Served"]
+        ),
+        "cancelled": len(
+            [o for o in orders if o.status == "Cancelled"]
+        ),
     }

@@ -7,12 +7,21 @@ from pydantic import BaseModel
 # ==========================================
 
 class OrderBase(BaseModel):
+
     restaurant_id: int
+
     customer_id: int | None = None
+
     customer_name: str | None = None
+
     customer_email: str | None = None
+
     customer_phone: str | None = None
+
+    item_name: str
+
     total_amount: float
+
     status: str = "Pending"
 
 
@@ -32,6 +41,7 @@ class OrderUpdate(BaseModel):
     customer_name: str | None = None
     customer_email: str | None = None
     customer_phone: str | None = None
+    item_name: str | None = None
     total_amount: float | None = None
     status: str | None = None
 

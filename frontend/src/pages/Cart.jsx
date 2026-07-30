@@ -169,22 +169,24 @@ function Cart() {
       }
 
       const order = {
-        restaurant_id: restaurant.restaurant_id,
+  restaurant_id: restaurant.restaurant_id,
 
-        customer_id: Number(user.id),
+  customer_id: Number(user.id),
 
-        customer_name: user.name,
+  customer_name: user.name,
 
-        customer_email: user.email,
+  customer_email: user.email,
 
-        customer_phone: user.phone,
+  customer_phone: user.phone,
 
-        total_amount: Number(
-          total.toFixed(2)
-        ),
+  item_name: cartItems
+    .map((item) => item.name)
+    .join(", "),
 
-        status: "Pending",
-      };
+  total_amount: Number(total.toFixed(2)),
+
+  status: "Pending",
+};
 
       console.log("ORDER =", order);
 

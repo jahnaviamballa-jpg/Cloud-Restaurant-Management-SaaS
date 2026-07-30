@@ -15,49 +15,55 @@ router = APIRouter(
 )
 
 
-# =====================================================
-# Sales Report
-# GET /reports/sales
-# =====================================================
-@router.get("/sales")
+@router.get("/restaurants/{restaurant_id}/sales")
 def sales_report(
+    restaurant_id: int,
     db: Session = Depends(get_db),
 ):
-    return get_sales_report(db)
+    return get_sales_report(
+        db,
+        restaurant_id,
+    )
 
 
-# =====================================================
-# Inventory Report
-# GET /reports/inventory
-# =====================================================
-@router.get("/inventory")
+@router.get("/restaurants/{restaurant_id}/inventory")
 def inventory_report(
+    restaurant_id: int,
     db: Session = Depends(get_db),
 ):
-    return get_inventory_report(db)
+    return get_inventory_report(
+        db,
+        restaurant_id,
+    )
 
 
-# =====================================================
-# Order Report
-# GET /reports/orders
-# =====================================================
-@router.get("/orders")
+@router.get("/restaurants/{restaurant_id}/orders")
 def order_report(
+    restaurant_id: int,
     db: Session = Depends(get_db),
 ):
-    return get_order_report(db)
+    return get_order_report(
+        db,
+        restaurant_id,
+    )
 
 
-# =====================================================
-# Report Summary
-# GET /reports/summary
-# =====================================================
-@router.get("/summary")
+@router.get("/restaurants/{restaurant_id}/summary")
 def report_summary(
+    restaurant_id: int,
     db: Session = Depends(get_db),
 ):
     return {
-        "sales": get_sales_report(db),
-        "inventory": get_inventory_report(db),
-        "orders": get_order_report(db),
+        "sales": get_sales_report(
+            db,
+            restaurant_id,
+        ),
+        "inventory": get_inventory_report(
+            db,
+            restaurant_id,
+        ),
+        "orders": get_order_report(
+            db,
+            restaurant_id,
+        ),
     }

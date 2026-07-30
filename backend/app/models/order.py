@@ -63,7 +63,10 @@ class Order(Base):
     # =====================================================
     # Order Details
     # =====================================================
-
+    item_name = Column(
+        String(200),
+        nullable=False,
+    )
     total_amount = Column(
         Float,
         nullable=False,

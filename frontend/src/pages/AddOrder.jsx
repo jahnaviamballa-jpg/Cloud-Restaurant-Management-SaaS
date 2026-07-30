@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { createOrder } from "../api/orderApi";
-
+import { getRestaurantId } from "../utils/restaurant";
 function AddOrder() {
   const navigate = useNavigate();
 
@@ -12,6 +12,7 @@ function AddOrder() {
   customer_name: "",
   customer_email: "",
   customer_phone: "",
+  item_name: "",
   total_amount: "",
   status: "Pending",
 });
@@ -24,26 +25,30 @@ function AddOrder() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      setSaving(true);
+  try {
+    setSaving(true);
 
-      await createOrder({
-        ...order,
-        total_amount: Number(order.total_amount),
-      });
+    await createOrder({
+      restaurant_id: getRestaurantId(),
+      customer_name: order.customer_name,
+      customer_email: order.customer_email,
+      customer_phone: order.customer_phone,
+      item_name: order.item_name,
+      total_amount: Number(order.total_amount),
+      status: order.status,
+    });
 
-      alert("Order created successfully!");
-
-      navigate("/orders");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to create order.");
-    } finally {
-      setSaving(false);
-    }
-  };
+    alert("Order created successfully!");
+    navigate("/orders");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to create order.");
+  } finally {
+    setSaving(false);
+  }
+};
 
   const inputStyle = {
     width: "100%",
@@ -113,6 +118,15 @@ function AddOrder() {
               style={inputStyle}
               required
             />
+            <input
+  type="text"
+  name="item_name"
+  placeholder="Item Name"
+  value={order.item_name}
+  onChange={handleChange}
+  style={inputStyle}
+  required
+/>
             <input
   type="email"
   name="customer_email"

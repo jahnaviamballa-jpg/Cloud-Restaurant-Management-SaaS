@@ -55,14 +55,15 @@ def create_order(
         )
 
     new_order = Order(
-        restaurant_id=order.restaurant_id,
-        customer_id=order.customer_id,
-        customer_name=order.customer_name,
-        customer_email=order.customer_email,
-        customer_phone=order.customer_phone,
-        total_amount=order.total_amount,
-        status=order.status,
-    )
+    restaurant_id=order.restaurant_id,
+    customer_id=order.customer_id,
+    customer_name=order.customer_name,
+    customer_email=order.customer_email,
+    customer_phone=order.customer_phone,
+    item_name=order.item_name,
+    total_amount=order.total_amount,
+    status=order.status,
+)
 
     db.add(new_order)
     db.commit()

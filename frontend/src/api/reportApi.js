@@ -1,10 +1,16 @@
 import api from "./api";
+import { getRestaurantId } from "../utils/restaurant";
 
 // ===================================
 // Sales Report
 // ===================================
 export const getSalesReport = async () => {
-  const response = await api.get("/reports/sales");
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/reports/restaurants/${restaurantId}/sales`
+  );
+
   return response.data;
 };
 
@@ -12,7 +18,12 @@ export const getSalesReport = async () => {
 // Inventory Report
 // ===================================
 export const getInventoryReport = async () => {
-  const response = await api.get("/reports/inventory");
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/reports/restaurants/${restaurantId}/inventory`
+  );
+
   return response.data;
 };
 
@@ -20,14 +31,24 @@ export const getInventoryReport = async () => {
 // Order Report
 // ===================================
 export const getOrderReport = async () => {
-  const response = await api.get("/reports/orders");
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/reports/restaurants/${restaurantId}/orders`
+  );
+
   return response.data;
 };
 
 // ===================================
-// Summary
+// Summary Report
 // ===================================
 export const getSummaryReport = async () => {
-  const response = await api.get("/reports/summary");
+  const restaurantId = getRestaurantId();
+
+  const response = await api.get(
+    `/reports/restaurants/${restaurantId}/summary`
+  );
+
   return response.data;
 };
