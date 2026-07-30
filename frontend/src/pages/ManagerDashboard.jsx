@@ -14,6 +14,7 @@ import { getSalesReport } from "../api/reportApi";
 
 
 function ManagerDashboard() {
+  const navigate = useNavigate();
   useEffect(() => {
   const restaurant = getRestaurant();
 
@@ -24,7 +25,7 @@ function ManagerDashboard() {
 
   loadDashboard();
 }, []);
-  const navigate = useNavigate();
+  
 
   const [inventory, setInventory] = useState({
     total_items: 0,

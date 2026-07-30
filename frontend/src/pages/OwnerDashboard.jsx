@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import DashboardCard from "../components/DashboardCard";
-
+import {
+  getRestaurant,
+  getRestaurantId,
+} from "../utils/restaurant";
 import { getRestaurants } from "../api/restaurantApi";
 import {
   getSalesAnalytics,
@@ -11,6 +14,7 @@ import {
 } from "../api/analyticsApi";
 
 function OwnerDashboard() {
+  const navigate = useNavigate();
   useEffect(() => {
   const restaurant = getRestaurant();
 
@@ -21,7 +25,7 @@ function OwnerDashboard() {
 
   loadDashboard();
 }, []);
-  const navigate = useNavigate();
+ 
 
   const [restaurantCount, setRestaurantCount] = useState(0);
   const [sales, setSales] = useState(0);

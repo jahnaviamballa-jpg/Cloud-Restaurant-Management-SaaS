@@ -6,8 +6,12 @@ import {
   getOrderStats,
   getOrdersByRestaurant,
 } from "../api/orderApi";
-
+import {
+  getRestaurant,
+  getRestaurantId,
+} from "../utils/restaurant";
 function CustomerDashboard() {
+  const navigate = useNavigate();
   useEffect(() => {
   const restaurant = getRestaurant();
 
