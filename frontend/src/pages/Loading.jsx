@@ -44,7 +44,7 @@ function Loading() {
             lineHeight: "1.8",
           }}
         >
-          Preparing your restaurant dashboard.
+          Preparing your RestroVerse AI Dashboard.
           <br />
           Please wait a moment...
         </p>

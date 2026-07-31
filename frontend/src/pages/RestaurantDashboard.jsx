@@ -1,5 +1,5 @@
 function RestaurantDashboard() {
-  return <h1>Restaurant Dashboard</h1>;
+  return <h1>RestroVerse AI Dashboard</h1>;
 }
 
 export default RestaurantDashboard;
