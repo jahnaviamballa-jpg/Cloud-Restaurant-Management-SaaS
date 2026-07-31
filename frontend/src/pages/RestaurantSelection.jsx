@@ -387,6 +387,7 @@ function RestaurantSelection() {
           className="auth-card"
           style={{
             width: "100%",
+            maxWidth: "1000px",
             maxHeight: "760px",
           }}
         >
@@ -423,17 +424,19 @@ function RestaurantSelection() {
               Loading Restaurants...
             </h3>
           ) : (
-            <div
-              style={{
-                maxHeight: "560px",
-                overflowY: "auto",
-                display: "grid",
-                gridTemplateColumns:
-                  "repeat(auto-fit,minmax(280px,1fr))",
-                gap: "22px",
-                paddingRight: "8px",
-              }}
-            >
+           <div
+  style={{
+    maxHeight: "560px",
+    overflowY: "auto",
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "18px",
+    alignItems: "start",
+    justifyItems: "stretch",
+    gridAutoRows: "max-content",
+    padding: "4px",
+  }}
+>
                             {filteredRestaurants.map(
                 (restaurant) => {
                   const selected =
@@ -458,16 +461,17 @@ function RestaurantSelection() {
                           "translateY(0)";
                       }}
                       style={{
-                        background:
-                          "rgba(32,32,42,.95)",
-                        borderRadius: "18px",
-                        padding: "18px",
-                        border: selected
-                          ? "2px solid #22C55E"
-                          : "1px solid rgba(255,255,255,.08)",
-                        transition: ".3s",
-                        cursor: "pointer",
-                      }}
+  width: "100%",
+  background: "rgba(32,32,42,.95)",
+  borderRadius: "18px",
+  padding: "18px",
+  border: selected
+    ? "2px solid #22C55E"
+    : "1px solid rgba(255,255,255,.08)",
+  transition: ".3s",
+  cursor: "pointer",
+  boxSizing: "border-box",
+}}
                     >
                       {selected && (
                         <div

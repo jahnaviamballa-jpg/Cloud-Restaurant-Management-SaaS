@@ -109,3 +109,13 @@ export const getOrderStats = async () => {
 
   return response.data;
 };
+
+export const getRecommendations = async (
+  customerId
+) => {
+  const response = await api.get(
+    `/orders/recommendations/${customerId}`
+  );
+
+  return response.data;
+};

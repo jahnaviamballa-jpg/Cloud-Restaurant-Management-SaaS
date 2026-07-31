@@ -5,6 +5,7 @@ from fastapi import (
     status,
 )
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.database import get_db
 from app.models.order import Order
@@ -287,3 +288,28 @@ def delete_order(
     return {
         "message": "Order deleted successfully"
     }
+
+@router.get("/recommendations/{customer_id}")
+def get_recommendations(
+    customer_id: int,
+    db: Session = Depends(get_db),
+):
+    recommendations = (
+        db.query(
+            Order.item_name,
+            func.count(Order.item_name).label("count"),
+        )
+        .filter(Order.customer_id == customer_id)
+        .group_by(Order.item_name)
+        .order_by(func.count(Order.item_name).desc())
+        .limit(5)
+        .all()
+    )
+
+    return [
+        {
+            "item_name": item,
+            "count": count,
+        }
+        for item, count in recommendations
+    ]

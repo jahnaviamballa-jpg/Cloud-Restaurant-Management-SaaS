@@ -6,3 +6,5 @@ __pycache__/
 backend/.env
 frontend/.env
 venv/
+.vercel
+.env*

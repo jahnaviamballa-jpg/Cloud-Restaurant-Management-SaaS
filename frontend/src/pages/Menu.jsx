@@ -14,6 +14,10 @@ import {
   deleteMenuItem,
 } from "../api/menuApi";
 
+import {
+  getRecommendations,
+} from "../api/orderApi";
+
 function Menu() {
   const navigate = useNavigate();
 
@@ -54,7 +58,13 @@ function Menu() {
 
   const [category, setCategory] =
     useState("All");
-
+  const [
+  recommendations,
+  setRecommendations,
+] = useState([]);
+useEffect(() => {
+    console.log("Recommendations State:", recommendations);
+}, [recommendations]);
   const [cart, setCart] = useState(() => {
     if (!restaurantId) return [];
 
@@ -223,17 +233,49 @@ function Menu() {
   // =====================================
 
   useEffect(() => {
-    if (!restaurantId) {
-      alert("Please select a restaurant.");
+  if (!restaurantId) {
+    alert("Please select a restaurant.");
 
-      navigate("/restaurant-selection");
+    navigate(
+      "/restaurant-selection"
+    );
 
-      return;
+    return;
+  }
+
+  loadMenu();
+
+  if (isCustomer) {
+    loadRecommendations();
+    console.log(
+  "Recommendations Loaded"
+);
+  }
+}, []);
+
+   // =====================================
+// Load AI Recommendations
+// =====================================
+
+const loadRecommendations = async () => {
+  try {
+    if (!user.id) return;
+
+    const data = await getRecommendations(user.id);
+
+    console.log("Recommendation Response");
+    console.log(data);
+
+    if (Array.isArray(data)) {
+      console.table(data);
     }
 
-    loadMenu();
-  }, []);
-
+    setRecommendations(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error(err);
+    setRecommendations([]);
+  }
+};
   // =====================================
   // Global Search (TopBar)
   // =====================================
@@ -537,7 +579,163 @@ function Menu() {
               {filteredItems.length} Items
             </div>
           </div>
+          {/* ===================================== */}
+{/* AI Recommendations */}
+{/* ===================================== */}
 
+{isCustomer &&
+Array.isArray(recommendations) &&
+recommendations.length > 0 && (
+  <div
+  style={{
+    background: "rgba(20,20,28,.92)",
+    borderRadius: "22px",
+    padding: "28px",
+    marginBottom: "35px",
+    border: "1px solid rgba(255,255,255,.08)",
+    boxShadow: "0 10px 30px rgba(0,0,0,.25)",
+  }}
+>
+    <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "25px",
+  }}
+>
+  <div>
+    <h2
+      style={{
+        color: "white",
+        margin: 0,
+        fontSize: "28px",
+      }}
+    >
+      🤖 AI Recommended For You
+    </h2>
+
+    <p
+      style={{
+        color: "#BDBDBD",
+        marginTop: "8px",
+      }}
+    >
+      Personalized dishes based on your previous orders
+    </p>
+  </div>
+
+  <div
+    style={{
+      background:
+        "linear-gradient(90deg,#7C3AED,#F97316)",
+      color: "white",
+      padding: "10px 18px",
+      borderRadius: "25px",
+      fontWeight: "700",
+    }}
+  >
+    {recommendations.length} Items
+  </div>
+</div>
+
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns:
+  "repeat(auto-fit,minmax(320px,1fr))",
+        gap: "20px",
+        marginBottom: "40px",
+      }}
+    >
+      {recommendations.map((item) => (
+        <div
+          key={item.id}
+          style={{
+  background: "rgba(20,20,28,.92)",
+  borderRadius: "20px",
+  overflow: "hidden",
+  border: "2px solid rgba(124,58,237,.45)",
+  boxShadow:
+    "0 10px 25px rgba(0,0,0,.25)",
+}}
+        >
+          <h2
+  style={{
+    color: "white",
+    marginTop: "18px",
+    marginBottom: "10px",
+    fontSize: "22px",
+  }}
+>
+  {item.name || item.menu_name || item.item_name}
+</h2>
+
+<p
+  style={{
+    color: "#CFCFCF",
+    minHeight: "48px",
+    lineHeight: "24px",
+    marginBottom: "15px",
+  }}
+>
+  {item.description ||
+    "Freshly prepared delicious food recommended for you."}
+</p>
+
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "20px",
+  }}
+>
+  <h2
+    style={{
+      color: "#FACC15",
+      margin: 0,
+    }}
+  >
+    ₹{item.price}
+  </h2>
+
+  <span
+    style={{
+      background: "#2563EB",
+      color: "white",
+      padding: "6px 14px",
+      borderRadius: "20px",
+      fontSize: "13px",
+    }}
+  >
+    ⭐ AI Pick
+  </span>
+</div>
+
+<button
+  onClick={() => handleAddToCart(item)}
+  style={{
+    width: "100%",
+    padding: "14px",
+    border: "none",
+    borderRadius: "12px",
+    background:
+      "linear-gradient(90deg,#7C3AED,#F97316)",
+    color: "white",
+    fontWeight: "700",
+    cursor: "pointer",
+  }}
+>
+  🛒 Add to Cart
+</button>
+
+      
+        </div>
+      ))}
+    </div>
+  </div>
+)}
           {/* ===================================== */}
           {/* Menu Grid */}
           {/* ===================================== */}
@@ -555,7 +753,7 @@ function Menu() {
 
               return (
                 <div
-                  key={item.id}
+                  key={item.id || item.menu_id}
                   style={{
                     background: "rgba(20,20,28,.92)",
                     borderRadius: "20px",
@@ -682,7 +880,11 @@ function Menu() {
                         {!cartItem ? (
                           <button
                             onClick={() =>
-                              handleAddToCart(item)
+                              handleAddToCart({
+    ...item,
+    id: item.id || item.menu_id,
+    name: item.name || item.menu_name || item.item_name,
+})
                             }
                             style={{
                               width: "100%",
