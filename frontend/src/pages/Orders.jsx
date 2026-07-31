@@ -519,7 +519,9 @@ function Orders() {
                   <p style={{ color: "#D1D5DB" }}>
                     🆔 Order #{order.id}
                   </p>
-
+                  <p style={{ color: "#D1D5DB" }}>
+                     🍽 <strong>Item:</strong> {order.item_name || "Unknown Item"}
+                  </p>
                   <p style={{ color: "#D1D5DB" }}>
                     💰 ₹
                     {Number(
