@@ -168,39 +168,51 @@ useEffect(() => {
   // =====================================
 
   const handleAddToCart = (item) => {
-    const key = `cart_${restaurantId}`;
+  console.log("Received Item:", item);
+  console.log("STEP 1");
+  console.log(item);
 
-    let currentCart =
-      JSON.parse(
-        localStorage.getItem(key)
-      ) || [];
+  const key = `cart_${restaurantId}`;
 
-    const existing =
-      currentCart.find(
-        (food) => food.id === item.id
-      );
+  let currentCart =
+    JSON.parse(localStorage.getItem(key)) || [];
 
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      currentCart.push({
-        ...item,
-        quantity: 1,
-        restaurant_id: restaurantId,
-      });
-    }
+  console.log("STEP 2");
 
-    localStorage.setItem(
-      key,
-      JSON.stringify(currentCart)
+  const existing =
+    currentCart.find(
+      (food) => food.id === item.id
     );
 
-    setCart([...currentCart]);
+  console.log("STEP 3");
 
-    window.dispatchEvent(
-      new Event("cartUpdated")
-    );
-  };
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    currentCart.push({
+      ...item,
+      quantity: 1,
+      restaurant_id: restaurantId,
+    });
+  }
+
+  console.log("STEP 4", currentCart);
+
+  localStorage.setItem(
+    key,
+    JSON.stringify(currentCart)
+  );
+  console.log("Cart Saved:", currentCart);
+  console.log("STEP 5");
+
+  setCart([...currentCart]);
+
+  window.dispatchEvent(
+    new Event("cartUpdated")
+  );
+
+  console.log("STEP 6");
+};
 
   // =====================================
   // Cart Helper
@@ -648,18 +660,35 @@ recommendations.length > 0 && (
         marginBottom: "40px",
       }}
     >
-      {recommendations.map((item) => (
-        <div
-          key={item.id}
-          style={{
-  background: "rgba(20,20,28,.92)",
-  borderRadius: "20px",
-  overflow: "hidden",
-  border: "2px solid rgba(124,58,237,.45)",
-  boxShadow:
-    "0 10px 25px rgba(0,0,0,.25)",
-}}
-        >
+      {recommendations.map((item) => {
+
+  const cartItem = getCartItem(item.id);
+  console.log("Recommendation Cart Item:", cartItem);
+  return (
+
+    <div
+      key={item.id}
+      style={{
+        background: "rgba(20,20,28,.92)",
+        borderRadius: "20px",
+        overflow: "hidden",
+        border: "2px solid rgba(124,58,237,.45)",
+        boxShadow: "0 10px 25px rgba(0,0,0,.25)",
+      }}
+    >
+          <img
+  src={
+    item.image_url && item.image_url.trim() !== ""
+      ? item.image_url
+      : "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
+  }
+  alt={item.name}
+  style={{
+    width: "100%",
+    height: "220px",
+    objectFit: "cover",
+  }}
+/>
           <h2
   style={{
     color: "white",
@@ -713,26 +742,55 @@ recommendations.length > 0 && (
   </span>
 </div>
 
-<button
-  onClick={() => handleAddToCart(item)}
-  style={{
-    width: "100%",
-    padding: "14px",
-    border: "none",
-    borderRadius: "12px",
-    background:
-      "linear-gradient(90deg,#7C3AED,#F97316)",
-    color: "white",
-    fontWeight: "700",
-    cursor: "pointer",
-  }}
->
-  🛒 Add to Cart
-</button>
+{!cartItem ? (
+  <button
+    onClick={() => {
+      handleAddToCart({
+        ...item,
+        id: Number(item.id),
+        name: item.name,
+        price: Number(item.price),
+        image_url: item.image_url,
+        description: item.description,
+        category: item.category,
+        is_available: item.is_available,
+        is_veg: item.is_veg,
+      });
+    }}
+    style={{
+      width: "100%",
+      padding: "14px",
+      border: "none",
+      borderRadius: "12px",
+      background: "linear-gradient(90deg,#7C3AED,#F97316)",
+      color: "white",
+      fontWeight: "700",
+      cursor: "pointer",
+    }}
+  >
+    🛒 Add to Cart
+  </button>
+) : (
+  <button
+    onClick={() => navigate("/cart")}
+    style={{
+      width: "100%",
+      padding: "14px",
+      border: "none",
+      borderRadius: "12px",
+      background: "#16A34A",
+      color: "white",
+      fontWeight: "700",
+      cursor: "pointer",
+    }}
+  >
+    ✅ View Cart ({cartItem.quantity})
+  </button>
+)}
 
       
         </div>
-      ))}
+      );})}
     </div>
   </div>
 )}
@@ -750,7 +808,7 @@ recommendations.length > 0 && (
           >
                         {filteredItems.map((item) => {
               const cartItem = getCartItem(item.id);
-
+              console.log("Recommendation Cart Item:", cartItem);
               return (
                 <div
                   key={item.id || item.menu_id}
@@ -878,47 +936,49 @@ recommendations.length > 0 && (
                     {isCustomer ? (
                       <>
                         {!cartItem ? (
-                          <button
-                            onClick={() =>
-                              handleAddToCart({
-    ...item,
-    id: item.id || item.menu_id,
-    name: item.name || item.menu_name || item.item_name,
-})
-                            }
-                            style={{
-                              width: "100%",
-                              padding: "14px",
-                              border: "none",
-                              borderRadius: "12px",
-                              background:
-                                "linear-gradient(90deg,#7C3AED,#F97316)",
-                              color: "white",
-                              fontWeight: "700",
-                              cursor: "pointer",
-                            }}
-                          >
-                            🛒 Add to Cart
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() =>
-                              navigate("/cart")
-                            }
-                            style={{
-                              width: "100%",
-                              padding: "14px",
-                              border: "none",
-                              borderRadius: "12px",
-                              background: "#16A34A",
-                              color: "white",
-                              fontWeight: "700",
-                              cursor: "pointer",
-                            }}
-                          >
-                            ✅ View Cart ({cartItem.quantity})
-                          </button>
-                        )}
+  <button
+    onClick={() => {
+      console.log("BUTTON CLICKED");
+
+      handleAddToCart({
+        ...item,
+        id: item.id,
+        name: item.name,
+        image_url: item.image_url,
+        price: item.price,
+        description: item.description,
+      });
+    }}
+    style={{
+      width: "100%",
+      padding: "14px",
+      border: "none",
+      borderRadius: "12px",
+      background: "linear-gradient(90deg,#7C3AED,#F97316)",
+      color: "white",
+      fontWeight: "700",
+      cursor: "pointer",
+    }}
+  >
+    🛒 Add to Cart
+  </button>
+) : (
+  <button
+    onClick={() => navigate("/cart")}
+    style={{
+      width: "100%",
+      padding: "14px",
+      border: "none",
+      borderRadius: "12px",
+      background: "#16A34A",
+      color: "white",
+      fontWeight: "700",
+      cursor: "pointer",
+    }}
+  >
+    ✅ View Cart ({cartItem.quantity})
+  </button>
+)}
                       </>
                     ) : (
                       <div

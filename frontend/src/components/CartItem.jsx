@@ -4,47 +4,41 @@ function CartItem({
   decreaseQuantity,
   removeItem,
 }) {
+  console.log("Cart Item:", item);
+
   return (
     <div
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform =
-          "translateY(-5px)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform =
-          "translateY(0)";
-      }}
       style={{
         display: "flex",
-        alignItems: "center",
         justifyContent: "space-between",
+        alignItems: "center",
         background: "rgba(20,20,28,.92)",
         padding: "22px",
         marginBottom: "20px",
         borderRadius: "18px",
         border: "1px solid rgba(255,255,255,.08)",
-        backdropFilter: "blur(10px)",
         boxShadow: "0 12px 30px rgba(0,0,0,.30)",
-        transition: ".3s",
       }}
     >
+      {/* Left Side */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "15px",
+          gap: "20px",
         }}
       >
         <img
           src={
-            item.image ||
-            "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
+            item.image_url && item.image_url !== ""
+              ? item.image_url
+              : "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
           }
           alt={item.name}
           style={{
             width: "100px",
             height: "100px",
-            borderRadius: "15px",
+            borderRadius: "12px",
             objectFit: "cover",
           }}
         />
@@ -53,110 +47,81 @@ function CartItem({
           <h2
             style={{
               color: "white",
-              marginBottom: "10px",
+              marginBottom: "8px",
             }}
           >
             {item.name}
           </h2>
 
+          <p
+            style={{
+              color: "#CFCFCF",
+              marginBottom: "8px",
+            }}
+          >
+            {item.description}
+          </p>
+
           <h3
             style={{
-              color: "#F97316",
-              margin: 0,
+              color: "#FACC15",
             }}
           >
             ₹{item.price}
           </h3>
-
-          <p
-            style={{
-              color: "#BDBDBD",
-              marginTop: "10px",
-              fontSize: "15px",
-            }}
-          >
-            Freshly prepared with premium
-            ingredients.
-          </p>
         </div>
       </div>
 
-      <div style={{ textAlign: "center" }}>
+      {/* Right Side */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             gap: "12px",
+            alignItems: "center",
           }}
         >
           <button
-            onClick={() =>
-              decreaseQuantity(item.id)
-            }
-            style={{
-              width: "45px",
-              height: "45px",
-              borderRadius: "50%",
-              border: "none",
-              background: "#7C3AED",
-              color: "white",
-              fontSize: "22px",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
+            onClick={() => decreaseQuantity(item.id)}
           >
-            −
+            -
           </button>
 
           <span
             style={{
               color: "white",
-              fontSize: "18px",
-              fontWeight: "bold",
-              minWidth: "30px",
+              fontSize: "20px",
             }}
           >
             {item.quantity}
           </span>
 
           <button
-            onClick={() =>
-              increaseQuantity(item.id)
-            }
-            style={{
-              width: "45px",
-              height: "45px",
-              borderRadius: "50%",
-              border: "none",
-              background: "#F97316",
-              color: "white",
-              fontSize: "20px",
-              cursor: "pointer",
-            }}
+            onClick={() => increaseQuantity(item.id)}
           >
             +
           </button>
         </div>
 
-        <br />
-
         <button
-          onClick={() =>
-            removeItem(item.id)
-          }
+          onClick={() => removeItem(item.id)}
           style={{
-            marginTop: "18px",
-            padding: "10px 18px",
-            border: "none",
-            borderRadius: "10px",
+            marginTop: "15px",
             background: "#DC2626",
             color: "white",
-            fontWeight: "600",
+            border: "none",
+            padding: "10px 18px",
+            borderRadius: "8px",
             cursor: "pointer",
           }}
         >
-          🗑 Remove Item
+          Remove
         </button>
       </div>
     </div>
