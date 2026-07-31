@@ -101,7 +101,7 @@ function Sidebar() {
             fontWeight: "700",
           }}
         >
-          🍽 Cloud Restaurant
+          🍽 RestroVerse AI
         </h2>
 
         <p

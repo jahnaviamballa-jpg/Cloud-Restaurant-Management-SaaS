@@ -365,7 +365,7 @@ function RestaurantSelection() {
             Browse menus, place
             orders, reserve tables
             and enjoy a seamless
-            cloud restaurant
+            RestroVerse AI
             experience.
           </p>
 

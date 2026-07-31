@@ -171,7 +171,7 @@ function Topbar() {
             whiteSpace: "nowrap",
           }}
         >
-          🍽 Cloud Restaurant
+          🍽 RestroVerse AI
         </h2>
 
         <div

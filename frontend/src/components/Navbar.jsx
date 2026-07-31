@@ -153,7 +153,7 @@ WebkitTextFillColor:
 
 >
 
-🍽 Cloud Restaurant
+🍽 RestroVerse AI
 
 </h2>
 

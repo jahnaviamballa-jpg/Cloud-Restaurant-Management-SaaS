@@ -609,7 +609,7 @@ function PredictionDashboard() {
           </p>
 
           <p>
-            Cloud Restaurant Management SaaS
+            RestroVerse AI
           </p>
 
           <p>

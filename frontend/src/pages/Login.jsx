@@ -100,7 +100,7 @@ else {
   <div className="auth-page">
 
     <div className="auth-left">
-      <h1>Cloud Restaurant</h1>
+      <h1>RestroVerse AI</h1>
 
       <h2>Restaurant Management SaaS</h2>
 

@@ -2,7 +2,7 @@
 
 ## Project Name
 
-Cloud Restaurant Management SaaS
+RestroVerse AI
 
 ## Frontend URL
 

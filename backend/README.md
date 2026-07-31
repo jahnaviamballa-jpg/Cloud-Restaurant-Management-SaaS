@@ -1,4 +1,4 @@
-# Cloud Restaurant Management SaaS - Backend
+# RestroVerse AI - Backend
 
 ## Menu APIs
 

@@ -1,12 +1,12 @@
-# 🍽️ Cloud Restaurant Management SaaS
+# 🍽️  RestroVerse AI
 
-A cloud-based Restaurant Management Software as a Service (SaaS) platform developed using **React**, **FastAPI**, and **PostgreSQL**. The application enables restaurants to efficiently manage orders, menus, inventory, reservations, employees, analytics, and customer authentication through a modern web interface.
+A RestroVerse AI platform developed using **React**, **FastAPI**, and **PostgreSQL**. The application enables restaurants to efficiently manage orders, menus, inventory, reservations, employees, analytics, and customer authentication through a modern web interface.
 
 ---
 
 # 📖 Project Overview
 
-Cloud Restaurant Management SaaS is a full-stack web application designed to simplify restaurant operations using cloud technologies. It supports restaurant management, order processing, menu management, inventory tracking, employee management, customer reservations, authentication, analytics, and AI-based prediction modules.
+RestroVerse AI is a full-stack web application designed to simplify restaurant operations using cloud technologies. It supports restaurant management, order processing, menu management, inventory tracking, employee management, customer reservations, authentication, analytics, and AI-based prediction modules.
 
 ---
 

@@ -23,7 +23,7 @@ Base.metadata.create_all(bind=engine)
 # FastAPI App
 # ==========================
 app = FastAPI(
-    title="Cloud Restaurant Management SaaS",
+    title=" RestroVerse AI",
     version="1.0.0",
 )
 
@@ -91,5 +91,5 @@ app.include_router(employee.router)
 @app.get("/")
 def root():
     return {
-        "message": "Cloud Restaurant Management SaaS Backend Running Successfully"
+        "message": "RestroVerse AI Backend Running Successfully"
     }

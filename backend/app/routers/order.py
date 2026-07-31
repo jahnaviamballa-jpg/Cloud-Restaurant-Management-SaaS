@@ -10,7 +10,7 @@ from sqlalchemy import func
 from app.database import get_db
 from app.models.order import Order
 from app.models.restaurant import Restaurant
-
+from app.models.menu import Menu
 from app.schemas.order_schema import (
     OrderCreate,
     OrderUpdate,
@@ -294,10 +294,10 @@ def get_recommendations(
     customer_id: int,
     db: Session = Depends(get_db),
 ):
-    recommendations = (
+    ordered_items = (
         db.query(
             Order.item_name,
-            func.count(Order.item_name).label("count"),
+            func.count(Order.item_name).label("count")
         )
         .filter(Order.customer_id == customer_id)
         .group_by(Order.item_name)
@@ -306,10 +306,27 @@ def get_recommendations(
         .all()
     )
 
-    return [
-        {
-            "item_name": item,
-            "count": count,
-        }
-        for item, count in recommendations
-    ]
+    recommendations = []
+
+    for item_name, count in ordered_items:
+
+        menu_item = (
+            db.query(Menu)
+            .filter(Menu.name == item_name)
+            .first()
+        )
+
+        if menu_item:
+            recommendations.append({
+                "id": menu_item.id,
+                "name": menu_item.name,
+                "description": menu_item.description,
+                "price": menu_item.price,
+                "image_url": menu_item.image_url,
+                "category": menu_item.category,
+                "is_veg": menu_item.is_veg,
+                "is_available": menu_item.is_available,
+                "count": count,
+            })
+
+    return recommendations

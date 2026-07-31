@@ -39,7 +39,7 @@ function Home() {
             lineHeight: "1.2",
           }}
         >
-          🍽️ Cloud Restaurant Management SaaS
+          🍽️ RestroVerse AI
         </h1>
 
         <p
@@ -209,7 +209,7 @@ function Home() {
             color: "#9CA3AF",
           }}
         >
-          © 2026 Cloud Restaurant Management SaaS Platform
+          © 2026 RestroVerse AI Platform
         </div>
       </div>
     </div>
