@@ -3,20 +3,26 @@ function AIAlertCard({
   recommendation,
   severity,
   quantity,
+  stockOutDate,
+  confidence,
 }) {
   const color =
     severity === "Critical"
       ? "#EF4444"
-      : severity === "Warning"
+      : severity === "High"
+      ? "#F97316"
+      : severity === "Medium"
       ? "#F59E0B"
       : "#22C55E";
 
   const icon =
     severity === "Critical"
       ? "🚨"
-      : severity === "Warning"
-      ? "⚠️"
-      : "✅";
+      : severity === "High"
+      ? "🔴"
+      : severity === "Medium"
+      ? "🟠"
+      : "🟢";
 
   return (
     <div
@@ -35,31 +41,48 @@ function AIAlertCard({
           marginBottom: "10px",
         }}
       >
-        {icon} {severity}
+        {icon} {severity} Risk
       </h3>
 
       <h2
         style={{
           color: "white",
-          marginBottom: "12px",
+          marginBottom: "15px",
         }}
       >
         {item}
       </h2>
 
       <p style={{ color: "#D1D5DB" }}>
-        Current Stock :
-        <strong> {quantity}</strong>
+        📦 Current Stock:
+        <strong> {quantity} Units</strong>
       </p>
 
-      <p style={{ color: "#E5E7EB" }}>
-        Recommendation :
+      <p style={{ color: "#D1D5DB" }}>
+        📅 Predicted Stock-out:
+        <strong> {stockOutDate}</strong>
+      </p>
+
+      <p style={{ color: "#D1D5DB" }}>
+        🤖 AI Confidence:
+        <strong> {confidence}</strong>
       </p>
 
       <p
         style={{
-          color: color,
+          color: "#E5E7EB",
+          marginTop: "15px",
+          marginBottom: "5px",
+        }}
+      >
+        Recommended Action
+      </p>
+
+      <p
+        style={{
+          color,
           fontWeight: "bold",
+          fontSize: "16px",
         }}
       >
         {recommendation}
